@@ -49,4 +49,5 @@ SliderControlView > #FieldsPanel > FloatField {
     margin-right: 0;
     flex-direction: row;
     flex-grow: 1;
+    width: 40;
 }
