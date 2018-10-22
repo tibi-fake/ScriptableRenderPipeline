@@ -30,7 +30,8 @@ float3 GetFogColor(PositionInputs posInput)
         return  float3(0.0, 0.0, 0.0);
 }
 
-// Returns fog color in rgb and fog factor in alpha.
+// Returns fog color in rgb and fog factor (opacity) in alpha.
+// The color is premultiplied by alpha.
 float4 EvaluateAtmosphericScattering(PositionInputs posInput)
 {
     float3 fogColor = 0;
@@ -48,6 +49,7 @@ float4 EvaluateAtmosphericScattering(PositionInputs posInput)
         {
             fogColor = GetFogColor(posInput);
             fogFactor = _FogDensity * saturate((posInput.linearDepth - _LinearFogStart) * _LinearFogOneOverRange) * saturate((_LinearFogHeightEnd - GetAbsolutePositionWS(posInput.positionWS).y) * _LinearFogHeightOneOverRange);
+            fogColor *= fogFactor;
             break;
         }
         case FOGTYPE_EXPONENTIAL:
@@ -56,6 +58,7 @@ float4 EvaluateAtmosphericScattering(PositionInputs posInput)
             float distance = length(GetWorldSpaceViewDir(posInput.positionWS));
             float fogHeight = max(0.0, GetAbsolutePositionWS(posInput.positionWS).y - _ExpFogBaseHeight);
             fogFactor = _FogDensity * TransmittanceHomogeneousMedium(_ExpFogHeightAttenuation, fogHeight) * (1.0f - TransmittanceHomogeneousMedium(1.0f / _ExpFogDistance, distance));
+            fogColor *= fogFactor;
             break;
         }
         case FOGTYPE_VOLUMETRIC:
@@ -71,8 +74,8 @@ float4 EvaluateAtmosphericScattering(PositionInputs posInput)
                                                      _VBufferDepthDecodingParams,
                                                      true, true);
 
+            fogColor  = volFog.rgb; // Pre-multiplied by design
             fogFactor = volFog.a;
-            fogColor  = volFog.rgb * min(rcp(fogFactor), FLT_MAX); // Un-premultiply, clamp to avoid (0 * INF = NaN)
             break;
         }
     }

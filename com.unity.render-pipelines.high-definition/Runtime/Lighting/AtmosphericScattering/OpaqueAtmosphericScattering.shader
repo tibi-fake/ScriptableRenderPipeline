@@ -47,7 +47,7 @@ Shader "Hidden/HDRenderPipeline/OpaqueAtmosphericScattering"
                 posInput.positionWS = GetCurrentViewPosition() + viewDirection;
             }
 
-            return EvaluateAtmosphericScattering(posInput);
+            return EvaluateAtmosphericScattering(posInput); // Premultiplied alpha
         }
 
         float4 Frag(Varyings input) : SV_Target
@@ -69,7 +69,7 @@ Shader "Hidden/HDRenderPipeline/OpaqueAtmosphericScattering"
         // 0: NOMSAA
         Pass
         {
-            Cull Off ZTest  Always ZWrite Off Blend  SrcAlpha OneMinusSrcAlpha
+            Cull Off ZTest  Always ZWrite Off Blend One OneMinusSrcAlpha // Premultiplied alpha
 
             HLSLPROGRAM
                 #pragma vertex Vert
@@ -80,7 +80,7 @@ Shader "Hidden/HDRenderPipeline/OpaqueAtmosphericScattering"
         // 1: MSAA
         Pass
         {
-            Cull Off ZTest  Always ZWrite Off Blend  SrcAlpha OneMinusSrcAlpha
+            Cull Off ZTest  Always ZWrite Off Blend One OneMinusSrcAlpha // Premultiplied alpha
 
             HLSLPROGRAM
                 #pragma vertex Vert
