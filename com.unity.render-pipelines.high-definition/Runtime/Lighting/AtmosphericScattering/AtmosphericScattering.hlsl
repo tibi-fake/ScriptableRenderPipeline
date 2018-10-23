@@ -72,7 +72,7 @@ float4 EvaluateAtmosphericScattering(PositionInputs posInput)
                                                      _VBufferUvScaleAndLimit.zw,
                                                      _VBufferDepthEncodingParams,
                                                      _VBufferDepthDecodingParams,
-                                                     true, true);
+                                                     true);
 
             fogColor  = volFog.rgb; // Pre-multiplied by design
             fogFactor = volFog.a;
