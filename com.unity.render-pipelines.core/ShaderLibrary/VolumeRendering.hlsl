@@ -61,34 +61,49 @@ real ComputeHeightFogMultiplier(real height, real baseHeight, real2 heightExpone
 real OpticalDepthHeightFog(real baseExtinction, real baseHeight, real2 heightExponents,
                            real cosZenith, real startHeight, real intervalLength)
 {
-    // Height fog is composed of two slices:
-    // - constant fog below 'baseHeight'   : d = k * t
-    // - exponential fog above 'baseHeight': d = Integrate[k * e^(-a * (h_0 + z * x)) dx, {x, 0, t}]
+    // Height fog is composed of two slices of optical depth:
+    // - homogeneous fog below 'baseHeight': d = k * t
+    // - exponential fog above 'baseHeight': d = Integrate[k * e^(-(h_0 + Z * x) / H) dx, {x, 0, t}]
 
-    real rcpAbsCos = rcp(max(abs(cosZenith), FLT_EPS));
+    real H          = heightExponents.y;
+    real rcpH       = heightExponents.x;
+    real Z          = cosZenith;
+    real absZ       = max(abs(cosZenith), FLT_EPS);
+    real rcpAbsZ    = rcp(absZ);
 
-    real endHeight = startHeight + intervalLength * cosZenith;
-    real minHeight = min(startHeight, endHeight);
-    real maxHeight = max(startHeight, endHeight);
+    real endHeight  = startHeight + intervalLength * Z;
+    real minHeight  = min(startHeight, endHeight);
 
-    real constantFogDistance = clamp((baseHeight - minHeight) * rcpAbsCos, 0, intervalLength);
+    startHeight     = max(startHeight - baseHeight, 0);
 
-    minHeight = max(0, minHeight - baseHeight);
-    maxHeight = max(0, maxHeight - baseHeight);
+    real homFogDist = clamp((baseHeight - minHeight) * rcpAbsZ, 0, intervalLength);
+    real expFogDist = intervalLength - homFogDist;
+    real expFogMult = exp(-startHeight * rcpH) * (abs(1 - exp(-expFogDist * absZ * rcpH)) * rcpAbsZ * H);
 
-    real heightFogFactor  = abs(exp(-heightExponents.x * maxHeight) - exp(-heightExponents.x * minHeight));
-         heightFogFactor *= rcpAbsCos * heightExponents.y;
-
-    return baseExtinction * (constantFogDistance + heightFogFactor);
+    return baseExtinction * (homFogDist + expFogMult);
 }
 
 // This version of the function assumes the interval of infinite length.
 real OpticalDepthHeightFog(real baseExtinction, real baseHeight, real2 heightExponents,
                            real cosZenith, real startHeight)
 {
-    // TODO: optimize.
-    return OpticalDepthHeightFog(baseExtinction, baseHeight, heightExponents,
-                                 cosZenith, startHeight, rcp(FLT_EPS));
+    real intervalLength = rcp(FLT_EPS);
+
+    real H          = heightExponents.y;
+    real rcpH       = heightExponents.x;
+    real Z          = cosZenith;
+    real absZ       = max(abs(cosZenith), FLT_EPS);
+    real rcpAbsZ    = rcp(absZ);
+
+    real endHeight  = startHeight + intervalLength * Z;
+    real minHeight  = min(startHeight, endHeight);
+
+    startHeight     = max(startHeight - baseHeight, 0);
+
+    real homFogDist = max((baseHeight - minHeight) * rcpAbsZ, 0);
+    real expFogMult = exp(-startHeight * rcpH) * (rcpAbsZ * H);
+
+    return baseExtinction * (homFogDist + expFogMult);
 }
 
 real IsotropicPhaseFunction()
@@ -154,6 +169,7 @@ void ImportanceSampleHomogeneousMedium(real rndVal, real extinction, real interv
 {
     // pdf    = extinction * exp(extinction * (intervalLength - t)) / (exp(intervalLength * extinction) - 1)
     // pdf    = extinction * exp(-extinction * t) / (1 - exp(-extinction * intervalLength))
+    // weight = Transmittance(t) / pdf
     // weight = exp(-extinction * t) / pdf
     // weight = (1 - exp(-extinction * intervalLength)) / extinction
     // weight = OpacityFromOpticalDepth(extinction * intervalLength) / extinction
