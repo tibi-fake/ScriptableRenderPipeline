@@ -11,6 +11,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             UseInfluenceVolume,
             MergeEditors,
             AddCaptureSettingsAndFrameSettings,
+            ModeAndTextures,
             ProbeSettings
         }
 
@@ -19,7 +20,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 MigrationStep.New(Version.UseInfluenceVolume, (HDAdditionalReflectionData t) =>
                 {
                     t.influenceVolume.boxSize = t.reflectionProbe.size;
-#pragma warning disable CS0618 // Type or member is obsolete
+#pragma warning disable 618
                     t.influenceVolume.sphereRadius = t.influenceSphereRadius;
                     t.influenceVolume.shape = t.influenceShape; //must be done after each size transfert
                     t.influenceVolume.boxBlendDistancePositive = t.blendDistancePositive;
@@ -28,7 +29,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                     t.influenceVolume.boxBlendNormalDistanceNegative = t.blendNormalDistanceNegative;
                     t.influenceVolume.boxSideFadePositive = t.boxSideFadePositive;
                     t.influenceVolume.boxSideFadeNegative = t.boxSideFadeNegative;
-#pragma warning restore CS0618 // Type or member is obsolete
+#pragma warning restore 618
                     //Note: former editor parameters will be recreated as if non existent.
                     //User will lose parameters corresponding to non used mode between simplified and advanced
                 }),
@@ -40,7 +41,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 }),
                 MigrationStep.New(Version.AddCaptureSettingsAndFrameSettings, (HDAdditionalReflectionData t) =>
                 {
-#pragma warning disable CS0618 // Type or member is obsolete
+#pragma warning disable 618
                     t.m_ObsoleteCaptureSettings.shadowDistance = t.reflectionProbe.shadowDistance;
                     t.m_ObsoleteCaptureSettings.cullingMask = t.reflectionProbe.cullingMask;
 #if UNITY_EDITOR //m_UseOcclusionCulling is not exposed in c# !
@@ -49,18 +50,24 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 #endif
                     t.m_ObsoleteCaptureSettings.nearClipPlane = t.reflectionProbe.nearClipPlane;
                     t.m_ObsoleteCaptureSettings.farClipPlane = t.reflectionProbe.farClipPlane;
-#pragma warning restore CS0618 // Type or member is obsolete
+#pragma warning restore 618
+                }),
+                MigrationStep.New(Version.ModeAndTextures, (HDAdditionalReflectionData t) =>
+                {
+                    t.mode = (ProbeSettings.Mode)t.reflectionProbe.mode;
+                    t.SetTexture(ProbeSettings.Mode.Baked, t.reflectionProbe.bakedTexture);
+                    t.SetTexture(ProbeSettings.Mode.Custom, t.reflectionProbe.customBakedTexture);
                 }),
                 MigrationStep.New(Version.ProbeSettings, (HDAdditionalReflectionData t) =>
                 {
-#pragma warning disable CS0618 // Type or member is obsolete
+#pragma warning disable 618
                     // TODO: shadow distance is not yet handled
                     // ?? = t.m_ObsoleteCaptureSettings.shadowDistance;
                     t.m_ProbeSettings.camera.culling.cullingMask = t.m_ObsoleteCaptureSettings.cullingMask;
                     t.m_ProbeSettings.camera.culling.useOcclusionCulling = t.m_ObsoleteCaptureSettings.useOcclusionCulling;
                     t.m_ProbeSettings.camera.frustum.nearClipPlane = t.m_ObsoleteCaptureSettings.nearClipPlane;
                     t.m_ProbeSettings.camera.frustum.farClipPlane = t.m_ObsoleteCaptureSettings.farClipPlane;
-#pragma warning restore CS0618 // Type or member is obsolete
+#pragma warning restore 618
                 })
             );
 

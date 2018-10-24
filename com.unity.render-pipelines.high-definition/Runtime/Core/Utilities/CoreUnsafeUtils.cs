@@ -349,5 +349,20 @@ namespace UnityEngine.Experimental.Rendering
                 }
             }
         }
+
+        public static unsafe bool HaveDuplicates(int[] arr)
+        {
+            int* copy = stackalloc int[arr.Length];
+            arr.CopyTo<int>(copy, arr.Length);
+            QuickSort<int>(arr.Length, copy);
+            for (int i = arr.Length - 1; i > 0; --i)
+            {
+                if (UnsafeUtility.ReadArrayElement<int>(copy, i).CompareTo(UnsafeUtility.ReadArrayElement<int>(copy, i - 1)) == 0)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

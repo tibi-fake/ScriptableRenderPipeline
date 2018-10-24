@@ -150,7 +150,11 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUI.BeginChangeCheck();
-                CoreEditorUtils.DrawVector6(faceFadeContent, d.editorAdvancedModeFaceFadePositive, d.editorAdvancedModeFaceFadeNegative, Vector3.zero, Vector3.one, HDReflectionProbeEditor.k_handlesColor);
+                var positive = d.editorAdvancedModeFaceFadePositive.vector3Value;
+                var negative = d.editorAdvancedModeFaceFadeNegative.vector3Value;
+                CoreEditorUtils.DrawVector6(faceFadeContent, ref positive, ref negative, Vector3.zero, Vector3.one, HDReflectionProbeEditor.k_HandlesColor);
+                d.editorAdvancedModeFaceFadePositive.vector3Value = positive;
+                d.editorAdvancedModeFaceFadeNegative.vector3Value = negative;
                 if (EditorGUI.EndChangeCheck())
                 {
                     d.boxSideFadePositive.vector3Value = d.editorAdvancedModeFaceFadePositive.vector3Value;
@@ -180,10 +184,14 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
                 EditorGUI.BeginChangeCheck();
                 blendDistancePositive.vector3Value = editorAdvancedModeBlendDistancePositive.vector3Value;
                 blendDistanceNegative.vector3Value = editorAdvancedModeBlendDistanceNegative.vector3Value;
+                var positive = blendDistancePositive.vector3Value;
+                var negative = blendDistanceNegative.vector3Value;
                 CoreEditorUtils.DrawVector6(
                     content,
-                    blendDistancePositive, blendDistanceNegative, Vector3.zero, maxBlendDistance, HDReflectionProbeEditor.k_handlesColor);
-                if(EditorGUI.EndChangeCheck())
+                    ref positive, ref negative, Vector3.zero, maxBlendDistance, HDReflectionProbeEditor.k_HandlesColor);
+                blendDistancePositive.vector3Value = positive;
+                blendDistanceNegative.vector3Value = negative;
+                if (EditorGUI.EndChangeCheck())
                 {
                     editorAdvancedModeBlendDistancePositive.vector3Value = blendDistancePositive.vector3Value;
                     editorAdvancedModeBlendDistanceNegative.vector3Value = blendDistanceNegative.vector3Value;

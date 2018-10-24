@@ -18,16 +18,6 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
             ShowInfluenceHandle = 1 << 3
         }
 
-        static readonly Color[] k_HandleColors = new Color[]
-        {
-            HDReflectionProbeEditor.k_handlesColor[0][0],
-            HDReflectionProbeEditor.k_handlesColor[0][1],
-            HDReflectionProbeEditor.k_handlesColor[0][2],
-            HDReflectionProbeEditor.k_handlesColor[1][0],
-            HDReflectionProbeEditor.k_handlesColor[1][1],
-            HDReflectionProbeEditor.k_handlesColor[1][2]
-        };
-
         EditorPrefBoolFlags<Flag> m_FlagStorage = new EditorPrefBoolFlags<Flag>("InfluenceVolumeUI");
 
         public HierarchicalBox boxBaseHandle;
@@ -44,13 +34,13 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
         public InfluenceVolumeUI()
         {
             boxBaseHandle = new HierarchicalBox(
-                HDReflectionProbeEditor.k_GizmoThemeColorExtent, k_HandleColors
+                HDReflectionProbeEditor.k_GizmoThemeColorExtent, HDReflectionProbeEditor.k_HandlesColor
             );
             boxInfluenceHandle = new HierarchicalBox(
-                HDReflectionProbeEditor.k_GizmoThemeColorInfluenceBlend, k_HandleColors, container: boxBaseHandle
+                HDReflectionProbeEditor.k_GizmoThemeColorInfluenceBlend, HDReflectionProbeEditor.k_HandlesColor, container: boxBaseHandle
             );
             boxInfluenceNormalHandle = new HierarchicalBox(
-                HDReflectionProbeEditor.k_GizmoThemeColorInfluenceNormalBlend, k_HandleColors, container: boxBaseHandle
+                HDReflectionProbeEditor.k_GizmoThemeColorInfluenceNormalBlend, HDReflectionProbeEditor.k_HandlesColor, container: boxBaseHandle
             );
         }
 

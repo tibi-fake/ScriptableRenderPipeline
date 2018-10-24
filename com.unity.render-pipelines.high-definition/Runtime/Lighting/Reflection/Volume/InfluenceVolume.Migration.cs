@@ -17,9 +17,9 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             {
                 if (i.shape == InfluenceShape.Sphere)
                 {
-#pragma warning disable CS0618
+#pragma warning disable 618
                     i.m_ObsoleteOffset = i.m_ObsoleteSphereBaseOffset;
-#pragma warning restore CS0618
+#pragma warning restore 618
                 }
             })
         );

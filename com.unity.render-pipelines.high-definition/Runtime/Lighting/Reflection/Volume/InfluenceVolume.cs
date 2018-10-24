@@ -133,10 +133,10 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 case InfluenceShape.Sphere:
                     return new BoundingSphere(position, sphereRadius);
                 case InfluenceShape.Box:
-                    {
-                        var radius = Mathf.Max(boxSize.x, Mathf.Max(boxSize.y, boxSize.z));
-                        return new BoundingSphere(position, radius);
-                    }
+                {
+                    var radius = Mathf.Max(boxSize.x, Mathf.Max(boxSize.y, boxSize.z));
+                    return new BoundingSphere(position, radius);
+                }
             }
         }
 
@@ -148,9 +148,9 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 case InfluenceShape.Sphere:
                     return new Bounds(position, Vector3.one * sphereRadius);
                 case InfluenceShape.Box:
-                    {
-                        return new Bounds(position, boxSize);
-                    }
+                {
+                    return new Bounds(position, boxSize);
+                }
             }
         }
 
@@ -203,13 +203,13 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         }
 
         Vector3 GetExtents(InfluenceShape shape)
-        {
-            switch (shape)
             {
-                default:
-                case InfluenceShape.Box:
+                switch (shape)
+                {
+                    default:
+                    case InfluenceShape.Box:
                     return boxSize * 0.5f;
-                case InfluenceShape.Sphere:
+                    case InfluenceShape.Sphere:
                     return sphereRadius * Vector3.one;
             }
         }

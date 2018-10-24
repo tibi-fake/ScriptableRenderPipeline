@@ -104,7 +104,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
                 if (renderingPath != HDAdditionalCameraData.RenderingPath.UseGraphicsSettings)
                 {
                     // TODO: place it in static cache
-                    var drawer = FrameSettingsUI.Inspector(true, false);
+                    var drawer = FrameSettingsUI.Inspector(true);
                     drawer.Draw(s.frameSettings, d.frameSettings, o);
                 }
             }
