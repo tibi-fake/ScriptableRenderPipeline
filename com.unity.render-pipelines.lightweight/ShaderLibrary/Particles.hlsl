@@ -62,11 +62,11 @@ half CameraFade(float near, float far, float4 projection)
 // Alpha blend and test - returns the alpha value based on the the materials settings
 half AlphaBlendAndTest(half alpha, half cutoff)
 {
-#if defined(_ALPHABLEND_ON) || defined(_ALPHAPREMULTIPLY_ON) || defined(_ALPHAOVERLAY_ON)
+//#if defined(_ALPHABLEND_ON) || defined(_ALPHAPREMULTIPLY_ON) || defined(_ALPHAOVERLAY_ON)
     half result = alpha;
-#else
-    half result = 1.0h;
-#endif
+//#else
+    //half result = 1.0h;
+//#endif
     AlphaDiscard(alpha, cutoff, 0.0001h);
 
     return result;

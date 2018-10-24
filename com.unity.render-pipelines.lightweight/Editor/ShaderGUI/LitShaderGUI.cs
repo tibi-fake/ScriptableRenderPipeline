@@ -20,6 +20,8 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
 
         protected class StylesLit
         {
+            public static GUIContent workflowModeText = new GUIContent("Workflow Mode", "SelectWorkflow");
+            
             public static GUIContent specularMapText = new GUIContent("Specular Map", "Specular (RGB) and Smoothness (A)");
             public static GUIContent metallicMapText = new GUIContent("Metallic Map", "Metallic (R) and Smoothness (A)");
             public static GUIContent smoothnessText = new GUIContent("Smoothness", "Smoothness value");
@@ -33,7 +35,6 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
             public static GUIContent fixNow = new GUIContent("Fix now");
 
             public static string surfaceInputs = "Surface Inputs";
-            public static string workflowModeText = "Workflow Mode";
             public static readonly string[] workflowNames = Enum.GetNames(typeof(WorkflowMode));
             public static readonly string[] metallicSmoothnessChannelNames = {"Metallic Alpha", "Albedo Alpha"};
             public static readonly string[] specularSmoothnessChannelNames = {"Specular Alpha", "Albedo Alpha"};
@@ -117,7 +118,6 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
             // Detect any changes to the material
             EditorGUI.BeginChangeCheck();
             {
-                //DoAlbedoArea();
                 DoMetallicSpecularArea();
                 DoNormalArea();
 
@@ -236,7 +236,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
             int prevIndentLevel = EditorGUI.indentLevel;
             EditorGUI.indentLevel = 3;
             if (smoothnessMapChannel != null)
-                DoPopup(StylesLit.smoothnessMapChannelText.text, smoothnessMapChannel, metallicSpecSmoothnessChannelName);
+                DoPopup(StylesLit.smoothnessMapChannelText, smoothnessMapChannel, metallicSpecSmoothnessChannelName);
             EditorGUI.indentLevel = prevIndentLevel;
         }
 

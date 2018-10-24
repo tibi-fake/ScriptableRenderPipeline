@@ -107,7 +107,7 @@ namespace UnityEditor
             }
             EditorGUILayout.EndFoldoutHeaderGroup();
             StoreHeaderState(surfaceState, 0);
-            
+
             var inputState = EditorGUILayout.BeginFoldoutHeaderGroup(GetHeaderState(1), Styles.SurfaceInputs);
             if (inputState)
             {
@@ -124,6 +124,8 @@ namespace UnityEditor
             }
             EditorGUILayout.EndFoldoutHeaderGroup();
             StoreHeaderState(advanced, 2);
+
+            DrawAdditionalFoldouts(material);
 
             MaterialChanged(material);
         }
@@ -151,9 +153,9 @@ namespace UnityEditor
 
         public virtual void DrawSurfaceOptions(Material material)
         {
-            DoPopup(Styles.surfaceType.text, surfaceTypeProp, Enum.GetNames(typeof(SurfaceType)));
+            DoPopup(Styles.surfaceType, surfaceTypeProp, Enum.GetNames(typeof(SurfaceType)));
             if ((SurfaceType)material.GetFloat("_Surface") == SurfaceType.Transparent)
-                DoPopup(Styles.blendingMode.text, blendModeProp, Enum.GetNames(typeof(BlendMode)));
+                DoPopup(Styles.blendingMode, blendModeProp, Enum.GetNames(typeof(BlendMode)));
 
             EditorGUI.BeginChangeCheck();
             var culling = (Culling)cullingProp.floatValue;
@@ -245,6 +247,11 @@ namespace UnityEditor
             }
         }
 
+        public virtual void DrawAdditionalFoldouts(Material material)
+        {
+            
+        }
+
         public void DrawBaseTileOffset()
         {
             materialEditor.TextureScaleOffsetProperty(baseMapProp);
@@ -321,7 +328,7 @@ namespace UnityEditor
             }
         }
 
-        protected void DoPopup(string label, MaterialProperty property, string[] options)
+        protected void DoPopup(GUIContent label, MaterialProperty property, string[] options)
         {
             if (property == null)
                 throw new ArgumentNullException("property");
@@ -333,7 +340,7 @@ namespace UnityEditor
             mode = EditorGUILayout.Popup(label, (int)mode, options);
             if (EditorGUI.EndChangeCheck())
             {
-                materialEditor.RegisterPropertyChangeUndo(label);
+                materialEditor.RegisterPropertyChangeUndo(label.text);
                 property.floatValue = (float)mode;
             }
 
@@ -369,7 +376,7 @@ namespace UnityEditor
                 bitMask = EditorPrefs.GetInt(m_HeaderStateKey);
             }
 
-            var headerState = (bitMask & (1 << index+1)) != 0;
+            var headerState = (bitMask & (1 << index + 1)) != 0;
             
             return headerState;
         }

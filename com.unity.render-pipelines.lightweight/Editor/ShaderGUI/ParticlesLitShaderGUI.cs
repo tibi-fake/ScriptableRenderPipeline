@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 
 namespace UnityEditor.Experimental.Rendering.LightweightPipeline
 {
-    internal class ParticlesLitShaderGUI : ShaderGUI
+    internal class ParticlesLitShaderGUI : BaseShaderGUI
     {
-        public enum BlendMode
+/*        public enum BlendMode
         {
             Opaque,
             Cutout,
@@ -16,7 +17,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
             Additive,
             Subtractive,
             Modulate
-        }
+        }*/
 
         public enum FlipbookMode
         {
@@ -34,7 +35,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
             Difference
         }
 
-        private static class Styles
+        private static class StylesParticle
         {
             public static GUIContent albedoText = new GUIContent("Albedo", "Albedo (RGB) and Transparency (A).");
             public static GUIContent alphaCutoffText = new GUIContent("Alpha Cutoff", "Threshold for alpha cutoff.");
@@ -48,7 +49,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
             public static GUIContent[] blendNames = Array.ConvertAll(Enum.GetNames(typeof(BlendMode)), item => new GUIContent(item));
 
             public static GUIContent colorMode = new GUIContent("Color Mode", "Determines the blending mode between the particle color and the texture albedo.");
-            public static GUIContent[] colorNames = Array.ConvertAll(Enum.GetNames(typeof(ColorMode)), item => new GUIContent(item));
+            //public static GUIContent[] colorNames = Array.ConvertAll(Enum.GetNames(typeof(ColorMode)), item => new GUIContent(item));
 
             public static GUIContent flipbookMode = new GUIContent("Flip-Book Mode", "Determines the blending mode used for animated texture sheets.");
             public static GUIContent[] flipbookNames = Array.ConvertAll(Enum.GetNames(typeof(FlipbookMode)), item => new GUIContent(item));
@@ -73,7 +74,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
             public static string mainOptionsText = "Main Options";
             public static string mapsOptionsText = "Maps";
             public static string advancedOptionsText = "Advanced Options";
-            public static string requiredVertexStreamsText = "Required Vertex Streams";
+            public static GUIContent VertexStreams = new GUIContent("Vertex Streams");
 
             public static string streamPositionText = "Position (POSITION.xyz)";
             public static string streamNormalText = "Normal (NORMAL.xyz)";
@@ -86,21 +87,13 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
             public static GUIContent streamApplyToAllSystemsText = new GUIContent("Apply to Systems", "Apply the vertex stream layout to all Particle Systems using this material");
         }
 
-        MaterialProperty blendMode;
         MaterialProperty colorMode;
         MaterialProperty flipbookMode;
-        MaterialProperty cullMode;
-        MaterialProperty albedoMap;
-        MaterialProperty albedoColor;
-        MaterialProperty alphaCutoff;
         MaterialProperty metallicMap;
         MaterialProperty metallic;
         MaterialProperty smoothness;
         MaterialProperty bumpScale;
-        MaterialProperty bumpMap;
-        MaterialProperty emissionEnabled;
-        MaterialProperty emissionColorForRendering;
-        MaterialProperty emissionMap;
+        MaterialProperty bumpMapProp;
         MaterialProperty softParticlesEnabled;
         MaterialProperty cameraFadingEnabled;
         MaterialProperty distortionEnabled;
@@ -111,40 +104,91 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
         private MaterialProperty distortionBlend;
         private MaterialProperty distortionStrength;
 
-        MaterialEditor m_MaterialEditor;
         List<ParticleSystemRenderer> m_RenderersUsingThisMaterial = new List<ParticleSystemRenderer>();
 
-        bool m_FirstTimeApply = true;
-
-        public void FindProperties(MaterialProperty[] props)
+        public override void FindProperties(MaterialProperty[] properties)
         {
-            blendMode = FindProperty("_Mode", props);
-            colorMode = FindProperty("_ColorMode", props, false);
-            flipbookMode = FindProperty("_FlipbookMode", props);
-            cullMode = FindProperty("_Cull", props);
-            albedoMap = FindProperty("_BaseMap", props);
-            albedoColor = FindProperty("_BaseColor", props);
-            alphaCutoff = FindProperty("_Cutoff", props);
-            metallicMap = FindProperty("_MetallicGlossMap", props, false);
-            metallic = FindProperty("_Metallic", props, false);
-            smoothness = FindProperty("_Smoothness", props, false);
-            bumpScale = FindProperty("_BumpScale", props, false);
-            bumpMap = FindProperty("_BumpMap", props, false);
-            emissionEnabled = FindProperty("_EmissionEnabled", props);
-            emissionColorForRendering = FindProperty("_EmissionColor", props);
-            emissionMap = FindProperty("_EmissionMap", props);
-            softParticlesEnabled = FindProperty("_SoftParticlesEnabled", props);
-            cameraFadingEnabled = FindProperty("_CameraFadingEnabled", props);
-            distortionEnabled = FindProperty("_DistortionEnabled", props, false);
-            softParticlesNearFadeDistance = FindProperty("_SoftParticlesNearFadeDistance", props);
-            softParticlesFarFadeDistance = FindProperty("_SoftParticlesFarFadeDistance", props);
-            cameraNearFadeDistance = FindProperty("_CameraNearFadeDistance", props);
-            cameraFarFadeDistance = FindProperty("_CameraFarFadeDistance", props);
-            distortionBlend = FindProperty("_DistortionBlend", props, false);
-            distortionStrength = FindProperty("_DistortionStrength", props, false);           
+            base.FindProperties(properties);
+            
+            colorMode = FindProperty("_ColorMode", properties, false);
+            flipbookMode = FindProperty("_FlipbookMode", properties);
+            metallicMap = FindProperty("_MetallicGlossMap", properties, false);
+            metallic = FindProperty("_Metallic", properties, false);
+            smoothness = FindProperty("_Smoothness", properties, false);
+            bumpScale = FindProperty("_BumpScale", properties, false);
+            bumpMapProp = FindProperty("_BumpMap", properties, false);
+            softParticlesEnabled = FindProperty("_SoftParticlesEnabled", properties);
+            cameraFadingEnabled = FindProperty("_CameraFadingEnabled", properties);
+            distortionEnabled = FindProperty("_DistortionEnabled", properties, false);
+            softParticlesNearFadeDistance = FindProperty("_SoftParticlesNearFadeDistance", properties);
+            softParticlesFarFadeDistance = FindProperty("_SoftParticlesFarFadeDistance", properties);
+            cameraNearFadeDistance = FindProperty("_CameraNearFadeDistance", properties);
+            cameraFarFadeDistance = FindProperty("_CameraFarFadeDistance", properties);
+            distortionBlend = FindProperty("_DistortionBlend", properties, false);
+            distortionStrength = FindProperty("_DistortionStrength", properties, false);           
+        }
+        
+        public override void MaterialChanged(Material material)
+        {
+            if (material == null)
+                throw new ArgumentNullException("material");
+            
+            material.shaderKeywords = null;
+            //SetupMaterialWithBlendMode(material, (BlendMode)material.GetFloat("_Blend"));
+            if (colorMode != null)
+                SetupMaterialWithColorMode(material);
+            SetupMaterialBlendMode(material);
+            SetMaterialKeywords(material);
+        }
+        
+        public override void DrawSurfaceOptions(Material material)
+        {
+            if (material == null)
+                throw new ArgumentNullException("material");
+
+            // Use default labelWidth
+            EditorGUIUtility.labelWidth = 0f;
+
+            // Detect any changes to the material
+            EditorGUI.BeginChangeCheck();
+            {
+                base.DrawSurfaceOptions(material);
+                DoPopup(StylesParticle.colorMode, colorMode, Enum.GetNames(typeof(ColorMode)));
+            }
+            if (EditorGUI.EndChangeCheck())
+            {
+                foreach (var obj in blendModeProp.targets)
+                    MaterialChanged((Material)obj);
+            }
+        }
+        
+        public override void DrawSurfaceInputs(Material material)
+        {
+            base.DrawSurfaceInputs(material);
+            
+            EditorGUI.BeginChangeCheck();
+            {
+                materialEditor.TexturePropertySingleLine(StylesParticle.normalMapText, bumpMapProp);
+
+                DrawEmissionProperties(material, true);
+
+                DrawBaseTileOffset();
+                EditorGUI.BeginChangeCheck();
+            }
         }
 
-        public override void OnGUI(MaterialEditor materialEditor, MaterialProperty[] props)
+        public override void DrawAdditionalFoldouts(Material material)
+        {
+            var vertexStreams = EditorGUILayout.BeginFoldoutHeaderGroup(GetHeaderState(3), StylesParticle.VertexStreams, EditorStyles.foldoutHeader, null, new GUIStyle());
+            if (vertexStreams)
+            {
+                DoVertexStreamsArea(material);
+            }
+            EditorGUILayout.EndFoldoutHeaderGroup();
+            StoreHeaderState(vertexStreams, 3);
+        }
+
+/*        public override void OnGUI(MaterialEditor materialEditor, MaterialProperty[] props)
         {
             if (materialEditor == null)
                 throw new ArgumentNullException("materialEditor");
@@ -161,9 +205,9 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
             }
 
             ShaderPropertiesGUI(material);
-        }
+        }*/
 
-        public void ShaderPropertiesGUI(Material material)
+/*        public void ShaderPropertiesGUI(Material material)
         {
             // Use default labelWidth
             EditorGUIUtility.labelWidth = 0f;
@@ -228,9 +272,9 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
 
             GUILayout.Label(Styles.requiredVertexStreamsText, EditorStyles.boldLabel);
             DoVertexStreamsArea(material);
-        }
+        }*/
 
-        public override void AssignNewShaderToMaterial(Material material, Shader oldShader, Shader newShader)
+        /*public override void AssignNewShaderToMaterial(Material material, Shader oldShader, Shader newShader)
         {
             if (material == null)
                 throw new ArgumentNullException("material");
@@ -242,10 +286,10 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
                 throw new ArgumentNullException("newShader");
 
             // Sync the lighting flag for the unlit shader
-            if (newShader.name.Contains("Unlit"))
+/*            if (newShader.name.Contains("Unlit"))
                 material.SetFloat("_LightingEnabled", 0.0f);
             else
-                material.SetFloat("_LightingEnabled", 1.0f);
+                material.SetFloat("_LightingEnabled", 1.0f);#1#
 
             // _Emission property is lost after assigning Standard shader to the material
             // thus transfer it before assigning the new shader
@@ -258,7 +302,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
 
             if (oldShader == null || !oldShader.name.Contains("Legacy Shaders/"))
             {
-                SetupMaterialWithBlendMode(material, (BlendMode)material.GetFloat("_Mode"));
+                SetupMaterialWithBlendMode(material, (BlendMode)material.GetFloat("_Blend"));
                 return;
             }
 
@@ -273,28 +317,28 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
                 // therefore Fade mode
                 blendMode = BlendMode.Fade;
             }
-            material.SetFloat("_Mode", (float)blendMode);
+            material.SetFloat("_Blend", (float)blendMode);
 
             MaterialChanged(material);
-        }
+        }*/
 
-        void BlendModePopup()
+/*        void BlendModePopup()
         {
             EditorGUI.showMixedValue = blendMode.hasMixedValue;
             var mode = (BlendMode)blendMode.floatValue;
 
             EditorGUI.BeginChangeCheck();
-            mode = (BlendMode)EditorGUILayout.Popup(Styles.renderingMode, (int)mode, Styles.blendNames);
+            mode = (BlendMode)EditorGUILayout.Popup(StylesParticle.renderingMode, (int)mode, StylesParticle.blendNames);
             if (EditorGUI.EndChangeCheck())
             {
-                m_MaterialEditor.RegisterPropertyChangeUndo("Rendering Mode");
+                materialEditor.RegisterPropertyChangeUndo("Rendering Mode");
                 blendMode.floatValue = (float)mode;
             }
 
             EditorGUI.showMixedValue = false;
-        }
+        }*/
 
-        void ColorModePopup()
+/*        void ColorModePopup()
         {
             if (colorMode != null)
             {
@@ -302,16 +346,16 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
                 var mode = (ColorMode)colorMode.floatValue;
 
                 EditorGUI.BeginChangeCheck();
-                mode = (ColorMode)EditorGUILayout.Popup(Styles.colorMode, (int)mode, Styles.colorNames);
+                mode = (ColorMode)EditorGUILayout.Popup(StylesParticle.colorMode, (int)mode, StylesParticle.colorNames);
                 if (EditorGUI.EndChangeCheck())
                 {
-                    m_MaterialEditor.RegisterPropertyChangeUndo("Color Mode");
+                    materialEditor.RegisterPropertyChangeUndo("Color Mode");
                     colorMode.floatValue = (float)mode;
                 }
 
                 EditorGUI.showMixedValue = false;
             }
-        }
+        }*/
 
         void FlipbookModePopup()
         {
@@ -319,31 +363,31 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
             var mode = (FlipbookMode)flipbookMode.floatValue;
 
             EditorGUI.BeginChangeCheck();
-            mode = (FlipbookMode)EditorGUILayout.Popup(Styles.flipbookMode, (int)mode, Styles.flipbookNames);
+            mode = (FlipbookMode)EditorGUILayout.Popup(StylesParticle.flipbookMode, (int)mode, StylesParticle.flipbookNames);
             if (EditorGUI.EndChangeCheck())
             {
-                m_MaterialEditor.RegisterPropertyChangeUndo("Flip-Book Mode");
+                materialEditor.RegisterPropertyChangeUndo("Flip-Book Mode");
                 flipbookMode.floatValue = (float)mode;
             }
 
             EditorGUI.showMixedValue = false;
         }
 
-        void TwoSidedPopup(Material material)
+/*        void TwoSidedPopup(Material material)
         {
             EditorGUI.showMixedValue = cullMode.hasMixedValue;
             var enabled = (cullMode.floatValue == (float)UnityEngine.Rendering.CullMode.Off);
 
             EditorGUI.BeginChangeCheck();
-            enabled = EditorGUILayout.Toggle(Styles.twoSidedEnabled, enabled);
+            enabled = EditorGUILayout.Toggle(StylesParticle.twoSidedEnabled, enabled);
             if (EditorGUI.EndChangeCheck())
             {
-                m_MaterialEditor.RegisterPropertyChangeUndo("Two Sided Enabled");
+                materialEditor.RegisterPropertyChangeUndo("Two Sided Enabled");
                 cullMode.floatValue = enabled ? (float)UnityEngine.Rendering.CullMode.Off : (float)UnityEngine.Rendering.CullMode.Back;
             }
 
             EditorGUI.showMixedValue = false;
-        }
+        }*/
 
         void FadingPopup(Material material)
         {
@@ -357,18 +401,18 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
                     var enabled = softParticlesEnabled.floatValue;
 
                     EditorGUI.BeginChangeCheck();
-                    enabled = EditorGUILayout.Toggle(Styles.softParticlesEnabled, enabled != 0.0f) ? 1.0f : 0.0f;
+                    enabled = EditorGUILayout.Toggle(StylesParticle.softParticlesEnabled, enabled != 0.0f) ? 1.0f : 0.0f;
                     if (EditorGUI.EndChangeCheck())
                     {
-                        m_MaterialEditor.RegisterPropertyChangeUndo("Soft Particles Enabled");
+                        materialEditor.RegisterPropertyChangeUndo("Soft Particles Enabled");
                         softParticlesEnabled.floatValue = enabled;
                     }
 
                     if (enabled != 0.0f)
                     {
                         int indentation = 2;
-                        m_MaterialEditor.ShaderProperty(softParticlesNearFadeDistance, Styles.softParticlesNearFadeDistanceText, indentation);
-                        m_MaterialEditor.ShaderProperty(softParticlesFarFadeDistance, Styles.softParticlesFarFadeDistanceText, indentation);
+                        materialEditor.ShaderProperty(softParticlesNearFadeDistance, StylesParticle.softParticlesNearFadeDistanceText, indentation);
+                        materialEditor.ShaderProperty(softParticlesFarFadeDistance, StylesParticle.softParticlesFarFadeDistanceText, indentation);
                     }
                 }
 
@@ -378,18 +422,18 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
                     var enabled = cameraFadingEnabled.floatValue;
 
                     EditorGUI.BeginChangeCheck();
-                    enabled = EditorGUILayout.Toggle(Styles.cameraFadingEnabled, enabled != 0.0f) ? 1.0f : 0.0f;
+                    enabled = EditorGUILayout.Toggle(StylesParticle.cameraFadingEnabled, enabled != 0.0f) ? 1.0f : 0.0f;
                     if (EditorGUI.EndChangeCheck())
                     {
-                        m_MaterialEditor.RegisterPropertyChangeUndo("Camera Fading Enabled");
+                        materialEditor.RegisterPropertyChangeUndo("Camera Fading Enabled");
                         cameraFadingEnabled.floatValue = enabled;
                     }
 
                     if (enabled != 0.0f)
                     {
                         int indentation = 2;
-                        m_MaterialEditor.ShaderProperty(cameraNearFadeDistance, Styles.cameraNearFadeDistanceText, indentation);
-                        m_MaterialEditor.ShaderProperty(cameraFarFadeDistance, Styles.cameraFarFadeDistanceText, indentation);
+                        materialEditor.ShaderProperty(cameraNearFadeDistance, StylesParticle.cameraNearFadeDistanceText, indentation);
+                        materialEditor.ShaderProperty(cameraFarFadeDistance, StylesParticle.cameraFarFadeDistanceText, indentation);
                     }
                 }
 
@@ -397,42 +441,14 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
             }
         }
 
-        void DoAlbedoArea(Material material)
+/*        void DoAlbedoArea(Material material)
         {
             m_MaterialEditor.TexturePropertyWithHDRColor(Styles.albedoText, albedoMap, albedoColor, true);
-            if (((BlendMode)material.GetFloat("_Mode") == BlendMode.Cutout))
+            if (((BlendMode)material.GetFloat("_Blend") == BlendMode.Cutout))
             {
                 m_MaterialEditor.ShaderProperty(alphaCutoff, Styles.alphaCutoffText, MaterialEditor.kMiniTextureFieldLabelIndentLevel);
             }
-        }
-
-        void DoEmissionArea(Material material)
-        {
-            // Emission
-            EditorGUI.showMixedValue = emissionEnabled.hasMixedValue;
-            var enabled = (emissionEnabled.floatValue != 0.0f);
-
-            EditorGUI.BeginChangeCheck();
-            enabled = EditorGUILayout.Toggle(Styles.emissionEnabled, enabled);
-            if (EditorGUI.EndChangeCheck())
-            {
-                m_MaterialEditor.RegisterPropertyChangeUndo("Emission Enabled");
-                emissionEnabled.floatValue = enabled ? 1.0f : 0.0f;
-            }
-
-            if (enabled)
-            {
-                bool hadEmissionTexture = emissionMap.textureValue != null;
-
-                // Texture and HDR color controls
-                m_MaterialEditor.TexturePropertyWithHDRColor(Styles.emissionText, emissionMap, emissionColorForRendering, false);
-
-                // If texture was assigned and color was black set color to white
-                float brightness = emissionColorForRendering.colorValue.maxColorComponent;
-                if (emissionMap.textureValue != null && !hadEmissionTexture && brightness <= 0f)
-                    emissionColorForRendering.colorValue = Color.white;
-            }
-        }
+        }*/
 
         void DoSpecularMetallicArea(Material material)
         {
@@ -441,19 +457,11 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
 
 
                 bool hasGlossMap = metallicMap.textureValue != null;
-                m_MaterialEditor.TexturePropertySingleLine(Styles.metallicMapText, metallicMap, hasGlossMap ? null : metallic);
+                materialEditor.TexturePropertySingleLine(StylesParticle.metallicMapText, metallicMap, hasGlossMap ? null : metallic);
 
                 int indentation = 2; // align with labels of texture properties
                 bool showSmoothnessScale = hasGlossMap;
-                m_MaterialEditor.ShaderProperty(smoothness, showSmoothnessScale ? Styles.smoothnessScaleText : Styles.smoothnessText, indentation);
-        }
-
-        void DoNormalMapArea(Material material)
-        {
-            if (bumpMap != null)
-            {
-                m_MaterialEditor.TexturePropertySingleLine(Styles.normalMapText, bumpMap, bumpMap.textureValue != null ? bumpScale : null);
-            }
+                materialEditor.ShaderProperty(smoothness, showSmoothnessScale ? StylesParticle.smoothnessScaleText : StylesParticle.smoothnessText, indentation);
         }
 
         void DoVertexStreamsArea(Material material)
@@ -463,22 +471,20 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
             bool useFlipbookBlending = (material.GetFloat("_FlipbookMode") > 0.0f);
             bool useTangents = material.GetTexture("_BumpMap") && useLighting;
 
-            GUILayout.Label(Styles.streamPositionText, EditorStyles.label);
-
             if (useLighting)
-                GUILayout.Label(Styles.streamNormalText, EditorStyles.label);
+                GUILayout.Label(StylesParticle.streamNormalText, EditorStyles.label);
 
-            GUILayout.Label(Styles.streamColorText, EditorStyles.label);
-            GUILayout.Label(Styles.streamUVText, EditorStyles.label);
+            GUILayout.Label(StylesParticle.streamColorText, EditorStyles.label);
+            GUILayout.Label(StylesParticle.streamUVText, EditorStyles.label);
 
             if (useFlipbookBlending)
             {
-                GUILayout.Label(Styles.streamUV2Text, EditorStyles.label);
-                GUILayout.Label(Styles.streamAnimBlendText, EditorStyles.label);
+                GUILayout.Label(StylesParticle.streamUV2Text, EditorStyles.label);
+                GUILayout.Label(StylesParticle.streamAnimBlendText, EditorStyles.label);
             }
 
             if (useTangents)
-                GUILayout.Label(Styles.streamTangentText, EditorStyles.label);
+                GUILayout.Label(StylesParticle.streamTangentText, EditorStyles.label);
 
             // Build the list of expected vertex streams
             List<ParticleSystemVertexStream> streams = new List<ParticleSystemVertexStream>();
@@ -500,7 +506,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
                 streams.Add(ParticleSystemVertexStream.Tangent);
 
             // Set the streams on all systems using this material
-            if (GUILayout.Button(Styles.streamApplyToAllSystemsText, EditorStyles.miniButton, GUILayout.ExpandWidth(false)))
+            if (GUILayout.Button(StylesParticle.streamApplyToAllSystemsText, EditorStyles.miniButton, GUILayout.ExpandWidth(false)))
             {
                 foreach (ParticleSystemRenderer renderer in m_RenderersUsingThisMaterial)
                 {
@@ -525,7 +531,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
             EditorGUILayout.Space();
         }
 
-        public static void SetupMaterialWithBlendMode(Material material, BlendMode blendMode)
+        /*public static void SetupMaterialWithBlendMode(Material material, BlendMode blendMode)
         {
             switch (blendMode)
             {
@@ -614,10 +620,12 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
                     material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
                     break;
             }
-        }
+        }*/
 
-        public static void SetupMaterialWithColorMode(Material material, ColorMode colorMode)
+        public static void SetupMaterialWithColorMode(Material material)
         {
+            var colorMode = (ColorMode) material.GetFloat("_ColorMode");
+            
             switch (colorMode)
             {
                 case ColorMode.Multiply:
@@ -656,21 +664,25 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
             }
         }
 
-        void SetMaterialKeywords(Material material)
+        static void SetMaterialKeywords(Material material)
         {
             // Z write doesn't work with distortion/fading
             bool hasZWrite = (material.GetInt("_ZWrite") != 0);
 
             // Lit shader?
-            bool useLighting = (material.GetFloat("_LightingEnabled") > 0.0f);
+            //bool useLighting = (material.GetFloat("_LightingEnabled") > 0.0f);
 
             // Note: keywords must be based on Material value not on MaterialProperty due to multi-edit & material animation
             // (MaterialProperty value might come from renderer material property block)
-            SetKeyword(material, "_NORMALMAP", material.GetTexture("_BumpMap") && useLighting);
-            SetKeyword(material, "_METALLICGLOSSMAP", (material.GetTexture("_MetallicGlossMap") != null) && useLighting);
+            SetKeyword(material, "_NORMALMAP", material.GetTexture("_BumpMap"));
+            SetKeyword(material, "_METALLICGLOSSMAP", (material.GetTexture("_MetallicGlossMap") != null));
 
-            material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.None;
-            SetKeyword(material, "_EMISSION", material.GetFloat("_EmissionEnabled") > 0.0f);
+            // A material's GI flag internally keeps track of whether emission is enabled at all, it's enabled but has no effect
+            // or is enabled and may be modified at runtime. This state depends on the values of the current flag and emissive color.
+            // The fixup routine makes sure that the material is in the correct state if/when changes are made to the mode or color.
+            MaterialEditor.FixupEmissiveFlag(material);
+            bool shouldEmissionBeEnabled = (material.globalIlluminationFlags & MaterialGlobalIlluminationFlags.EmissiveIsBlack) == 0;
+            CoreUtils.SetKeyword(material, "_EMISSION", shouldEmissionBeEnabled);
 
             // Set the define for flipbook blending
             bool useFlipbookBlending = (material.GetFloat("_FlipbookMode") > 0.0f);
@@ -723,21 +735,13 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
                 material.SetVector("_CameraFadeParams", new Vector4(0.0f, Mathf.Infinity, 0.0f, 0.0f));
 
             // distortion
-            bool useDistortion = (material.GetFloat("_DistortionEnabled") > 0.0f);
+            bool useDistortion = (material.GetFloat("_DistortionEnabled") > 0.0f) && (SurfaceType)material.GetFloat("_Surface") != SurfaceType.Opaque;
             SetKeyword(material, "_DISTORTION_ON", useDistortion);
             if(useDistortion)
                 material.SetFloat("_DistortionStrengthScaled", material.GetFloat("_DistortionStrength") * 0.1f);
             
             // Set the define for distortion + grabpass (Distortion not supported)
             material.SetShaderPassEnabled("Always", false);
-        }
-
-        void MaterialChanged(Material material)
-        {
-            SetupMaterialWithBlendMode(material, (BlendMode)material.GetFloat("_Mode"));
-            if (colorMode != null)
-                SetupMaterialWithColorMode(material, (ColorMode)material.GetFloat("_ColorMode"));
-            SetMaterialKeywords(material);
         }
 
         void CacheRenderersUsingThisMaterial(Material material)
