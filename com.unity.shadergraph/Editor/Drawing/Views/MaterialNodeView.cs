@@ -557,6 +557,7 @@ namespace UnityEditor.ShaderGraph.Drawing
                 portInputView.Dispose();
 
             node = null;
+            userData = null;
             if (m_PreviewRenderData != null)
             {
                 m_PreviewRenderData.onPreviewChanged -= UpdatePreviewTexture;

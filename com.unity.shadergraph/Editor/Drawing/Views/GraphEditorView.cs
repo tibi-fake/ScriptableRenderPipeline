@@ -320,11 +320,12 @@ namespace UnityEditor.ShaderGraph.Drawing
                 var anyChanged = false;
                 foreach (var materialNodeView in element.Select(e => e).OfType<MaterialNodeView>())
                 {
-                    if (materialNodeView.node.groupGuid == groupData.guid)
+                    if (materialNodeView.userData != null && materialNodeView.node.groupGuid == groupData.guid)
                     {
                         anyChanged = true;
                         break;
                     }
+
                 }
 
                 if (!anyChanged)
@@ -334,7 +335,8 @@ namespace UnityEditor.ShaderGraph.Drawing
 
                 foreach (var materialNodeView in element.Select(e => e).OfType<MaterialNodeView>())
                 {
-                    m_Graph.SetNodeGroup(materialNodeView.node, null);
+                    if (materialNodeView.node != null)
+                        m_Graph.SetNodeGroup(materialNodeView.node, null);
                 }
             }
 
@@ -383,7 +385,6 @@ namespace UnityEditor.ShaderGraph.Drawing
             previewManager.RenderPreviews();
             m_BlackboardProvider.HandleGraphChanges();
 
-
             // Group Handling
             foreach (GroupData groupData in m_Graph.removedGroups)
             {
@@ -419,7 +420,6 @@ namespace UnityEditor.ShaderGraph.Drawing
                 if (nodeView != null)
                 {
                     nodeView.Dispose();
-                    nodeView.userData = null;
                     m_GraphView.RemoveElement(nodeView);
                 }
             }
@@ -429,8 +429,6 @@ namespace UnityEditor.ShaderGraph.Drawing
                 Debug.Log("ADDING::" + node.name);
                 AddNode(node);
             }
-
-
 
             foreach (var groupNodeStruct in m_Graph.groupNodeStruct)
             {
