@@ -7,9 +7,9 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
     partial class InfluenceVolumeUI
     {
  
-        static readonly Color k_GizmoThemeColorBase = new Color(230 / 255f, 229 / 255f, 148 / 255f, 8 / 255f).gamma;
-        static readonly Color k_GizmoThemeColorInfluence = new Color(83 / 255f, 255 / 255f, 95 / 255f, 8 / 255f).gamma;
-        static readonly Color k_GizmoThemeColorInfluenceNormal = new Color(128 / 255f, 128 / 255f, 255 / 255f, 8 / 255f).gamma;
+        static readonly Color k_GizmoThemeColorBase = new Color(230 / 255f, 229 / 255f, 148 / 255f, 0.7f).gamma;
+        static readonly Color k_GizmoThemeColorInfluence = new Color(83 / 255f, 255 / 255f, 95 / 255f, 0.7f).gamma;
+        static readonly Color k_GizmoThemeColorInfluenceNormal = new Color(128 / 255f, 128 / 255f, 255 / 255f, 0.7f).gamma;
         internal static readonly Color[] k_HandlesColor = new Color[]
         {
             Color.red,

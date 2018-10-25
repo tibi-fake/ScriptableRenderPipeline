@@ -37,10 +37,12 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
                 HDReflectionProbeEditor.k_GizmoThemeColorExtent, HDReflectionProbeEditor.k_HandlesColor
             );
             boxInfluenceHandle = new HierarchicalBox(
-                HDReflectionProbeEditor.k_GizmoThemeColorInfluenceBlend, HDReflectionProbeEditor.k_HandlesColor, container: boxBaseHandle
+                HDReflectionProbeEditor.k_GizmoThemeColorInfluenceBlend,
+                HDReflectionProbeEditor.k_HandlesColor, parent: boxBaseHandle
             );
             boxInfluenceNormalHandle = new HierarchicalBox(
-                HDReflectionProbeEditor.k_GizmoThemeColorInfluenceNormalBlend, HDReflectionProbeEditor.k_HandlesColor, container: boxBaseHandle
+                HDReflectionProbeEditor.k_GizmoThemeColorInfluenceNormalBlend,
+                HDReflectionProbeEditor.k_HandlesColor, parent: boxBaseHandle
             );
         }
 

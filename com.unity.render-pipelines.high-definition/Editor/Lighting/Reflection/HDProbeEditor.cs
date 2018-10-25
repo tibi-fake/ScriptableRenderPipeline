@@ -100,7 +100,6 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
 
         protected void OnSceneGUI()
         {
-            //mandatory update as for strange reason the serialized rollback one update here
             m_UIState.Update(m_SerializedHDProbe);
             m_SerializedHDProbe.Update();
 

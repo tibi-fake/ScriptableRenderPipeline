@@ -12,18 +12,17 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
         internal static void DrawHandles(HDProbeUI s, SerializedHDProbe d, Editor o)
         {
             var probe = d.target;
-            var mat = Matrix4x4.TRS(probe.transform.position, probe.transform.rotation, Vector3.one);
 
             switch (EditMode.editMode)
             {
                 case EditBaseShape:
-                    InfluenceVolumeUI.DrawHandles_EditBase(s.probeSettings.influence, d.probeSettings.influence, o, mat, probe);
+                    InfluenceVolumeUI.DrawHandles_EditBase(s.probeSettings.influence, d.probeSettings.influence, o, probe.transform);
                     break;
                 case EditInfluenceShape:
-                    InfluenceVolumeUI.DrawHandles_EditInfluence(s.probeSettings.influence, d.probeSettings.influence, o, mat, probe);
+                    InfluenceVolumeUI.DrawHandles_EditInfluence(s.probeSettings.influence, d.probeSettings.influence, o, probe.transform);
                     break;
                 case EditInfluenceNormalShape:
-                    InfluenceVolumeUI.DrawHandles_EditInfluenceNormal(s.probeSettings.influence, d.probeSettings.influence, o, mat, probe);
+                    InfluenceVolumeUI.DrawHandles_EditInfluenceNormal(s.probeSettings.influence, d.probeSettings.influence, o, probe.transform);
                     break;
                 case EditCapturePosition:
                 case EditMirrorPosition:

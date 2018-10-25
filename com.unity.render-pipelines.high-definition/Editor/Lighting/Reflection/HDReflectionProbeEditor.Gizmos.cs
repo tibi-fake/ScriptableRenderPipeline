@@ -26,24 +26,6 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
             );
 
             Gizmos_CapturePoint(reflectionProbe);
-            DrawVerticalRay(reflectionProbe.transform);
-        }
-
-        static void DrawVerticalRay(Transform transform)
-        {
-            var ray = new Ray(transform.position, Vector3.down);
-            if (Physics.Raycast(ray, out RaycastHit hit))
-            {
-                Handles.color = Color.green;
-                Handles.zTest = UnityEngine.Rendering.CompareFunction.LessEqual;
-                Handles.DrawLine(transform.position - Vector3.up * 0.5f, hit.point);
-                Handles.DrawWireDisc(hit.point, hit.normal, 0.5f);
-
-                Handles.color = Color.red;
-                Handles.zTest = UnityEngine.Rendering.CompareFunction.Greater;
-                Handles.DrawLine(transform.position, hit.point);
-                Handles.DrawWireDisc(hit.point, hit.normal, 0.5f);
-            }
         }
 
         static void Gizmos_CapturePoint(ReflectionProbe target)
@@ -52,7 +34,6 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
                 sphere = Resources.GetBuiltinResource<Mesh>("New-Sphere.fbx");
             if(material == null)
                 material = new Material(Shader.Find("Debug/ReflectionProbePreview"));
-
 
             var probe = target.GetComponent<HDAdditionalReflectionData>();
             var probePositionSettings = ProbeCapturePositionSettings.ComputeFrom(probe, null);
@@ -65,6 +46,20 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
             material.SetTexture("_Cubemap", probe.texture);
             material.SetPass(0);
             Graphics.DrawMeshNow(sphere, Matrix4x4.TRS(capturePosition, Quaternion.identity, Vector3.one * capturePointPreviewSize));
+
+            var ray = new Ray(capturePosition, Vector3.down);
+            if (Physics.Raycast(ray, out RaycastHit hit))
+            {
+                Handles.color = Color.green;
+                Handles.zTest = UnityEngine.Rendering.CompareFunction.LessEqual;
+                Handles.DrawLine(capturePosition - Vector3.up * 0.5f, hit.point);
+                Handles.DrawWireDisc(hit.point, hit.normal, 0.5f);
+
+                Handles.color = Color.red;
+                Handles.zTest = UnityEngine.Rendering.CompareFunction.Greater;
+                Handles.DrawLine(capturePosition, hit.point);
+                Handles.DrawWireDisc(hit.point, hit.normal, 0.5f);
+            }
         }
     }
 }
