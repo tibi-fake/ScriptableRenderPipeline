@@ -20,6 +20,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
                         s.sphereBaseHandle.radius = d.sphereRadius.floatValue;
 
                         EditorGUI.BeginChangeCheck();
+                        s.sphereBaseHandle.DrawHull(true);
                         s.sphereBaseHandle.DrawHandle();
                         if (EditorGUI.EndChangeCheck())
                         {
@@ -193,34 +194,19 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
             }
         }
 
-        static void DrawSphereHandle(InfluenceVolumeUI s, SerializedInfluenceVolume d, Editor o, Transform transform, SphereBoundsHandle sphere)
+        static void DrawSphereFadeHandle(InfluenceVolumeUI s, SerializedInfluenceVolume d, Editor o, Transform transform, HierarchicalSphere sphere, SerializedProperty radius)
         {
             using (new Handles.DrawingScope(Matrix4x4.TRS(transform.position, transform.rotation, Vector3.one)))
             {
                 sphere.center = Vector3.zero;
-                sphere.radius = d.sphereRadius.floatValue;
+                sphere.radius = d.sphereRadius.floatValue - radius.floatValue;
 
                 EditorGUI.BeginChangeCheck();
+                sphere.DrawHull(true);
                 sphere.DrawHandle();
                 if (EditorGUI.EndChangeCheck())
-                {
-                    float radius = sphere.radius;
-                    d.sphereRadius.floatValue = radius;
-                    d.sphereBlendDistance.floatValue = Mathf.Clamp(d.sphereBlendDistance.floatValue, 0, radius);
-                    d.sphereBlendNormalDistance.floatValue = Mathf.Clamp(d.sphereBlendNormalDistance.floatValue, 0, radius);
-                }
+                    radius.floatValue = Mathf.Clamp(d.sphereRadius.floatValue - sphere.radius, 0, d.sphereRadius.floatValue);
             }
-        }
-
-        static void DrawSphereFadeHandle(InfluenceVolumeUI s, SerializedInfluenceVolume d, Editor o, Transform transform, SphereBoundsHandle sphere, SerializedProperty radius)
-        {
-            sphere.center = Vector3.zero;
-            sphere.radius = radius.floatValue;
-
-            EditorGUI.BeginChangeCheck();
-            sphere.DrawHandle();
-            if (EditorGUI.EndChangeCheck())
-                radius.floatValue = Mathf.Clamp(d.sphereRadius.floatValue - sphere.radius, 0, d.sphereRadius.floatValue);
         }
     }
 }

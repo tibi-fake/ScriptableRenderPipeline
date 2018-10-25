@@ -24,9 +24,9 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
         public HierarchicalBox boxInfluenceHandle;
         public HierarchicalBox boxInfluenceNormalHandle;
 
-        public SphereBoundsHandle sphereBaseHandle = new SphereBoundsHandle();
-        public SphereBoundsHandle sphereInfluenceHandle = new SphereBoundsHandle();
-        public SphereBoundsHandle sphereInfluenceNormalHandle = new SphereBoundsHandle();
+        public HierarchicalSphere sphereBaseHandle;
+        public HierarchicalSphere sphereInfluenceHandle;
+        public HierarchicalSphere sphereInfluenceNormalHandle;
 
         public bool HasFlag(Flag v) => m_FlagStorage.HasFlag(v);
         public bool SetFlag(Flag f, bool v) => m_FlagStorage.SetFlag(f, v);
@@ -43,6 +43,14 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
             boxInfluenceNormalHandle = new HierarchicalBox(
                 HDReflectionProbeEditor.k_GizmoThemeColorInfluenceNormalBlend,
                 HDReflectionProbeEditor.k_HandlesColor, parent: boxBaseHandle
+            );
+
+            sphereBaseHandle = new HierarchicalSphere(HDReflectionProbeEditor.k_GizmoThemeColorExtent);
+            sphereInfluenceHandle = new HierarchicalSphere(
+                HDReflectionProbeEditor.k_GizmoThemeColorInfluenceBlend, parent: sphereBaseHandle
+            );
+            sphereInfluenceNormalHandle = new HierarchicalSphere(
+                HDReflectionProbeEditor.k_GizmoThemeColorInfluenceNormalBlend, parent: sphereBaseHandle
             );
         }
 
