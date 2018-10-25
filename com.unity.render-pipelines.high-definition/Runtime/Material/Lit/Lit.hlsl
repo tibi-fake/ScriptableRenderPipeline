@@ -51,6 +51,7 @@ TEXTURE2D(_ShadowMaskTexture); // Alias for shadow mask, so we don't need to kno
 
 #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Material/LTCAreaLight/LTCAreaLight.hlsl"
 #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Material/PreIntegratedFGD/PreIntegratedFGD.hlsl"
+#include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/ScreenSpaceLighting/ScreenSpaceLightingCommon.hlsl"
 
 //-----------------------------------------------------------------------------
 // Definition
@@ -1584,12 +1585,10 @@ IndirectLighting EvaluateBSDF_ScreenspaceRefraction(LightLoopContext lightLoopCo
 
     // Resolve weight and color
 
-    // Fade pixels near the texture buffers' borders
-    float2  weightNDC = clamp(min(hit.positionNDC, 1 - hit.positionNDC) * _SSRefractionInvScreenWeightDistance, 0, 1);
-            weightNDC = weightNDC * weightNDC * (3 - 2 * weightNDC);
     // TODO: Fade pixels with normal non facing the ray direction
     // TODO: Fade pixels marked as foreground in stencil
-    float weight = weightNDC.x * weightNDC.y * hitWeight;
+    // Fade pixels near the texture buffers' borders
+    float weight = EdgeFade(hit.positionNDC, _SSRefractionInvScreenWeightDistance) * hitWeight;
 
     // Exit if texel is discarded
     if (weight == 0)
