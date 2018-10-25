@@ -7,7 +7,7 @@
     float4  _DepthPyramidScale;             // (x,y) = Screen Scale, z = lod count, w = unused
     float4  _CameraMotionVectorsScale;      // (x,y) = Screen Scale, z = lod count, w = unused
 
-                                            // Screen space lighting
+    // Screen space refraction
     float   _SSRefractionInvScreenWeightDistance;     // Distance for screen space smoothstep with fallback
 
     // Ambiant occlusion
