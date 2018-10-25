@@ -61,12 +61,12 @@ float4 ApplyBlendMode(float3 color, float opacity)
 
 // Used for transparent object. input color is color + alpha of the original transparent pixel.
 // This must be call after ApplyBlendMode to work correctly
-float4 EvaluateAtmosphericScattering(PositionInputs posInput, float4 inputColor)
+float4 EvaluateAtmosphericScattering(PositionInputs posInput, float3 V, float4 inputColor)
 {
     float4 result = inputColor;
 
 #ifdef _ENABLE_FOG_ON_TRANSPARENT
-    float4 fog = EvaluateAtmosphericScattering(posInput); // Premultiplied alpha
+    float4 fog = EvaluateAtmosphericScattering(posInput, V); // Premultiplied alpha
 
     #if defined(_BLENDMODE_ALPHA)
         // Regular alpha blend need to multiply fog color by opacity (as we do src * src_a inside the shader)

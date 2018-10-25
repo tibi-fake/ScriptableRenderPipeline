@@ -100,33 +100,4 @@ float4 SampleVBuffer(TEXTURE3D_ARGS(VBuffer, clampSampler),
                          clampToBorder);
 }
 
-// Returns interpolated {volumetric radiance, transmittance}.
-float4 SampleVolumetricLighting(TEXTURE3D_ARGS(VBufferLighting, clampSampler),
-                                float2 positionNDC,
-                                float  linearDepth,
-                                float4 VBufferResolution,
-                                float2 VBufferSliceCount,
-                                float2 VBufferUvScale,
-                                float2 VBufferUvLimit,
-                                float4 VBufferDepthEncodingParams,
-                                float4 VBufferDepthDecodingParams,
-                                bool   quadraticFilterXY)
-{
-    // TODO: add some slowly animated noise (dither?) to the reconstructed value.
-    float4 value = SampleVBuffer(TEXTURE3D_PARAM(VBufferLighting, clampSampler),
-                                 positionNDC,
-                                 linearDepth,
-                                 VBufferResolution,
-                                 VBufferSliceCount,
-                                 VBufferUvScale,
-                                 VBufferUvLimit,
-                                 VBufferDepthEncodingParams,
-                                 VBufferDepthDecodingParams,
-                                 quadraticFilterXY,
-                                 false);
-
-    // TODO: re-enable tone mapping after implementing pre-exposure.
-    return DelinearizeRGBA(float4(/*FastTonemapInvert*/(value.rgb), value.a));
-}
-
 #endif // UNITY_VBUFFER_INCLUDED

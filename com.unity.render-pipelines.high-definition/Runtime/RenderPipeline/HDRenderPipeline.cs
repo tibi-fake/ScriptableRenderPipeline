@@ -1187,7 +1187,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                                     m_CopyStencil.SetInt(HDShaderIDs._StencilRef, (int)StencilBitMask.DoesntReceiveSSR);
                                     m_CopyStencil.SetInt(HDShaderIDs._StencilMask, (int)StencilBitMask.DoesntReceiveSSR);
 
-                                    // Pass 4 performs an OR between the already present content of the copy and the stencil ref, if stencil test passes. 
+                                    // Pass 4 performs an OR between the already present content of the copy and the stencil ref, if stencil test passes.
                                     CoreUtils.DrawFullScreen(cmd, m_CopyStencil, null, 4);
                                     cmd.ClearRandomWriteTargets();
                                 }
@@ -1819,7 +1819,11 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             m_SkyManager.RenderSky(hdCamera, m_LightLoop.GetCurrentSunLight(), colorBuffer, depthBuffer, m_CurrentDebugDisplaySettings, cmd);
 
             if (visualEnv.fogType.value != FogType.None)
-                m_SkyManager.RenderOpaqueAtmosphericScattering(cmd, colorBuffer, depthBuffer, hdCamera.frameSettings.enableMSAA);
+            {
+                // TODO: compute only once.
+                var pixelCoordToViewDirWS = HDUtils.ComputePixelCoordToWorldSpaceViewDirectionMatrix(hdCamera.camera.fieldOfView * Mathf.Deg2Rad, hdCamera.screenSize, hdCamera.viewMatrix, false);
+                m_SkyManager.RenderOpaqueAtmosphericScattering(cmd, colorBuffer, depthBuffer, pixelCoordToViewDirWS, hdCamera.frameSettings.enableMSAA);
+            }
         }
 
         public Texture2D ExportSkyToTexture()
@@ -2046,7 +2050,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 {
                     cmd.SetComputeTextureParam(cs, kernel, HDShaderIDs._ColorPyramidTexture, RuntimeUtilities.whiteTexture);
                 }
-  
+
                 cmd.DispatchCompute(cs, kernel, HDUtils.DivRoundUp(hdCamera.actualWidth, 8), HDUtils.DivRoundUp(hdCamera.actualHeight, 8), 1);
             }
 

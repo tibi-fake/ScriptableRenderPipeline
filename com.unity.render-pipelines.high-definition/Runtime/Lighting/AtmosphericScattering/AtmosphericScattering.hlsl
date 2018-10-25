@@ -32,7 +32,7 @@ float3 GetFogColor(PositionInputs posInput)
 
 // Returns fog color in rgb and fog factor (opacity) in alpha.
 // The color is premultiplied by alpha.
-float4 EvaluateAtmosphericScattering(PositionInputs posInput)
+float4 EvaluateAtmosphericScattering(PositionInputs posInput, float3 V)
 {
     float3 fogColor = 0;
     float  fogFactor = 0;
@@ -63,19 +63,43 @@ float4 EvaluateAtmosphericScattering(PositionInputs posInput)
         }
         case FOGTYPE_VOLUMETRIC:
         {
-            float4 volFog = SampleVolumetricLighting(TEXTURE3D_PARAM(_VBufferLighting, s_linear_clamp_sampler),
-                                                     posInput.positionNDC,
-                                                     posInput.linearDepth,
-                                                     _VBufferResolution,
-                                                     _VBufferSliceCount.xy,
-                                                     _VBufferUvScaleAndLimit.xy,
-                                                     _VBufferUvScaleAndLimit.zw,
-                                                     _VBufferDepthEncodingParams,
-                                                     _VBufferDepthDecodingParams,
-                                                     true);
+            float4 value = SampleVBuffer(TEXTURE3D_PARAM(_VBufferLighting, s_linear_clamp_sampler),
+                                         posInput.positionNDC,
+                                         posInput.linearDepth,
+                                         _VBufferResolution,
+                                         _VBufferSliceCount.xy,
+                                         _VBufferUvScaleAndLimit.xy,
+                                         _VBufferUvScaleAndLimit.zw,
+                                         _VBufferDepthEncodingParams,
+                                         _VBufferDepthDecodingParams,
+                                         true, false);
+
+            // TODO: add some slowly animated noise (dither?) to the reconstructed value.
+            // TODO: re-enable tone mapping after implementing pre-exposure.
+            float4 volFog = DelinearizeRGBD(float4(/*FastTonemapInvert*/(value.rgb), value.a));
+
+            // TODO: if 'posInput.linearDepth' is computed using 'posInput.positionWS',
+            // and the latter resides on the far plane, the computation will be numerically unstable.
+            float linearDepthDelta = posInput.linearDepth - _VBufferMaxLinearDepth;
+
+            if (linearDepthDelta > 0)
+            {
+                // Apply the fall-back fog.
+                float3 F     = GetViewForwardDir();
+                float  FdotV = dot(F, -V);
+                float  dist  = linearDepthDelta * rcp(FdotV);
+                float  start = _VBufferMaxLinearDepth * rcp(FdotV);
+
+                float3 positionWS  = GetCurrentViewPosition() - start * V;
+                float  startHeight = positionWS.y;
+                float  cosZenith   = -V.y;
+
+                volFog.a += OpticalDepthHeightFog(_HeightFogBaseExtinction, _HeightFogBaseHeight, _HeightFogExponents,
+                                                  cosZenith, startHeight, dist);
+            }
 
             fogColor  = volFog.rgb; // Pre-multiplied by design
-            fogFactor = volFog.a;
+            fogFactor = 1 - Transmittance(volFog.a);
             break;
         }
     }
