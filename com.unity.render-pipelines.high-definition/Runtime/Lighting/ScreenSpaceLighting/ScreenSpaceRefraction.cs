@@ -10,7 +10,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         public enum RefractionModel
         {
             None = 0,
-            Plane = 1,
+            Box = 1,
             Sphere = 2
         };
 

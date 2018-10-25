@@ -695,7 +695,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
                 activeFields.Add("Refraction");
                 switch (masterNode.refractionModel)
                 {
-                    case ScreenSpaceRefraction.RefractionModel.Plane:
+                    case ScreenSpaceRefraction.RefractionModel.Box:
                         activeFields.Add("RefractionPlane");
                         break;
 
