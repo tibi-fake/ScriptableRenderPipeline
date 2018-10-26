@@ -142,6 +142,18 @@ namespace UnityEditor.ShaderGraph
             get { return m_groupNodeStruct; }
         }
 
+        [NonSerialized]
+        Dictionary<Guid, List<AbstractMaterialNode>> m_GroupNodes = new Dictionary<Guid, List<AbstractMaterialNode>>();
+
+        public IEnumerable<AbstractMaterialNode> GetNodesInGroup(GroupData groupData)
+        {
+            if (m_GroupNodes.TryGetValue(groupData.guid, out var nodes))
+            {
+                return nodes;
+            }
+            return Enumerable.Empty<AbstractMaterialNode>();
+        }
+
         #endregion
 
 
@@ -238,6 +250,7 @@ namespace UnityEditor.ShaderGraph
                 return;
             m_Groups.Add(groupData);
             m_AddedGroups.Add(groupData);
+            m_GroupNodes.Add(groupData.guid, new List<AbstractMaterialNode>());
         }
 
         //public void AddGroup(GroupData groupData)
@@ -247,16 +260,34 @@ namespace UnityEditor.ShaderGraph
         //    m_Groups.Add(groupData);
         //}
 
-        public void RemoveGroupData(GroupData groupData)
+        public void RemoveGroup(GroupData groupData)
         {
-            m_Groups.Remove(groupData);
-            m_RemovedGroups.Add(groupData);
+            RemoveGroupNoValidate(groupData);
+            ValidateGraph();
+        }
+
+        void RemoveGroupNoValidate(GroupData group)
+        {
+            if (!m_Groups.Contains(group))
+                throw new InvalidOperationException("Cannot remove a group that doesn't exist.");
+            m_Groups.Remove(group);
+            m_RemovedGroups.Add(group);
+
+            if (m_GroupNodes.TryGetValue(group.guid, out var nodes))
+            {
+                m_GroupNodes.Remove(group.guid);
+                foreach (AbstractMaterialNode node in nodes)
+                {
+                    RemoveNodeNoValidate(node);
+                }
+            }
         }
 
         public void SetNodeGroup(AbstractMaterialNode node, GroupData group)
         {
             // TODO: Record this change in a list with node id, previous group id, and new node id
             // Checking if the groupdata is null. If it is, then it means node has been removed out of a group.
+            // If the group data is null, then maybe the old group id should be removed
             Guid groupGuid;
             if (group != null)
                 groupGuid = group.guid;
@@ -269,13 +300,42 @@ namespace UnityEditor.ShaderGraph
                 oldGroupGuid = node.groupGuid,
                 newGroupGuid = groupGuid
             };
+            node.groupGuid = groupGuid;
+
+            var oldGroupNodes = m_GroupNodes[groupStruct.oldGroupGuid];
+            oldGroupNodes.Remove(node);
+            if (!oldGroupNodes.Any())
+            {
+                RemoveGroupNoValidate(m_Groups.First(x => x.guid == groupStruct.oldGroupGuid));
+            }
+
+            if (group != null)
+                m_GroupNodes[group.guid].Add(node);
+
             m_groupNodeStruct.Add(groupStruct);
             //node.groupGuid = group.guid;
         }
 
+//        void AddNodesToGroupDict(GroupData groupData)
+//        {
+//            //m_GraphView.nodes.ToList().OfType<MaterialNodeView>().FirstOrDefault(p => p.node != null && p.node.guid == node.guid);
+//            //m_GraphView.graphElements.ToList().OfType<MaterialGraphGroup>();
+//
+//            foreach (GraphElement element in group.containedElements)
+//            {
+//
+//            }
+//        }
+
+
+
         void AddNodeNoValidate(INode node)
         {
             var materialNode = (AbstractMaterialNode)node;
+            if (materialNode.groupGuid != Guid.Empty && !m_GroupNodes.ContainsKey(materialNode.groupGuid))
+            {
+                throw new InvalidOperationException("Cannot add a node whose group doesn't exist.");
+            }
             materialNode.owner = this;
             if (m_FreeNodeTempIds.Any())
             {
@@ -292,6 +352,10 @@ namespace UnityEditor.ShaderGraph
             }
             m_NodeDictionary.Add(materialNode.guid, materialNode);
             m_AddedNodes.Add(materialNode);
+            if (materialNode.groupGuid != Guid.Empty)
+            {
+                m_GroupNodes[materialNode.groupGuid].Add(materialNode);
+            }
         }
 
         public void RemoveNode(INode node)
@@ -304,6 +368,11 @@ namespace UnityEditor.ShaderGraph
 
         void RemoveNodeNoValidate(INode node)
         {
+            if (!m_NodeDictionary.ContainsKey(node.guid))
+            {
+                throw new InvalidOperationException("Cannot remove a node that doesn't exist.");
+            }
+
             var materialNode = (AbstractMaterialNode)node;
             if (!materialNode.canDeleteNode)
                 return;
@@ -312,6 +381,15 @@ namespace UnityEditor.ShaderGraph
             m_FreeNodeTempIds.Push(materialNode.tempId);
             m_NodeDictionary.Remove(materialNode.guid);
             m_RemovedNodes.Add(materialNode);
+
+            if (materialNode.groupGuid != Guid.Empty && m_GroupNodes.TryGetValue(materialNode.groupGuid, out var nodes))
+            {
+                nodes.Remove(materialNode);
+                if (!nodes.Any())
+                {
+                    RemoveGroupNoValidate(m_Groups.First(x => x.guid == materialNode.groupGuid));
+                }
+            }
         }
 
         void AddEdgeToNodeEdges(IEdge edge)
@@ -394,8 +472,10 @@ namespace UnityEditor.ShaderGraph
 
             foreach (var groupData in groups)
             {
-                RemoveGroupData(groupData);
+                if (m_GroupNodes.ContainsKey(groupData.guid))
+                    RemoveGroupNoValidate(groupData);
             }
+
             ValidateGraph();
         }
 
@@ -635,6 +715,19 @@ namespace UnityEditor.ShaderGraph
                     m_AddedEdges.Remove(edge);
                 }
             }
+
+            // Get removed nodes, check their group id and then check if that group is empty
+            // TODO: the above written
+
+//            foreach (INode node in m_RemovedNodes)
+//            {
+//                AbstractMaterialNode absNode = node as AbstractMaterialNode;
+//
+//                if (absNode.groupGuid != Guid.Empty && !m_GroupNodes[absNode.groupGuid].Any())
+//                {
+//                    RemoveGroup();
+//                }
+//            }
         }
 
         public void ReplaceWith(IGraph other)
@@ -664,16 +757,16 @@ namespace UnityEditor.ShaderGraph
             // Current tactic is to remove all nodes and edges and then re-add them, such that depending systems
             // will re-initialize with new references.
 
-//            using (var removedGroupsPooledObject = ListPool<GroupData>.GetDisposable())
-//            {
-//                var removedGroupDatas = removedGroupsPooledObject.value;
-//                //removedGroupDatas.AddRange(m_Groups);
-//                foreach (var groupData in removedGroupDatas)
-//                {
-//                    Debug.Log("ReplaceWith GroupData:: " + groupData.title);
-//                    RemoveGroupData(groupData);
-//                }
-//            }
+            using (var removedGroupsPooledObject = ListPool<GroupData>.GetDisposable())
+            {
+                var removedGroupDatas = removedGroupsPooledObject.value;
+                removedGroupDatas.AddRange(m_Groups);
+                foreach (var groupData in removedGroupDatas)
+                {
+                    Debug.Log("ReplaceWith GroupData:: " + groupData.title);
+                    RemoveGroupNoValidate(groupData);
+                }
+            }
 
             using (var pooledList = ListPool<IEdge>.GetDisposable())
             {
@@ -693,14 +786,14 @@ namespace UnityEditor.ShaderGraph
 
             ValidateGraph();
 
+            foreach (GroupData groupData in other.groups)
+                AddGroupData(groupData);
+
             foreach (var node in other.GetNodes<INode>())
                 AddNodeNoValidate(node);
 
             foreach (var edge in other.edges)
                 ConnectNoValidate(edge.outputSlot, edge.inputSlot);
-
-            foreach (GroupData groupData in other.groups)
-                AddGroupData(groupData);
 
             ValidateGraph();
         }
@@ -792,6 +885,12 @@ namespace UnityEditor.ShaderGraph
                 node.tempId = new Identifier(m_Nodes.Count);
                 m_Nodes.Add(node);
                 m_NodeDictionary.Add(node.guid, node);
+
+                // Adding the node to the Group Node Dict
+                if(m_GroupNodes.ContainsKey(node.groupGuid))
+                    m_GroupNodes[node.groupGuid].Add(node);
+                else
+                    m_GroupNodes.Add(node.groupGuid, new List<AbstractMaterialNode>(){node});
             }
 
             m_SerializableNodes = null;

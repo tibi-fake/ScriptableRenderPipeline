@@ -37,7 +37,7 @@ namespace UnityEditor.ShaderGraph.Drawing
         EdgeConnectorListener m_EdgeConnectorListener;
         BlackboardProvider m_BlackboardProvider;
 
-        System.Collections.Generic.List<MaterialGraphGroup> m_GraphGroups = new System.Collections.Generic.List<MaterialGraphGroup>();
+        List<MaterialGraphGroup> m_GraphGroups = new List<MaterialGraphGroup>();
 
         const string k_FloatingWindowsLayoutKey = "UnityEditor.ShaderGraph.FloatingWindowsLayout";
         FloatingWindowsLayout m_FloatingWindowsLayout;
@@ -162,7 +162,6 @@ namespace UnityEditor.ShaderGraph.Drawing
             {
                 AddNewGroupNode(graphGroup);
             }
-            // TODO Adding the groups here as well.
 
             foreach (var edge in graph.edges)
                 AddEdge(edge);
@@ -377,7 +376,7 @@ namespace UnityEditor.ShaderGraph.Drawing
         }
 
         HashSet<MaterialNodeView> m_NodeViewHashSet = new HashSet<MaterialNodeView>();
-        HashSet<Guid> m_PotentialEmptyGroupNodes = new HashSet<Guid>();
+//        HashSet<Guid> m_PotentialEmptyGroupNodes = new HashSet<Guid>();
         public void HandleGraphChanges()
         {
 
@@ -388,13 +387,22 @@ namespace UnityEditor.ShaderGraph.Drawing
             // Group Handling
             foreach (GroupData groupData in m_Graph.removedGroups)
             {
+                var group = m_GraphView.graphElements.ToList().OfType<MaterialGraphGroup>().ToList().First(g => g.userData == groupData);
+//                group.RemoveFromHierarchy();
+                m_GraphView.RemoveElement(group);
+                /*
+                foreach (AbstractMaterialNode node in m_Graph.GetNodesInGroup(groupData))
+                {
+                    Debug.Log(node.name);
+                }
+
                 // Need to get all the Groups in the scene
                 var groups = m_GraphView.graphElements.ToList().OfType<MaterialGraphGroup>();
                 foreach (var group in groups)
                 {
                     if (group.userData == groupData)
                     {
-                        System.Collections.Generic.List<INode> removeNodes = new System.Collections.Generic.List<INode>();
+                        List<INode> removeNodes = new List<INode>();
                         foreach (GraphElement element in group.containedElements)
                         {
                             //Debug.Log("DELETING NODE::: " + (element.userData as INode).name);
@@ -409,6 +417,7 @@ namespace UnityEditor.ShaderGraph.Drawing
                         m_GraphView.RemoveElement(group);
                     }
                 }
+                */
             }
 
             //RemoveEmptyGroups();
@@ -441,7 +450,7 @@ namespace UnityEditor.ShaderGraph.Drawing
                 if (groupNodeStruct.oldGroupGuid != Guid.Empty)
                 {
                     Debug.Log("OLD ID:: " + groupNodeStruct.oldGroupGuid);
-                    m_PotentialEmptyGroupNodes.Add(groupNodeStruct.oldGroupGuid);
+//                    m_PotentialEmptyGroupNodes.Add(groupNodeStruct.oldGroupGuid);
                 }
                 //materialNodeView.node.groupGuid = groupData.guid;
 
@@ -449,28 +458,28 @@ namespace UnityEditor.ShaderGraph.Drawing
 
 
 
-            foreach (var guid in m_PotentialEmptyGroupNodes)
-            {
-                //var node = m_GraphView.graphElements.ToList().FirstOrDefault((e => e.persistenceKey == guid.ToString()));
-
-                //var node = m_GraphView.GetElementByGuid(guid.ToString());
-                //var nod = m_GraphView.GetNodeByGuid(guid.ToString());
-
-                List<GraphElement> groups = m_GraphView.graphElements.ToList().FindAll(p => p.userData is GroupData);
-                foreach (GraphElement element in groups)
-                {
-                    Group group = element as Group;
-                    if (group != null)
-                    {
-                        GroupData groupData = (GroupData)group.userData;
-                        if(groupData.guid == guid && !group.containedElements.Any())
-                        {
-                            graphView.RemoveElement(group);
-                        }
-                    }
-                }
-            }
-            m_PotentialEmptyGroupNodes.Clear();
+//            foreach (var guid in m_PotentialEmptyGroupNodes)
+//            {
+//                //var node = m_GraphView.graphElements.ToList().FirstOrDefault((e => e.persistenceKey == guid.ToString()));
+//
+//                //var node = m_GraphView.GetElementByGuid(guid.ToString());
+//                //var nod = m_GraphView.GetNodeByGuid(guid.ToString());
+//
+//                List<GraphElement> groups = m_GraphView.graphElements.ToList().FindAll(p => p.userData is GroupData);
+//                foreach (GraphElement element in groups)
+//                {
+//                    Group group = element as Group;
+//                    if (group != null)
+//                    {
+//                        GroupData groupData = (GroupData)group.userData;
+//                        if(groupData.guid == guid && !group.containedElements.Any())
+//                        {
+//                            graphView.RemoveElement(group);
+//                        }
+//                    }
+//                }
+//            }
+//            m_PotentialEmptyGroupNodes.Clear();
 
             foreach (GroupData groupData in m_Graph.addedGroups)
             {

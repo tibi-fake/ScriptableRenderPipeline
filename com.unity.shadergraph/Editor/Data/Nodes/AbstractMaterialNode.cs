@@ -627,6 +627,8 @@ namespace UnityEditor.ShaderGraph
 
             if (!string.IsNullOrEmpty(m_GroupGuidSerialized))
                 m_GroupGuid = new Guid(m_GroupGuidSerialized);
+            else
+                m_GroupGuid = Guid.Empty;
 
             m_Slots = SerializationHelper.Deserialize<ISlot>(m_SerializableSlots, GraphUtil.GetLegacyTypeRemapping());
             m_SerializableSlots = null;
