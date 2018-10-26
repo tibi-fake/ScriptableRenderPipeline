@@ -1006,6 +1006,15 @@ float4 GetQuadVertexPosition(uint vertexID, float z = UNITY_NEAR_CLIP_VALUE)
     return float4(x, y, z, 1.0);
 }
 
+// Performs fading at the edge of the screen. 
+float EdgeOfScreenFade(float2 coordNDC, float fadeRcpLength)
+{
+    float2 coordCS = coordNDC * 2 - 1;
+    float2 t = Remap10(abs(coordCS), fadeRcpLength, fadeRcpLength);
+    return Smoothstep01(t.x) * Smoothstep01(t.y);
+}
+
+
 #if !defined(SHADER_API_GLES)
 
 // LOD dithering transition helper
