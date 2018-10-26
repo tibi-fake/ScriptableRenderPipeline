@@ -1,3 +1,4 @@
+using UnityEngine;
 using UnityEngine.Experimental.Rendering.HDPipeline;
 
 namespace UnityEditor.Experimental.Rendering.HDPipeline
@@ -19,6 +20,13 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
             customRenderData = serializedObject.Find((PlanarReflectionProbe p) => p.customRenderData);
 
             probeSettings.influence.editorSimplifiedModeBlendNormalDistance.floatValue = 0;
+
+            if (!HDUtils.IsQuaternionValid(probeSettings.proxyMirrorRotationProxySpace.quaternionValue))
+                probeSettings.proxyMirrorRotationProxySpace.quaternionValue = Quaternion.LookRotation(Vector3.forward);
+            if (!HDUtils.IsQuaternionValid(probeSettings.proxyCaptureRotationProxySpace.quaternionValue))
+                probeSettings.proxyCaptureRotationProxySpace.quaternionValue = Quaternion.LookRotation(Vector3.forward);
+
+            serializedObject.ApplyModifiedProperties();
         }
     }
 }

@@ -68,6 +68,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
 
         protected virtual void Draw(TUI s, TSerialized p, Editor o)
         {
+            HDProbeUI.Drawer<TProvider>.DrawToolbars(s, p, o);
             HDProbeUI.Drawer<TProvider>.DrawPrimarySettings(s, p, o);
             if (DrawAndSetSectionFoldout(s, HDProbeUI.Flag.SectionExpandedProjection, "Projection Settings"))
             {

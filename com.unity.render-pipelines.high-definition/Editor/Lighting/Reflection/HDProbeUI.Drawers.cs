@@ -16,6 +16,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
         [Flags]
         internal enum ToolBar
         {
+            None = 0,
             InfluenceShape = 1 << 0,
             Blend = 1 << 1,
             NormalBlend = 1 << 2,
@@ -32,6 +33,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
             ProbeSettingsOverride overrideableAdvancedSettings { get; }
             Type customTextureType { get; }
             ToolBar[] toolbars { get; }
+            Dictionary<KeyCode, ToolBar> shortcuts { get; }
         }
 
         // Constants
@@ -52,15 +54,6 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
             { ToolBar.CapturePosition, EditCapturePosition },
             { ToolBar.MirrorPosition, EditMirrorPosition },
             { ToolBar.MirrorRotation, EditMirrorRotation }
-        };
-
-        //[TODO] change this to be modifiable shortcuts
-        static Dictionary<KeyCode, ToolBar> k_ToolbarShortCutKey = new Dictionary<KeyCode, ToolBar>
-        {
-            { KeyCode.Alpha1, ToolBar.InfluenceShape },
-            { KeyCode.Alpha2, ToolBar.Blend },
-            { KeyCode.Alpha3, ToolBar.NormalBlend },
-            { KeyCode.Alpha4, ToolBar.CapturePosition }
         };
 
         // Probe Setting Mode cache
@@ -91,25 +84,14 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
                     listContent.Clear();
 
                     var toolBar = toolbars[i];
-                    if ((toolBar & ToolBar.InfluenceShape) > 0)
+                    for (int j = 0; j < sizeof(int) * 8; ++j)
                     {
-                        listMode.Add(k_ToolbarMode[ToolBar.InfluenceShape]);
-                        listContent.Add(k_ToolbarContents[ToolBar.InfluenceShape]);
-                    }
-                    if ((toolBar & ToolBar.Blend) > 0)
-                    {
-                        listMode.Add(k_ToolbarMode[ToolBar.Blend]);
-                        listContent.Add(k_ToolbarContents[ToolBar.Blend]);
-                    }
-                    if ((toolBar & ToolBar.NormalBlend) > 0)
-                    {
-                        listMode.Add(k_ToolbarMode[ToolBar.NormalBlend]);
-                        listContent.Add(k_ToolbarContents[ToolBar.NormalBlend]);
-                    }
-                    if ((toolBar & ToolBar.CapturePosition) > 0)
-                    {
-                        listMode.Add(k_ToolbarMode[ToolBar.CapturePosition]);
-                        listContent.Add(k_ToolbarContents[ToolBar.CapturePosition]);
+                        var toolbarJ = (ToolBar)(1 << j);
+                        if ((toolBar & toolbarJ) > 0)
+                        {
+                            listMode.Add(k_ToolbarMode[toolbarJ]);
+                            listContent.Add(k_ToolbarContents[toolbarJ]);
+                        }
                     }
                     k_ListContent[i] = listContent.ToArray();
                     k_ListModes[i] = listMode.ToArray();
@@ -118,7 +100,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
             }
 
             // Tool bars
-            public static void Drawer_Toolbars(HDProbeUI s, SerializedHDProbe d, Editor o)
+            public static void DrawToolbars(HDProbeUI s, SerializedHDProbe d, Editor o)
             {
                 var provider = new TProvider();
 
@@ -137,12 +119,13 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
             {
                 var provider = new TProvider();
                 var toolbars = provider.toolbars;
+                var shortcuts = provider.shortcuts;
 
                 var evt = Event.current;
                 if (evt.type != EventType.KeyDown || !evt.shift)
                     return;
 
-                if (k_ToolbarShortCutKey.TryGetValue(evt.keyCode, out ToolBar toolbar))
+                if (shortcuts.TryGetValue(evt.keyCode, out ToolBar toolbar))
                 {
                     bool used = false;
                     foreach (ToolBar t in toolbars)

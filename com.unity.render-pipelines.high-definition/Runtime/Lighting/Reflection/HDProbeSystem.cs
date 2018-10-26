@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine.Assertions;
 
 namespace UnityEngine.Experimental.Rendering.HDPipeline
 {
@@ -151,15 +152,18 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             switch (settings.mode)
             {
                 case ProbeSettings.Mode.Baked:
+                    Assert.IsFalse(m_BakedProbes.Contains(probe));
                     m_BakedProbes.Add(probe);
                     break;
                 case ProbeSettings.Mode.Realtime:
                     switch (settings.type)
                     {
                         case ProbeSettings.ProbeType.PlanarProbe:
+                            Assert.IsFalse(m_RealtimeViewDependentProbes.Contains(probe));
                             m_RealtimeViewDependentProbes.Add(probe);
                             break;
                         case ProbeSettings.ProbeType.ReflectionProbe:
+                            Assert.IsFalse(m_RealtimeViewIndependentProbes.Contains(probe));
                             m_RealtimeViewIndependentProbes.Add(probe);
                             break;
                     }
@@ -198,6 +202,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 {
                     m_PlanarProbes[index] = m_PlanarProbes[m_PlanarProbeCount - 1];
                     m_PlanarProbeBounds[index] = m_PlanarProbeBounds[m_PlanarProbeCount - 1];
+                    m_PlanarProbes[m_PlanarProbeCount - 1] = null;
                 }
                 --m_PlanarProbeCount;
             }

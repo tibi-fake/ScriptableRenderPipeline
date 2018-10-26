@@ -7,9 +7,10 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
     [CanEditMultipleObjects]
     class ReflectionProxyVolumeComponentEditor : Editor
     {
-        static readonly Color k_HandleColor = new Color(0 / 255f, 0xE5 / 255f, 0xFF / 255f, 0x20 / 255f);
+        static readonly Color k_HandleColor = new Color(0 / 255f, 0xE5 / 255f, 0xFF / 255f, 8f / 255).gamma;
 
-        HierarchicalBox m_Handle = new HierarchicalBox(k_HandleColor);
+        HierarchicalSphere m_SphereHandle;
+        HierarchicalBox m_BoxHandle;
         SerializedReflectionProxyVolumeComponent m_SerializedData;
         ReflectionProxyVolumeComponentUI m_UIState = new ReflectionProxyVolumeComponentUI();
         ReflectionProxyVolumeComponent[] m_TypedTargets;
@@ -21,10 +22,13 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
             for (int i = 0; i < serializedObject.targetObjects.Length; ++i)
                 m_TypedTargets[i] = (ReflectionProxyVolumeComponent)serializedObject.targetObjects[i];
 
-            m_Handle = m_Handle ?? new HierarchicalBox(k_HandleColor);
             m_UIState = m_UIState ?? new ReflectionProxyVolumeComponentUI();
 
-            m_Handle.monoHandle = false;
+            m_SphereHandle = new HierarchicalSphere(k_HandleColor);
+            m_BoxHandle = new HierarchicalBox(k_HandleColor)
+            {
+                monoHandle = false
+            };
         }
 
         public override void OnInspectorGUI()
@@ -46,26 +50,37 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
             
             for (int i = 0; i < m_TypedTargets.Length; ++i)
             {
-                var comp = (ReflectionProxyVolumeComponent)m_TypedTargets[i];
+                var comp = m_TypedTargets[i];
                 var tr = comp.transform;
                 var prox = comp.proxyVolume;
 
                 switch (prox.shape)
                 {
                     case ProxyShape.Box:
-                        m_Handle.center = tr.position;
-                        m_Handle.size = prox.boxSize;
+                        m_BoxHandle.center = tr.position;
+                        m_BoxHandle.size = prox.boxSize;
                         EditorGUI.BeginChangeCheck();
-                        m_Handle.DrawHull(true); 
-                        m_Handle.DrawHandle();
+                        m_BoxHandle.DrawHull(true); 
+                        m_BoxHandle.DrawHandle();
                         if (EditorGUI.EndChangeCheck())
                         {
                             Undo.RecordObjects(new Object[] { tr, comp }, "Update Proxy Volume Size");
-                            tr.position = m_Handle.center;
-                            prox.boxSize = m_Handle.size;
+                            tr.position = m_BoxHandle.center;
+                            prox.boxSize = m_BoxHandle.size;
                         }
                         break;
                     case ProxyShape.Sphere:
+                        m_SphereHandle.center = tr.position;
+                        m_SphereHandle.radius = prox.sphereRadius;
+                        EditorGUI.BeginChangeCheck();
+                        m_SphereHandle.DrawHull(true);
+                        m_SphereHandle.DrawHandle();
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            Undo.RecordObjects(new Object[] { tr, comp }, "Update Proxy Volume Size");
+                            tr.position = m_SphereHandle.center;
+                            prox.sphereRadius = m_SphereHandle.radius;
+                        }
                         break;
                     case ProxyShape.Infinite:
                         break;

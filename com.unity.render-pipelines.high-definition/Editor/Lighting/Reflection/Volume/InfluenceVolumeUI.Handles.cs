@@ -102,7 +102,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
         {
             using (new Handles.DrawingScope(Matrix4x4.TRS(Vector3.zero, transform.rotation, Vector3.one)))
             {
-                box.center = transform.position;
+                box.center = Quaternion.Inverse(transform.rotation) * transform.position;
                 box.size = d.boxSize.vector3Value;
 
                 EditorGUI.BeginChangeCheck();
@@ -110,8 +110,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
                 box.DrawHandle();
                 if (EditorGUI.EndChangeCheck())
                 {
-                    //d.offset.vector3Value = box.center;
-                    var newPosition = (Vector3)(Handles.inverseMatrix * box.center);
+                    var newPosition = transform.rotation * box.center;
                     Undo.RecordObject(transform, "Moving Influence");
                     transform.position = newPosition;
 
