@@ -210,20 +210,38 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 
         internal void PrepareCull(Camera camera, ReflectionProbeCullResults results)
         {
-            var cullingGroup = new CullingGroup();
-            cullingGroup.targetCamera = camera;
+            RemoveDestroyedProbes(m_PlanarProbes, m_PlanarProbeBounds, ref m_PlanarProbeCount);
+
+            var cullingGroup = new CullingGroup
+            {
+                targetCamera = camera
+            };
             cullingGroup.SetBoundingSpheres(m_PlanarProbeBounds);
             cullingGroup.SetBoundingSphereCount(m_PlanarProbeCount);
 
             results.PrepareCull(cullingGroup, m_PlanarProbes);
         }
 
-        void RemoveDestroyedProbes(List<HDProbe> probes)
+        static void RemoveDestroyedProbes(List<HDProbe> probes)
         {
             for (int i = probes.Count - 1; i >= 0; --i)
             {
                 if (probes[i] == null || probes[i].Equals(null))
                     probes.RemoveAt(i);
+            }
+        }
+
+        static void RemoveDestroyedProbes(PlanarReflectionProbe[] probes, BoundingSphere[] bounds, ref int count)
+        {
+            for (int i = 0; i < count; ++i)
+            {
+                if (probes[i] == null || probes[i].Equals(null))
+                {
+                    probes[i] = probes[count - 1];
+                    bounds[i] = bounds[count - 1];
+                    probes[count - 1] = null;
+                    --count;
+                }
             }
         }
     }

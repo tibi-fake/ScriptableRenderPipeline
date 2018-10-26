@@ -68,9 +68,9 @@ namespace UnityEditor.Experimental.Rendering
     {
         const float k_HandleSizeCoef = 0.05f;
         static Material k_Material_Cache;
-        static Material k_Material => (k_Material_Cache ?? (k_Material_Cache = new Material(Shader.Find("Hidden/UnlitTransparentColored"))));
+        static Material k_Material => (k_Material_Cache == null || k_Material_Cache.Equals(null) ? (k_Material_Cache = new Material(Shader.Find("Hidden/UnlitTransparentColored"))) : k_Material_Cache);
         static Mesh k_MeshQuad_Cache;
-        static Mesh k_MeshQuad => k_MeshQuad_Cache ?? (k_MeshQuad_Cache = Resources.GetBuiltinResource<Mesh>("Quad.fbx"));
+        static Mesh k_MeshQuad => k_MeshQuad_Cache == null || k_MeshQuad_Cache.Equals(null) ? (k_MeshQuad_Cache = Resources.GetBuiltinResource<Mesh>("Quad.fbx")) : k_MeshQuad_Cache;
 
         enum NamedFace { Right, Top, Front, Left, Bottom, Back, None }
 

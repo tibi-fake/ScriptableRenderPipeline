@@ -69,9 +69,9 @@ namespace UnityEditor.Experimental.Rendering
         const float k_HandleSizeCoef = 0.05f;
 
         static Material k_Material_Cache;
-        static Material k_Material => (k_Material_Cache ?? (k_Material_Cache = new Material(Shader.Find("Hidden/UnlitTransparentColored"))));
+        static Material k_Material => (k_Material_Cache == null || k_Material_Cache.Equals(null) ? (k_Material_Cache = new Material(Shader.Find("Hidden/UnlitTransparentColored"))) : k_Material_Cache);
         static Mesh k_MeshSphere_Cache;
-        static Mesh k_MeshSphere => k_MeshSphere_Cache ?? (k_MeshSphere_Cache = Resources.GetBuiltinResource<Mesh>("New-Sphere.fbx"));
+        static Mesh k_MeshSphere => k_MeshSphere_Cache == null || k_MeshSphere_Cache.Equals(null) ? (k_MeshSphere_Cache = Resources.GetBuiltinResource<Mesh>("New-Sphere.fbx")) : k_MeshSphere_Cache;
 
         readonly Material m_Material;
         readonly HierarchicalSphere m_Parent;
