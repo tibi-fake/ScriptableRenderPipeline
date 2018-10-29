@@ -47,6 +47,8 @@ Shader "Hidden/HDRenderPipeline/OpaqueAtmosphericScattering"
                 // And recompute the position on the sphere with the current camera direction.
                 float3 viewDirection = -V * 5000.0f;
                 posInput.positionWS = GetCurrentViewPosition() + viewDirection;
+
+                // Warning: we do not modify 'posInput.linearDepth'. It may still be imprecise!
             }
 
             return EvaluateAtmosphericScattering(posInput, V); // Premultiplied alpha
