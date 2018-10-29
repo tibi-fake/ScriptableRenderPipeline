@@ -7,7 +7,7 @@
 // Transmittance(x, z) = Transmittance(x, y) * Transmittance(y, z)
 // Integral{a, b}{Transmittance(0, t) dt} = Transmittance(0, a) * Integral{a, b}{Transmittance(0, t - a) dt}
 
-real3 TransmittanceFromOpticalDepth(real3 opticalDepth)
+real TransmittanceFromOpticalDepth(real opticalDepth)
 {
     return exp(-opticalDepth);
 }
@@ -85,17 +85,7 @@ real OpticalDepthHomogeneousMedium(real extinction, real intervalLength)
     return extinction * intervalLength;
 }
 
-real3 OpticalDepthHomogeneousMedium(real3 extinction, real intervalLength)
-{
-    return extinction * intervalLength;
-}
-
 real TransmittanceHomogeneousMedium(real extinction, real intervalLength)
-{
-    return TransmittanceFromOpticalDepth(OpticalDepthHomogeneousMedium(extinction, intervalLength));
-}
-
-real3 TransmittanceHomogeneousMedium(real3 extinction, real intervalLength)
 {
     return TransmittanceFromOpticalDepth(OpticalDepthHomogeneousMedium(extinction, intervalLength));
 }
@@ -105,11 +95,6 @@ real TransmittanceIntegralHomogeneousMedium(real extinction, real intervalLength
 {
     // Note: when multiplied by the extinction coefficient, it becomes
     // Albedo * (1 - TransmittanceFromOpticalDepth(d)) = Albedo * Opacity(d).
-    return rcp(extinction) - rcp(extinction) * exp(-extinction * intervalLength);
-}
-
-real3 TransmittanceIntegralHomogeneousMedium(real3 extinction, real intervalLength)
-{
     return rcp(extinction) - rcp(extinction) * exp(-extinction * intervalLength);
 }
 
