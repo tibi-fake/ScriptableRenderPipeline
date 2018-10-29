@@ -235,7 +235,7 @@ Shader "HDRenderPipeline/LitTessellation"
     #pragma shader_feature _PIXEL_DISPLACEMENT_LOCK_OBJECT_SCALE
     #pragma shader_feature _VERTEX_WIND
     #pragma shader_feature _ _TESSELLATION_PHONG
-    #pragma shader_feature _ _REFRACTION_BOX _REFRACTION_SPHERE
+    #pragma shader_feature _ _REFRACTION_PLANE _REFRACTION_SPHERE
 
     #pragma shader_feature _ _EMISSIVE_MAPPING_PLANAR _EMISSIVE_MAPPING_TRIPLANAR
     #pragma shader_feature _ _MAPPING_PLANAR _MAPPING_TRIPLANAR

@@ -87,7 +87,7 @@ TEXTURE2D(_ShadowMaskTexture); // Alias for shadow mask, so we don't need to kno
 #define OUT_GBUFFER_SHADOWMASK outGBuffer4
 #endif
 
-#define HAS_REFRACTION (defined(_REFRACTION_BOX) || defined(_REFRACTION_SPHERE))
+#define HAS_REFRACTION (defined(_REFRACTION_PLANE) || defined(_REFRACTION_SPHERE))
 
 // Enum for materialFeatureId (only use for encode/decode GBuffer)
 #define GBUFFER_LIT_STANDARD         0
@@ -204,7 +204,8 @@ uint TileVariantToFeatureFlags(uint variant, uint tileIndex)
 #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Refraction.hlsl"
 
 #if HAS_REFRACTION
-    #if defined(_REFRACTION_BOX)
+    // Note that this option is referred as "Box" in the UI, we are keeping _REFRACTION_PLANE as shader define to avoid complication with already created materials.  
+    #if defined(_REFRACTION_PLANE)
     #define REFRACTION_MODEL(V, posInputs, bsdfData) RefractionModelBox(V, posInputs.positionWS, bsdfData.normalWS, bsdfData.ior, bsdfData.thickness)
     #elif defined(_REFRACTION_SPHERE)
     #define REFRACTION_MODEL(V, posInputs, bsdfData) RefractionModelSphere(V, posInputs.positionWS, bsdfData.normalWS, bsdfData.ior, bsdfData.thickness)
