@@ -143,7 +143,7 @@ MonoBehaviour:
     supportLightLayers: 1
     supportedLitShaderMode: 3
     supportDecals: 1
-    m_SupportMSAA: 0
+    supportMSAA: 0
     msaaSampleCount: 1
     supportMotionVectors: 1
     supportRuntimeDebugDisplay: 0
@@ -183,6 +183,6 @@ MonoBehaviour:
       atlasHeight: 1024
       perChannelMask: 1
   allowShaderVariantStripping: 1
-  enableSRPBatcher: 0
+  enableSRPBatcher: 1
   diffusionProfileSettings: {fileID: 11400000, guid: 802c802428a2d9640a87e821dfcdd9e8,
     type: 2}
