@@ -575,10 +575,15 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                                                                                : "VolumeVoxelizationBruteforceMQ");
                 }
 
+<<<<<<< HEAD
                 var currFrameParams = hdCamera.vBufferParams[0];
                 var cvp = currFrameParams.viewportSize;
 
                 Vector4 resolution  = new Vector4(cvp.x, cvp.y, 1.0f / cvp.x, 1.0f / cvp.y);
+                float   vFoV        = hdCamera.camera.fieldOfView * Mathf.Deg2Rad;
+=======
+                var     frameParams = hdCamera.vBufferParams[0];
+                Vector4 resolution  = frameParams.viewportResolution;
 #if UNITY_2019_1_OR_NEWER
                 var vFoV        = hdCamera.camera.GetGateFittedFieldOfView() * Mathf.Deg2Rad;
                 var lensShift = hdCamera.camera.GetGateFittedLensShift();
@@ -586,6 +591,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 var vFoV        = hdCamera.camera.fieldOfView * Mathf.Deg2Rad;
                 var lensShift = Vector2.zero;
 #endif
+>>>>>>> 3724f8106673d634396cc34e8d585ae7f1981286
 
                 // Compose the matrix which allows us to compute the world space view direction.
                 Matrix4x4 transform = HDUtils.ComputePixelCoordToWorldSpaceViewDirectionMatrix(vFoV, lensShift, resolution, hdCamera.viewMatrix, false);
@@ -705,10 +711,17 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                     }
                 }
 
+<<<<<<< HEAD
                 var currFrameParams = hdCamera.vBufferParams[0];
                 var cvp = currFrameParams.viewportSize;
 
                 Vector4 resolution = new Vector4(cvp.x, cvp.y, 1.0f / cvp.x, 1.0f / cvp.y);
+                float   vFoV       = hdCamera.camera.fieldOfView * Mathf.Deg2Rad;
+                // Compose the matrix which allows us to compute the world space view direction.
+                Matrix4x4 transform = HDUtils.ComputePixelCoordToWorldSpaceViewDirectionMatrix(vFoV, resolution, hdCamera.viewMatrix, false);
+=======
+                var       frameParams = hdCamera.vBufferParams[0];
+                Vector4   resolution  = frameParams.viewportResolution;
 #if UNITY_2019_1_OR_NEWER
                 var vFoV = hdCamera.camera.GetGateFittedFieldOfView() * Mathf.Deg2Rad;
                 var lensShift = hdCamera.camera.GetGateFittedLensShift();
@@ -718,6 +731,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 #endif
                 // Compose the matrix which allows us to compute the world space view direction.
                 Matrix4x4 transform   = HDUtils.ComputePixelCoordToWorldSpaceViewDirectionMatrix(vFoV, lensShift, resolution, hdCamera.viewMatrix, false);
+>>>>>>> 3724f8106673d634396cc34e8d585ae7f1981286
 
                 GetHexagonalClosePackedSpheres7(m_xySeq);
 
