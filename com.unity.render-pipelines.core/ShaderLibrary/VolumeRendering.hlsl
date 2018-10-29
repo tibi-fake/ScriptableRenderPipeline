@@ -7,6 +7,79 @@
 // Transmittance(x, z) = Transmittance(x, y) * Transmittance(y, z)
 // Integral{a, b}{Transmittance(0, t) dt} = Transmittance(0, a) * Integral{a, b}{Transmittance(0, t - a) dt}
 
+real3 TransmittanceFromOpticalDepth(real3 opticalDepth)
+{
+    return exp(-opticalDepth);
+}
+
+real OpacityFromOpticalDepth(real opticalDepth)
+{
+    return 1 - TransmittanceFromOpticalDepth(opticalDepth);
+}
+
+//
+// ---------------------------------- Deep Pixel Compositing ---------------------------------------
+//
+
+// TODO: it would be good to improve the perf and numerical stability
+// of approximations below by finding a polynomial approximation.
+
+// input = {radiance, opacity}
+// Note that opacity must be less than 1 (not fully opaque).
+real4 LinearizeRGBA(real4 value)
+{
+    // See "Deep Compositing Using Lie Algebras".
+    // log(A) = {OpticalDepthFromOpacity(A.a) / A.a * A.rgb, -OpticalDepthFromOpacity(A.a)}.
+    // We drop redundant negations.
+    real a = value.a;
+    real d = -log(1 - a);
+    real r = (a >= FLT_EPS) ? (d * rcp(a)) : 1; // Prevent numerical explosion
+    return real4(r * value.rgb, d);
+}
+
+// input = {radiance, optical_depth}
+// Note that opacity must be less than 1 (not fully opaque).
+real4 LinearizeRGBD(real4 value)
+{
+    // See "Deep Compositing Using Lie Algebras".
+    // log(A) = {A.a / OpacityFromOpticalDepth(A.a) * A.rgb, -A.a}.
+    // We drop redundant negations.
+    real d = value.a;
+    real a = 1 - exp(-d);
+    real r = (a >= FLT_EPS) ? (d * rcp(a)) : 1; // Prevent numerical explosion
+    return real4(r * value.rgb, d);
+}
+
+// output = {radiance, opacity}
+// Note that opacity must be less than 1 (not fully opaque).
+real4 DelinearizeRGBA(real4 value)
+{
+    // See "Deep Compositing Using Lie Algebras".
+    // exp(B) = {OpacityFromOpticalDepth(-B.a) / -B.a * B.rgb, OpacityFromOpticalDepth(-B.a)}.
+    // We drop redundant negations.
+    real d = value.a;
+    real a = 1 - exp(-d);
+    real i = (a >= FLT_EPS) ? (a * rcp(d)) : 1; // Prevent numerical explosion
+    return real4(i * value.rgb, a);
+}
+
+// input = {radiance, optical_depth}
+// Note that opacity must be less than 1 (not fully opaque).
+real4 DelinearizeRGBD(real4 value)
+{
+    // See "Deep Compositing Using Lie Algebras".
+    // exp(B) = {OpacityFromOpticalDepth(-B.a) / -B.a * B.rgb, -B.a}.
+    // We drop redundant negations.
+    real d = value.a;
+    real a = 1 - exp(-d);
+    real i = (a >= FLT_EPS) ? (a * rcp(d)) : 1; // Prevent numerical explosion
+    return real4(i * value.rgb, d);
+}
+
+//
+// ----------------------------- Homogeneous Participating Media -----------------------------------
+//
+
 real OpticalDepthHomogeneousMedium(real extinction, real intervalLength)
 {
     return extinction * intervalLength;
@@ -17,36 +90,21 @@ real3 OpticalDepthHomogeneousMedium(real3 extinction, real intervalLength)
     return extinction * intervalLength;
 }
 
-real Transmittance(real opticalDepth)
-{
-    return exp(-opticalDepth);
-}
-
-real3 Transmittance(real3 opticalDepth)
-{
-    return exp(-opticalDepth);
-}
-
-real Opacity(real opticalDepth)
-{
-    return 1 - Transmittance(opticalDepth);
-}
-
 real TransmittanceHomogeneousMedium(real extinction, real intervalLength)
 {
-    return Transmittance(OpticalDepthHomogeneousMedium(extinction, intervalLength));
+    return TransmittanceFromOpticalDepth(OpticalDepthHomogeneousMedium(extinction, intervalLength));
 }
 
 real3 TransmittanceHomogeneousMedium(real3 extinction, real intervalLength)
 {
-    return Transmittance(OpticalDepthHomogeneousMedium(extinction, intervalLength));
+    return TransmittanceFromOpticalDepth(OpticalDepthHomogeneousMedium(extinction, intervalLength));
 }
 
-// Integral{a, b}{Transmittance(0, t - a) dt}.
+// Integral{a, b}{TransmittanceFromOpticalDepth(0, t - a) dt}.
 real TransmittanceIntegralHomogeneousMedium(real extinction, real intervalLength)
 {
     // Note: when multiplied by the extinction coefficient, it becomes
-    // Albedo * (1 - Transmittance(d)) = Albedo * Opacity(d).
+    // Albedo * (1 - TransmittanceFromOpticalDepth(d)) = Albedo * Opacity(d).
     return rcp(extinction) - rcp(extinction) * exp(-extinction * intervalLength);
 }
 
@@ -54,6 +112,10 @@ real3 TransmittanceIntegralHomogeneousMedium(real3 extinction, real intervalLeng
 {
     return rcp(extinction) - rcp(extinction) * exp(-extinction * intervalLength);
 }
+
+//
+// ----------------------------------- Height Fog --------------------------------------------------
+//
 
 // Can be used to scale base extinction and scattering coefficients.
 real ComputeHeightFogMultiplier(real height, real baseHeight, real2 heightExponents)
@@ -107,6 +169,26 @@ real OpticalDepthHeightFog(real baseExtinction, real baseHeight, real2 heightExp
 
     return baseExtinction * (homFogDist + expFogMult);
 }
+
+real TransmittanceHeightFog(real baseExtinction, real baseHeight, real2 heightExponents,
+                            real cosZenith, real startHeight, real intervalLength)
+{
+    real od = OpticalDepthHeightFog(baseExtinction, baseHeight, heightExponents,
+                                    cosZenith, startHeight, intervalLength);
+    return TransmittanceFromOpticalDepth(od);
+}
+
+real TransmittanceHeightFog(real baseExtinction, real baseHeight, real2 heightExponents,
+                            real cosZenith, real startHeight)
+{
+    real od = OpticalDepthHeightFog(baseExtinction, baseHeight, heightExponents,
+                                    cosZenith, startHeight);
+    return TransmittanceFromOpticalDepth(od);
+}
+
+//
+// ----------------------------------- Phase Functions ---------------------------------------------
+//
 
 real IsotropicPhaseFunction()
 {
@@ -162,6 +244,10 @@ real CornetteShanksPhaseFunction(real anisotropy, real cosTheta)
            CornetteShanksPhasePartVarying(anisotropy, cosTheta);
 }
 
+//
+// --------------------------------- Importance Sampling -------------------------------------------
+//
+
 // Samples the interval of homogeneous participating medium using the closed-form tracking approach
 // (proportionally to the transmittance).
 // Returns the offset from the start of the interval and the weight = (transmittance / pdf).
@@ -171,7 +257,7 @@ void ImportanceSampleHomogeneousMedium(real rndVal, real extinction, real interv
 {
     // pdf    = extinction * exp(extinction * (intervalLength - t)) / (exp(intervalLength * extinction) - 1)
     // pdf    = extinction * exp(-extinction * t) / (1 - exp(-extinction * intervalLength))
-    // weight = Transmittance(t) / pdf
+    // weight = TransmittanceFromOpticalDepth(t) / pdf
     // weight = exp(-extinction * t) / pdf
     // weight = (1 - exp(-extinction * intervalLength)) / extinction
     // weight = OpacityFromOpticalDepth(extinction * intervalLength) / extinction
@@ -234,65 +320,14 @@ void ImportanceSamplePunctualLight(real rndVal, real3 lightPosition, real lightS
     sqDist = max(sqDist - lightSqRadius, FLT_EPS);
 }
 
+//
+// ------------------------------------ Miscellaneous ----------------------------------------------
+//
+
 // Absorption coefficient from Disney: http://blog.selfshadow.com/publications/s2015-shading-course/burley/s2015_pbs_disney_bsdf_notes.pdf
 real3 TransmittanceColorAtDistanceToAbsorption(real3 transmittanceColor, real atDistance)
 {
     return -log(transmittanceColor + FLT_EPS) / max(atDistance, FLT_EPS);
-}
-
-// TODO: it would be good to improve the perf and numerical stability
-// of approximations below by finding a polynomial approximation.
-
-// input = {radiance, opacity}
-// Note that opacity must be less than 1 (not fully opaque).
-real4 LinearizeRGBA(real4 value)
-{
-    // See "Deep Compositing Using Lie Algebras".
-    // log(A) = {OpticalDepthFromOpacity(A.a) / A.a * A.rgb, -OpticalDepthFromOpacity(A.a)}.
-    // We drop redundant negations.
-    real a = value.a;
-    real d = -log(1 - a);
-    real r = (a >= FLT_EPS) ? (d * rcp(a)) : 1; // Prevent numerical explosion
-    return real4(r * value.rgb, d);
-}
-
-// input = {radiance, optical_depth}
-// Note that opacity must be less than 1 (not fully opaque).
-real4 LinearizeRGBD(real4 value)
-{
-    // See "Deep Compositing Using Lie Algebras".
-    // log(A) = {A.a / OpacityFromOpticalDepth(A.a) * A.rgb, -A.a}.
-    // We drop redundant negations.
-    real d = value.a;
-    real a = 1 - exp(-d);
-    real r = (a >= FLT_EPS) ? (d * rcp(a)) : 1; // Prevent numerical explosion
-    return real4(r * value.rgb, d);
-}
-
-// output = {radiance, opacity}
-// Note that opacity must be less than 1 (not fully opaque).
-real4 DelinearizeRGBA(real4 value)
-{
-    // See "Deep Compositing Using Lie Algebras".
-    // exp(B) = {OpacityFromOpticalDepth(-B.a) / -B.a * B.rgb, OpacityFromOpticalDepth(-B.a)}.
-    // We drop redundant negations.
-    real d = value.a;
-    real a = 1 - exp(-d);
-    real i = (a >= FLT_EPS) ? (a * rcp(d)) : 1; // Prevent numerical explosion
-    return real4(i * value.rgb, a);
-}
-
-// input = {radiance, optical_depth}
-// Note that opacity must be less than 1 (not fully opaque).
-real4 DelinearizeRGBD(real4 value)
-{
-    // See "Deep Compositing Using Lie Algebras".
-    // exp(B) = {OpacityFromOpticalDepth(-B.a) / -B.a * B.rgb, -B.a}.
-    // We drop redundant negations.
-    real d = value.a;
-    real a = 1 - exp(-d);
-    real i = (a >= FLT_EPS) ? (a * rcp(d)) : 1; // Prevent numerical explosion
-    return real4(i * value.rgb, d);
 }
 
 #endif // UNITY_VOLUME_RENDERING_INCLUDED

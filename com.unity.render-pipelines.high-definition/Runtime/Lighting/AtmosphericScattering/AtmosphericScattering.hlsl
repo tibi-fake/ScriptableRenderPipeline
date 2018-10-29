@@ -103,7 +103,7 @@ float4 EvaluateAtmosphericScattering(PositionInputs posInput, float3 V)
                 float3 volAlbedo  = _HeightFogBaseScattering / _HeightFogBaseExtinction;
                 float  odFallback = OpticalDepthHeightFog(_HeightFogBaseExtinction, _HeightFogBaseHeight,
                                                           _HeightFogExponents, cosZenith, startHeight, dist);
-                float  trFallback = Transmittance(odFallback);
+                float  trFallback = TransmittanceFromOpticalDepth(odFallback);
                 float  trCamera   = 1 - volFog.a;
 
                 volFog.rgb += trCamera * GetFogColor(posInput) * volAlbedo * (1 - trFallback);

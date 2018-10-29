@@ -642,7 +642,7 @@ void FillVolumetricLightingBuffer(LightLoopContext context, uint featureFlags,
     #endif // ENABLE_REPROJECTION
 
         // Compute the transmittance from the camera to 't0'.
-        float transmittance = Transmittance(opticalDepth);
+        float transmittance = TransmittanceFromOpticalDepth(opticalDepth);
         float phase         = _CornetteShanksConstant;
 
         // Integrate the contribution of the probe over the interval.
