@@ -76,7 +76,7 @@ float4 EvaluateAtmosphericScattering(PositionInputs posInput, float3 V)
 
             // TODO: add some slowly animated noise (dither?) to the reconstructed value.
             // TODO: re-enable tone mapping after implementing pre-exposure.
-            float4 volFog = DelinearizeRGBD(float4(/*FastTonemapInvert*/(value.rgb), value.a));
+            float4 volFog = DelinearizeRGBA(float4(/*FastTonemapInvert*/(value.rgb), value.a));
 
             // TODO: if 'posInput.linearDepth' is computed using 'posInput.positionWS',
             // and the latter resides on the far plane, the computation will be numerically unstable.
@@ -94,12 +94,24 @@ float4 EvaluateAtmosphericScattering(PositionInputs posInput, float3 V)
                 float  startHeight = positionWS.y;
                 float  cosZenith   = -V.y;
 
-                volFog.a += OpticalDepthHeightFog(_HeightFogBaseExtinction, _HeightFogBaseHeight, _HeightFogExponents,
-                                                  cosZenith, startHeight, dist);
+                // For both homogeneous and exponential media,
+                // Integrate[Transmittance[x] * Scattering[x], {x, 0, t}] = Albedo * Opacity[t].
+                // Note that pulling the incoming radiance (which is affected by the fog) out of the
+                // integral is wrong, as it means that shadow rays are not volumetrically shadowed.
+                // This will result in fog looking overly bright.
+
+                float3 volAlbedo  = _HeightFogBaseScattering / _HeightFogBaseExtinction;
+                float  odFallback = OpticalDepthHeightFog(_HeightFogBaseExtinction, _HeightFogBaseHeight,
+                                                          _HeightFogExponents, cosZenith, startHeight, dist);
+                float  trFallback = Transmittance(odFallback);
+                float  trCamera   = 1 - volFog.a;
+
+                volFog.rgb += trCamera * GetFogColor(posInput) * volAlbedo * (1 - trFallback);
+                volFog.a    = 1 - (trCamera * trFallback);
             }
 
             fogColor  = volFog.rgb; // Pre-multiplied by design
-            fogFactor = 1 - Transmittance(volFog.a);
+            fogFactor = volFog.a;
             break;
         }
     }

@@ -45,6 +45,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
             PropertyField(m_HeightExponent,         s_HeightExponentLabel);
             PropertyField(m_Anisotropy,             s_AnisotropyLabel);
             PropertyField(m_GlobalLightProbeDimmer, s_GlobalLightProbeDimmerLabel);
+            base.OnInspectorGUI(); // Color
         }
     }
 }

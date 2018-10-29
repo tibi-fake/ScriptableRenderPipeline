@@ -2,10 +2,10 @@
 #define UNITY_VOLUME_RENDERING_INCLUDED
 
 // Reminder:
-// Optical_Depth(x, y) = Integral{x, y}{Extinction(t) dt}
-// Transmittance(x, y) = Exp(-Optical_Depth(x, y))
+// OpticalDepth(x, y) = Integral{x, y}{Extinction(t) dt}
+// Transmittance(x, y) = Exp(-OpticalDepth(x, y))
 // Transmittance(x, z) = Transmittance(x, y) * Transmittance(y, z)
-// Integral{a, b}{Transmittance(0, t) * L_s(t) dt} = Transmittance(0, a) * Integral{a, b}{Transmittance(0, t - a) * L_s(t) dt}.
+// Integral{a, b}{Transmittance(0, t) dt} = Transmittance(0, a) * Integral{a, b}{Transmittance(0, t - a) dt}
 
 real OpticalDepthHomogeneousMedium(real extinction, real intervalLength)
 {
@@ -27,6 +27,11 @@ real3 Transmittance(real3 opticalDepth)
     return exp(-opticalDepth);
 }
 
+real Opacity(real opticalDepth)
+{
+    return 1 - Transmittance(opticalDepth);
+}
+
 real TransmittanceHomogeneousMedium(real extinction, real intervalLength)
 {
     return Transmittance(OpticalDepthHomogeneousMedium(extinction, intervalLength));
@@ -40,10 +45,11 @@ real3 TransmittanceHomogeneousMedium(real3 extinction, real intervalLength)
 // Integral{a, b}{Transmittance(0, t - a) dt}.
 real TransmittanceIntegralHomogeneousMedium(real extinction, real intervalLength)
 {
+    // Note: when multiplied by the extinction coefficient, it becomes
+    // Albedo * (1 - Transmittance(d)) = Albedo * Opacity(d).
     return rcp(extinction) - rcp(extinction) * exp(-extinction * intervalLength);
 }
 
-// Integral{a, b}{Transmittance(0, t - a) dt}.
 real3 TransmittanceIntegralHomogeneousMedium(real3 extinction, real intervalLength)
 {
     return rcp(extinction) - rcp(extinction) * exp(-extinction * intervalLength);
@@ -52,9 +58,10 @@ real3 TransmittanceIntegralHomogeneousMedium(real3 extinction, real intervalLeng
 // Can be used to scale base extinction and scattering coefficients.
 real ComputeHeightFogMultiplier(real height, real baseHeight, real2 heightExponents)
 {
-    height = max(0, height - baseHeight);
+    real h    = max(height - baseHeight, 0);
+    real rcpH = heightExponents.x;
 
-    return exp(-heightExponents.x * height);
+    return exp(-h * rcpH);
 }
 
 // Optical depth between two endpoints.
@@ -63,7 +70,7 @@ real OpticalDepthHeightFog(real baseExtinction, real baseHeight, real2 heightExp
 {
     // Height fog is composed of two slices of optical depth:
     // - homogeneous fog below 'baseHeight': d = k * t
-    // - exponential fog above 'baseHeight': d = Integrate[k * e^(-(h_0 + Z * x) / H) dx, {x, 0, t}]
+    // - exponential fog above 'baseHeight': d = Integrate[k * e^(-(h + z * x) / H) dx, {x, 0, t}]
 
     real H          = heightExponents.y;
     real rcpH       = heightExponents.x;
@@ -73,12 +80,11 @@ real OpticalDepthHeightFog(real baseExtinction, real baseHeight, real2 heightExp
 
     real endHeight  = startHeight + intervalLength * Z;
     real minHeight  = min(startHeight, endHeight);
-
-    startHeight     = max(startHeight - baseHeight, 0);
+    real h          = max(minHeight - baseHeight, 0);
 
     real homFogDist = clamp((baseHeight - minHeight) * rcpAbsZ, 0, intervalLength);
     real expFogDist = intervalLength - homFogDist;
-    real expFogMult = exp(-startHeight * rcpH) * (abs(1 - exp(-expFogDist * absZ * rcpH)) * rcpAbsZ * H);
+    real expFogMult = exp(-h * rcpH) * (1 - exp(-expFogDist * absZ * rcpH)) * (rcpAbsZ * H);
 
     return baseExtinction * (homFogDist + expFogMult);
 }
@@ -87,21 +93,17 @@ real OpticalDepthHeightFog(real baseExtinction, real baseHeight, real2 heightExp
 real OpticalDepthHeightFog(real baseExtinction, real baseHeight, real2 heightExponents,
                            real cosZenith, real startHeight)
 {
-    real intervalLength = rcp(FLT_EPS);
-
     real H          = heightExponents.y;
     real rcpH       = heightExponents.x;
     real Z          = cosZenith;
     real absZ       = max(abs(cosZenith), FLT_EPS);
     real rcpAbsZ    = rcp(absZ);
 
-    real endHeight  = startHeight + intervalLength * Z;
-    real minHeight  = min(startHeight, endHeight);
-
-    startHeight     = max(startHeight - baseHeight, 0);
+    real minHeight  = (Z >= 0) ? startHeight : -rcp(FLT_EPS);
+    real h          = max(minHeight - baseHeight, 0);
 
     real homFogDist = max((baseHeight - minHeight) * rcpAbsZ, 0);
-    real expFogMult = exp(-startHeight * rcpH) * (rcpAbsZ * H);
+    real expFogMult = exp(-h * rcpH) * (rcpAbsZ * H);
 
     return baseExtinction * (homFogDist + expFogMult);
 }

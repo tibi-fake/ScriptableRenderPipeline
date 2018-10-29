@@ -17,11 +17,11 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 
         public override void PushShaderParameters(HDCamera hdCamera, CommandBuffer cmd)
         {
+            PushShaderParametersCommon(hdCamera, cmd, FogType.Volumetric);
+
             DensityVolumeArtistParameters param = new DensityVolumeArtistParameters(albedo, meanFreePath, anisotropy);
 
             DensityVolumeEngineData data = param.ConvertToEngineData();
-
-            cmd.SetGlobalInt(HDShaderIDs._AtmosphericScatteringType, (int)FogType.Volumetric);
 
             cmd.SetGlobalVector(HDShaderIDs._HeightFogBaseScattering, data.scattering);
             cmd.SetGlobalFloat(HDShaderIDs._HeightFogBaseExtinction,  data.extinction);
