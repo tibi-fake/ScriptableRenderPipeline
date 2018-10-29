@@ -14,6 +14,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         public ClampedFloatParameter heightExponent         = new ClampedFloatParameter(0.5f, 0.001f, 1.0f);
         public ClampedFloatParameter anisotropy             = new ClampedFloatParameter(0.0f, -1.0f, 1.0f);
         public ClampedFloatParameter globalLightProbeDimmer = new ClampedFloatParameter(1.0f, 0.0f, 1.0f);
+        public BoolParameter         enableDistantFog       = new BoolParameter(false);
 
         public override void PushShaderParameters(HDCamera hdCamera, CommandBuffer cmd)
         {
@@ -33,9 +34,10 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 crBaseHeight -= hdCamera.camera.transform.position.y;
             }
 
-            cmd.SetGlobalVector(HDShaderIDs._HeightFogExponents, new Vector2(heightExponent, 1.0f / heightExponent));
-            cmd.SetGlobalFloat(HDShaderIDs._HeightFogBaseHeight, crBaseHeight);
-            cmd.SetGlobalFloat(HDShaderIDs._GlobalFogAnisotropy, anisotropy);
+            cmd.SetGlobalVector(HDShaderIDs._HeightFogExponents,  new Vector2(heightExponent, 1.0f / heightExponent));
+            cmd.SetGlobalFloat( HDShaderIDs._HeightFogBaseHeight, crBaseHeight);
+            cmd.SetGlobalFloat( HDShaderIDs._GlobalFogAnisotropy, anisotropy);
+            cmd.SetGlobalInt(   HDShaderIDs._EnableDistantFog,    enableDistantFog ? 1 : 0);
         }
     }
 }

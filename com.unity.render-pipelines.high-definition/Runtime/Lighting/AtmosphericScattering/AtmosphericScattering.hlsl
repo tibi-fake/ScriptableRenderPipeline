@@ -82,9 +82,9 @@ float4 EvaluateAtmosphericScattering(PositionInputs posInput, float3 V)
             // and the latter resides on the far plane, the computation will be numerically unstable.
             float linearDepthDelta = posInput.linearDepth - _VBufferMaxLinearDepth;
 
-            if (linearDepthDelta > 0)
+            if ((_EnableDistantFog != 0) && (linearDepthDelta > 0))
             {
-                // Apply the fall-back fog.
+                // Apply the distant (fallback) fog.
                 float3 F     = GetViewForwardDir();
                 float  FdotV = dot(F, -V);
                 float  dist  = linearDepthDelta * rcp(FdotV);
