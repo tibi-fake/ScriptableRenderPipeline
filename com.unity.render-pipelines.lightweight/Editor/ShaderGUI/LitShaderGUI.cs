@@ -1,8 +1,9 @@
 using System;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
+using UnityEditor.Experimental.Rendering.LightweightPipeline;
 
-namespace UnityEditor.Experimental.Rendering.LightweightPipeline
+namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
 {
     internal class LitShaderGUI : BaseShaderGUI
     {
@@ -62,23 +63,23 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
         {
             base.FindProperties(properties);
 
-            workflowMode = FindProperty("_WorkflowMode", properties);
+            workflowMode = FindProperty("_WorkflowMode", properties, false);
 
-            smoothness = FindProperty("_Glossiness", properties);
+            smoothness = FindProperty("_Smoothness", properties);
             smoothnessScale = FindProperty("_GlossMapScale", properties, false);
             smoothnessMapChannel = FindProperty("_SmoothnessTextureChannel", properties, false);
 
             metallic = FindProperty("_Metallic", properties);
-            specColor = FindProperty("_SpecColor", properties);
+            specColor = FindProperty("_SpecColor", properties, false);
             metallicGlossMap = FindProperty("_MetallicGlossMap", properties);
-            specGlossMap = FindProperty("_SpecGlossMap", properties);
-            highlights = FindProperty("_SpecularHighlights", properties);
-            reflections = FindProperty("_GlossyReflections", properties);
+            specGlossMap = FindProperty("_SpecGlossMap", properties, false);
+            highlights = FindProperty("_SpecularHighlights", properties, false);
+            reflections = FindProperty("_GlossyReflections", properties, false);
 
             bumpScale = FindProperty("_BumpScale", properties);
             bumpMap = FindProperty("_BumpMap", properties);
-            occlusionStrength = FindProperty("_OcclusionStrength", properties);
-            occlusionMap = FindProperty("_OcclusionMap", properties);
+            occlusionStrength = FindProperty("_OcclusionStrength", properties, false);
+            occlusionMap = FindProperty("_OcclusionMap", properties, false);
         }
 
         public override void MaterialChanged(Material material)
@@ -102,7 +103,10 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
             // Detect any changes to the material
             EditorGUI.BeginChangeCheck();
             {
-                DoPopup(StylesLit.workflowModeText, workflowMode, StylesLit.workflowNames);
+                if (workflowMode != null)
+                {
+                    DoPopup(StylesLit.workflowModeText, workflowMode, StylesLit.workflowNames);
+                }
                 base.DrawSurfaceOptions(material);
             }
             if (EditorGUI.EndChangeCheck())
@@ -119,9 +123,13 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
             EditorGUI.BeginChangeCheck();
             {
                 DoMetallicSpecularArea();
-                DoNormalArea();
+                base.DoNormalArea(bumpMap, bumpScale);
 
-                materialEditor.TexturePropertySingleLine(StylesLit.occlusionText, occlusionMap, occlusionMap.textureValue != null ? occlusionStrength : null);
+                if (occlusionMap != null)
+                {
+                    materialEditor.TexturePropertySingleLine(StylesLit.occlusionText, occlusionMap,
+                        occlusionMap.textureValue != null ? occlusionStrength : null);
+                }
 
                 DrawEmissionProperties(material, true);
 
@@ -132,11 +140,16 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
 
         public override void DrawAdvancedOptions(Material material)
         {
-            EditorGUI.BeginChangeCheck();
+            if (reflections != null && highlights != null)
             {
-                materialEditor.ShaderProperty(highlights, StylesLit.highlightsText);
-                materialEditor.ShaderProperty(reflections, StylesLit.reflectionsText);
+                EditorGUI.BeginChangeCheck();
+                {
+                    materialEditor.ShaderProperty(highlights, StylesLit.highlightsText);
+                    materialEditor.ShaderProperty(reflections, StylesLit.reflectionsText);
+                    EditorGUI.BeginChangeCheck();
+                }
             }
+
             base.DrawAdvancedOptions(material);
         }
 
@@ -207,7 +220,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
         {
             string[] metallicSpecSmoothnessChannelName;
             bool hasGlossMap = false;
-            if ((WorkflowMode)workflowMode.floatValue == WorkflowMode.Metallic)
+            if (workflowMode == null || (WorkflowMode)workflowMode.floatValue == WorkflowMode.Metallic)
             {
                 hasGlossMap = metallicGlossMap.textureValue != null;
                 metallicSpecSmoothnessChannelName = StylesLit.metallicSmoothnessChannelNames;

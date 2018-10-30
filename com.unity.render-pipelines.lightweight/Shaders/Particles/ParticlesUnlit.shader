@@ -35,7 +35,7 @@ Shader "Lightweight Render Pipeline/Particles/Unlit"
         // Particle specific
         [HideInInspector] _ColorMode("_ColorMode", Float) = 0.0
         [HideInInspector] _BaseColorAddSubDiff("_ColorMode", Vector) = (0,0,0,0)
-        [HideInInspector] _FlipbookMode("__flipbookmode", Float) = 0.0
+        [ToggleOff] _FlipbookBlending("__flipbookblending", Float) = 0.0
         [HideInInspector] _SoftParticlesEnabled("__softparticlesenabled", Float) = 0.0
         [HideInInspector] _CameraFadingEnabled("__camerafadingenabled", Float) = 0.0
         [HideInInspector] _SoftParticleFadeParams("__softparticlefadeparams", Vector) = (0,0,0,0)
@@ -83,7 +83,7 @@ Shader "Lightweight Render Pipeline/Particles/Unlit"
             // Particle Keywords
             #pragma shader_feature _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON _ALPHAMODULATE_ON
             #pragma shader_feature _ _COLOROVERLAY_ON _COLORCOLOR_ON _COLORADDSUBDIFF_ON
-            #pragma shader_feature _REQUIRE_UV2
+            #pragma shader_feature _FLIPBOOKBLENDING_OFF
             #pragma shader_feature _FADING_ON
             #pragma shader_feature _DISTORTION_ON
             

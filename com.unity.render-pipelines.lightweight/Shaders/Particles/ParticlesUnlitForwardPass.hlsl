@@ -8,7 +8,7 @@ struct AttributesParticle
     float4 vertex : POSITION;
     float3 normal : NORMAL;
     half4 color : COLOR;
-#if defined(_REQUIRE_UV2) && !defined(UNITY_PARTICLE_INSTANCING_ENABLED)
+#if defined(_FLIPBOOKBLENDING_OFF) && !defined(UNITY_PARTICLE_INSTANCING_ENABLED)
     float4 texcoords : TEXCOORD0;
     float texcoordBlend : TEXCOORD1;
 #else
@@ -33,7 +33,7 @@ struct VaryingsParticle
     half3 viewDirWS                 : TEXCOORD3;
 #endif
 
-#if defined(_REQUIRE_UV2)
+#if defined(_FLIPBOOKBLENDING_OFF)
     float3 texcoord2AndBlend        : TEXCOORD5;
 #endif
 #if defined(SOFTPARTICLES_ON) || defined(_FADING_ON) || defined(_DISTORTION_ON)
@@ -116,7 +116,7 @@ VaryingsParticle vertParticleUnlit(AttributesParticle input)
     //vertColor(output.color);
     
     output.texcoord = input.texcoords.xy;
-#ifdef _REQUIRE_UV2
+#ifdef _FLIPBOOKBLENDING_OFF
     output.texcoord2AndBlend.xy = input.texcoords.zw;
     output.texcoord2AndBlend.z = input.texcoordBlend;
 #endif
@@ -132,7 +132,7 @@ half4 fragParticleUnlit(VaryingsParticle input) : SV_Target
 {
     float2 uv = input.texcoord;
     float3 blendUv = float3(0, 0, 0);
-#if defined(_REQUIRE_UV2)
+#if defined(_FLIPBOOKBLENDING_OFF)
     blendUv = input.texcoord2AndBlend;
 #endif
 

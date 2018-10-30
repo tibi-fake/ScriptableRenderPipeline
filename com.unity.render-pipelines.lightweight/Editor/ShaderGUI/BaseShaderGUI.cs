@@ -55,6 +55,11 @@ namespace UnityEditor
             public static readonly GUIContent emissionMap = new GUIContent("Emission Map", "This Property is used for adding emissive light to the material.\n" +
                                                                               "If there is no RGB texture map assigned the color property controls the emission, otherwise it is multiplied over the texture map.");
             public static readonly GUIContent emissionColor = new GUIContent("Emission Color", "This color property adds emissive to the material, if a Base Map is assigned this color will be multiplied over it.");
+            
+            public static readonly GUIContent normalMapText = new GUIContent("Normal Map", "Normal Map");
+            public static readonly GUIContent bumpScaleNotSupported = new GUIContent("Bump scale is not supported on mobile platforms");
+            public static readonly GUIContent fixNow = new GUIContent("Fix now");
+            
             public static readonly GUIContent queueSlider = new GUIContent("Queue Offset", "This slider controls the offset in the render queue, use this for fine tuning render order.");
         }
 
@@ -71,7 +76,7 @@ namespace UnityEditor
         protected MaterialProperty emissionMapProp { get; set; }
         protected MaterialProperty emissionColorProp { get; set; }
         protected MaterialProperty queueOffsetProp { get; set; }
-        private bool m_FirstTimeApply = true;
+        public bool m_FirstTimeApply = true;
 
         private const string k_KeyPrefix = "LightweightRP:Material:UI_State:";
         private string m_HeaderStateKey;
@@ -246,11 +251,26 @@ namespace UnityEditor
                     material.globalIlluminationFlags |= MaterialGlobalIlluminationFlags.EmissiveIsBlack;
             }
         }
-
-        public virtual void DrawAdditionalFoldouts(Material material)
+        
+        public virtual void DoNormalArea(MaterialProperty bumpMap, MaterialProperty bumpMapScale = null)
         {
-            
+            if (bumpMapScale != null)
+            {
+                materialEditor.TexturePropertySingleLine(Styles.normalMapText, bumpMap,
+                    bumpMap.textureValue != null ? bumpMapScale : null);
+                if (bumpMapScale.floatValue != 1 &&
+                    UnityEditorInternal.InternalEditorUtility.IsMobilePlatform(
+                        EditorUserBuildSettings.activeBuildTarget))
+                    if (materialEditor.HelpBoxWithButton(Styles.bumpScaleNotSupported, Styles.fixNow))
+                        bumpMapScale.floatValue = 1;
+            }
+            else
+            {
+                materialEditor.TexturePropertySingleLine(Styles.normalMapText, bumpMap);
+            }
         }
+
+        public virtual void DrawAdditionalFoldouts(Material material){}
 
         public void DrawBaseTileOffset()
         {
@@ -326,6 +346,18 @@ namespace UnityEditor
                         break;
                 }
             }
+        }
+
+        [MenuItem("CONTEXT/Material/Test", false, 999)]
+        static void Test(MenuCommand command)
+        {
+            Material mat = (Material) command.context;
+            Shader shader = mat.shader;
+
+            var bumpScale = mat.HasProperty("_BumpScale"); // checks shader
+            //mat.
+            
+            Debug.Log("Clicking on " + mat.name + " and bump scale is " + bumpScale);
         }
 
         protected void DoPopup(GUIContent label, MaterialProperty property, string[] options)

@@ -11,7 +11,7 @@ half4 _BaseColor;
 half4 _SpecColor;
 half4 _EmissionColor;
 half _Cutoff;
-half _Glossiness;
+half _Smoothness;
 half _GlossMapScale;
 half _Metallic;
 half _BumpScale;
@@ -49,7 +49,7 @@ half4 SampleMetallicSpecGloss(float2 uv, half albedoAlpha)
     #ifdef _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
         specGloss.a = albedoAlpha * _GlossMapScale;
     #else
-        specGloss.a = _Glossiness;
+        specGloss.a = _Smoothness;
     #endif
 #endif
 
