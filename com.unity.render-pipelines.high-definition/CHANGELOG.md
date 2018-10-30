@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [5.1.0-preview] - 2018-10-18
 
+### Fixed
+- Fixed material tesselation's parameters "start fade distance" and "end fade distance" that were clamped while being modified.
+
 ## [5.0.0-preview] - 2018-09-28
 
 ### Added
@@ -56,6 +59,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fixed depth pyramid debug view mode
 - Fixed sphere shaped influence handles clamping in reflection probes
 - Fixed reflection probes data migration for project created before using hdrp
+
 
 ### Changed
 - Use samplerunity_ShadowMask instead of samplerunity_samplerLightmap for shadow mask
