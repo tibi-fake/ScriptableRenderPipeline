@@ -32,6 +32,6 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
         static readonly GUIContent normalModeContent = CoreEditorUtils.GetContent("Normal|Normal parameters mode (only change for box shape).");
         static readonly GUIContent advancedModeContent = CoreEditorUtils.GetContent("Advanced|Advanced parameters mode (only change for box shape).");
         
-        static readonly string influenceVolumeHeader = "Influence Volume";
+        internal static readonly string influenceVolumeHeader = "Influence Volume";
     }
 }

@@ -44,10 +44,14 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
             Inspector[Inspector.Length - 1] = CED.noop; //hide bake button
 
             //override SectionInfluenceVolume to remove normals settings
-            Inspector[3] = CED.Select(
-                (s, d, o) => s.influenceVolume,
-                (s, d, o) => d.influenceVolume,
-                InfluenceVolumeUI.SectionFoldoutShapePlanar
+            Inspector[3] = HeaderMaker(
+                InfluenceVolumeUI.influenceVolumeHeader,
+                Expendable.InfluenceVolume,
+                CED.Select(
+                    (s, d, o) => s.influenceVolume,
+                    (s, d, o) => d.influenceVolume,
+                    InfluenceVolumeUI.InnerInspector(UnityEngine.Experimental.Rendering.HDPipeline.ReflectionProbeType.PlanarReflection)
+                    )
                 );
         }
 

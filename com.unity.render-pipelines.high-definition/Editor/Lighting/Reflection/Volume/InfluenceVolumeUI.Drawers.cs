@@ -8,21 +8,17 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
 
     partial class InfluenceVolumeUI
     {
-        //[TODO: planar / non planar will be redone in next PR]
-        internal static readonly CED.IDrawer SectionFoldoutShapePlanar;
-        internal static readonly CED.IDrawer SectionFoldoutShape;
         static readonly CED.IDrawer SectionShapeBoxPlanar = CED.Action((s, p, o) => Drawer_SectionShapeBox( s, p, o, false, false, false));
         static readonly CED.IDrawer SectionShapeBox = CED.Action((s, p, o) => Drawer_SectionShapeBox(s, p, o, true, true, true));
         static readonly CED.IDrawer SectionShapeSpherePlanar = CED.Action((s, p, o) => Drawer_SectionShapeSphere(s, p, o, false, false));
         static readonly CED.IDrawer SectionShapeSphere = CED.Action((s, p, o) => Drawer_SectionShapeSphere(s, p, o, true, true));
 
-        static InfluenceVolumeUI()
+        internal static CED.IDrawer InnerInspector(ReflectionProbeType type)
         {
-            SectionFoldoutShapePlanar = CED.Group(
-                    CED.FoldoutGroup(
-                        influenceVolumeHeader,
-                        (s, d, o) => s.isSectionExpandedShape,
-                        FoldoutOption.Indent,
+            switch (type)
+            {
+                case ReflectionProbeType.PlanarReflection:
+                    return CED.Group(
                         CED.Action(Drawer_InfluenceAdvancedSwitch),
                         CED.space,
                         CED.Action(Drawer_FieldShapeType),
@@ -32,13 +28,9 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
                             SectionShapeBoxPlanar,
                             SectionShapeSpherePlanar
                             )
-                        )
-                    );
-            SectionFoldoutShape = CED.Group(
-                    CED.FoldoutGroup(
-                        influenceVolumeHeader,
-                        (s, d, o) => s.isSectionExpandedShape,
-                        FoldoutOption.Indent,
+                        );
+                case ReflectionProbeType.ReflectionProbe:
+                    return CED.Group(
                         CED.Action(Drawer_InfluenceAdvancedSwitch),
                         CED.space,
                         CED.Action(Drawer_FieldShapeType),
@@ -48,8 +40,10 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
                             SectionShapeBox,
                             SectionShapeSphere
                             )
-                        )
-                    );
+                        );
+                default:
+                    throw new System.ArgumentException("Unknown probe type");
+            }
         }
 
         static void Drawer_FieldShapeType(InfluenceVolumeUI s, SerializedInfluenceVolume d, Editor o)

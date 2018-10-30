@@ -9,7 +9,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
 
     partial class CaptureSettingsUI : BaseUI<SerializedCaptureSettings>
     {
-        const string captureSettingsHeaderContent = "Capture Settings";
+        internal const string captureSettingsHeaderContent = "Capture Settings";
 
         static readonly GUIContent clearColorModeContent = CoreEditorUtils.GetContent("Clear Mode");
         static readonly GUIContent backgroundColorHDRContent = CoreEditorUtils.GetContent("Background Color");
@@ -30,13 +30,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
 
         static readonly GUIContent shadowDistanceContent = CoreEditorUtils.GetContent("Shadow Distance");
 
-        public static CED.IDrawer SectionCaptureSettings = CED.FoldoutGroup(
-                captureSettingsHeaderContent,
-                (s, p, o) => s.isSectionExpandedCaptureSettings,
-                FoldoutOption.Indent,
-                CED.LabelWidth(150, CED.Action((s, p, o) => Drawer_SectionCaptureSettings(s, p, o)))
-                //no space as FrameSettings is rendered here and will handle it
-                );
+        public static CED.IDrawer SectionCaptureSettings = CED.LabelWidth(150, CED.Action((s, p, o) => Drawer_SectionCaptureSettings(s, p, o)));
 
         public AnimBool isSectionExpandedCaptureSettings { get { return m_AnimBools[0]; } }
 
