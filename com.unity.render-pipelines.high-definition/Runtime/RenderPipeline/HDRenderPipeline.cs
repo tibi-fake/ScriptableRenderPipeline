@@ -2016,6 +2016,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 // Render transparent depth prepass after opaque one
                 using (new ProfilingSample(cmd, "Transparent Depth Prepass", CustomSamplerId.TransparentDepthPrepass.GetSampler()))
                 {
+                    HDUtils.SetRenderTarget(cmd, hdCamera, m_SharedRTManager.GetDepthStencilBuffer());
                     RenderTransparentRenderList(cull, hdCamera, renderContext, cmd, m_TransparentDepthPrepassNames);
                 }
             }
