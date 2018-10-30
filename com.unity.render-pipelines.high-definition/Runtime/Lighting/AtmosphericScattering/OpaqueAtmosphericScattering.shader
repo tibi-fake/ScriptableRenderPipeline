@@ -25,14 +25,12 @@ Shader "Hidden/HDRenderPipeline/OpaqueAtmosphericScattering"
         struct Varyings
         {
             float4 positionCS : SV_POSITION;
-            float2 texcoord   : TEXCOORD0;
         };
 
         Varyings Vert(Attributes input)
         {
             Varyings output;
             output.positionCS = GetFullScreenTriangleVertexPosition(input.vertexID);
-            output.texcoord   = GetFullScreenTriangleTexCoord(input.vertexID);
             return output;
         }
 
@@ -65,7 +63,7 @@ Shader "Hidden/HDRenderPipeline/OpaqueAtmosphericScattering"
 
         float4 FragMSAA(Varyings input, uint sampleIndex: SV_SampleIndex) : SV_Target
         {
-            float2 positionSS = TexCoordStereoOffset(input.texcoord.xy * _ScreenSize.xy);
+            float2 positionSS = input.positionCS.xy;
             float3 V          = normalize(mul(float3(positionSS, 1.0), (float3x3)_PixelCoordToViewDirWS));
             float  depth      = _DepthTextureMS.Load((int2)positionSS, sampleIndex).x;
 
