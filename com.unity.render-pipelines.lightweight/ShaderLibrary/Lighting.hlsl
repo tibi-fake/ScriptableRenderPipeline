@@ -45,15 +45,15 @@ struct Light
     half    shadowAttenuation;
 };
 
-int GetPerObjectLightIndex(half i)
+int GetPerObjectLightIndex(int index)
 {
 #if USE_STRUCTURED_BUFFER_FOR_LIGHT_DATA
-    return _AdditionalLightsBuffer[unity_LightIndicesOffsetAndCount.x + i];
+    return _AdditionalLightsBuffer[unity_LightIndicesOffsetAndCount.x + index];
 #else
     // The following code is more optimal than indexing unity_4LightIndices0.
     // Conditional moves are branch free even on mali-400
-    half i_rem = (i < 2.0h) ? i : i - 2.0h;
-    half2 lightIndex2 = (i < 2.0h) ? unity_4LightIndices0.xy : unity_4LightIndices0.zw;
+    half2 lightIndex2 = (index < 2.0h) ? unity_PerObjectLightIndices[0].xy : unity_PerObjectLightIndices[0].zw;
+    half i_rem = (index < 2.0h) ? index : index - 2.0h;
     return (i_rem < 1.0h) ? lightIndex2.x : lightIndex2.y;
 #endif
 }
@@ -130,7 +130,7 @@ Light GetMainLight(float4 shadowCoord)
     return light;
 }
 
-Light GetAdditionalLight(half i, float3 positionWS)
+Light GetAdditionalLight(int i, float3 positionWS)
 {
     int perObjectLightIndex = GetPerObjectLightIndex(i);
 
@@ -159,7 +159,7 @@ Light GetAdditionalLight(half i, float3 positionWS)
     return light;
 }
 
-half GetAdditionalLightsCount()
+int GetAdditionalLightsCount()
 {
     // TODO: we need to expose in SRP api an ability for the pipeline cap the amount of lights
     // in the culling. This way we could do the loop branch with an uniform
