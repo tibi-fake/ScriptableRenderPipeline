@@ -6,8 +6,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [5.1.0-preview] - 2018-10-18
 
+### Added
+
 ### Fixed
-- Fixed material tesselation's parameters "start fade distance" and "end fade distance" that were clamped while being modified.
+- Fixed UI of layered material where scrollbar was rendered above copy button.
+
+### Changed
+- Renamed Line shaped lights to Tube light
 
 ## [5.0.0-preview] - 2018-09-28
 
@@ -59,7 +64,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fixed depth pyramid debug view mode
 - Fixed sphere shaped influence handles clamping in reflection probes
 - Fixed reflection probes data migration for project created before using hdrp
-
 
 ### Changed
 - Use samplerunity_ShadowMask instead of samplerunity_samplerLightmap for shadow mask
