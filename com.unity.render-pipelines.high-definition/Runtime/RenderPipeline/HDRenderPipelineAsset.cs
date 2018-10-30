@@ -36,6 +36,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 #if UNITY_EDITOR
         HDRenderPipelineEditorResources m_RenderPipelineEditorResources;
 
+
         public HDRenderPipelineEditorResources renderPipelineEditorResources
         {
             get
@@ -45,7 +46,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 // - constructor only called at asset creation
                 // - cannot rely on OnEnable
                 //thus fallback with lazy init for them
-                if (m_RenderPipelineEditorResources == null)
+                if (m_RenderPipelineEditorResources == null || m_RenderPipelineEditorResources.Equals(null))
                     m_RenderPipelineEditorResources = UnityEditor.AssetDatabase.LoadAssetAtPath<HDRenderPipelineEditorResources>(HDUtils.GetHDRenderPipelinePath() + "Editor/RenderPipelineResources/HDRenderPipelineEditorResources.asset");
                 return m_RenderPipelineEditorResources;
             }
@@ -189,14 +190,6 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             }
         }
 
-        public override Material defaultMaterial
-        {
-            get
-            {
-                return renderPipelineEditorResources == null ? null : renderPipelineEditorResources.materials.defaultDiffuseMat;
-            }
-        }
-
         public override Shader defaultShader
         {
             get
@@ -206,6 +199,14 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         }
 
 #if UNITY_EDITOR
+        public override Material defaultMaterial
+        {
+            get
+            {
+                return renderPipelineEditorResources == null ? null : renderPipelineEditorResources.materials.defaultDiffuseMat;
+            }
+        }
+
         // call to GetAutodeskInteractiveShaderXXX are only from within editor
         public override Shader autodeskInteractiveShader
         {
@@ -230,7 +231,6 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 return renderPipelineEditorResources == null ? null : renderPipelineEditorResources.shaderGraphs.autodeskInteractiveMasked;
             }
         }
-#endif
 
         // Note: This function is HD specific
         public Material GetDefaultDecalMaterial()
@@ -251,6 +251,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 return renderPipelineEditorResources == null ? null : renderPipelineEditorResources.materials.defaultTerrainMat;
             }
         }
+#endif
 
         void ISerializationCallbackReceiver.OnBeforeSerialize()
         {
