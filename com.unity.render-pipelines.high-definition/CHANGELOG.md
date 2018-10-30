@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fixed shape density volume handle speed
 - Fixed density volume shape handle moving too fast
 - Fixed camera velocity
+- Fixed some null pointer exceptions when disabling motion vectors support
 
 ### Changed
 - Renamed "Line" shaped lights to "Tube" light
