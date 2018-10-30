@@ -7,12 +7,26 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [5.1.0-preview] - 2018-10-18
 
 ### Added
+- Added separate editor resources file for those resources to not be taken in player builds.
+- Added support for disabling SSR on materials in shader graph
+- Added support of MSAA when Both ListShaderMode is enabled (previously only Forward mode was supported)
+- Added support of emissive color override in debug mode
+- Exposed max light for lightloop settings in hdrp asset UI
 
 ### Fixed
+- Fixed sphere shaped influence handles clamping in reflection probes
+- Fixed reflection probes data migration for project created before using hdrp
 - Fixed UI of layered material where scrollbar was rendered above copy button.
+- Fixed material tesselation's parameters "start fade distance" and "end fade distance" that were clamped while being modified.
+- Fixed various distortion and refraction issues - handle a better fallback
+- Fixed SSR for multiple views
+- Fixed SSR issues related to self-intersections
+- Fixed shape density volume handle speed
+- Fixed density volume shape handle moving too fast
 
 ### Changed
-- Renamed Line shaped lights to Tube light
+- Renamed "Line" shaped lights to "Tube" light
+- Use the "mean height" fog parametrization
 
 ## [5.0.0-preview] - 2018-09-28
 
@@ -37,7 +51,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added translaction's scale invariance on DensityVolume
 - Added multiple supported LitShadermode and per renderer choice in case of both Forward and Deferred supported
 - Added custom specular occlusion mode to Lit Shader Graph Master node
-- Added separate editor resources file for those resources to not be taken in player builds.
 
 ### Fixed
 - Fixed a normal bias issue with Stacklit (Was causing light leaking)
@@ -57,13 +70,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fixed shadow filter width in deferred rendering not matching shader config
 - Fixed stereo sampling of depth texture in MSAA DepthValues.shader
 - Fixed box light UI which allowed negative and zero sizes, thus causing NaNs
-- Fixed stereo rendering in HDRISky.shader 
+- Fixed stereo rendering in HDRISky.shader (VR)
 - Fixed normal blend and blend sphere influence for reflection probe
 - Fixed distortion filtering (was point filtering, now trilinear)
 - Fixed contact shadow for large distance
 - Fixed depth pyramid debug view mode
-- Fixed sphere shaped influence handles clamping in reflection probes
-- Fixed reflection probes data migration for project created before using hdrp
 
 ### Changed
 - Use samplerunity_ShadowMask instead of samplerunity_samplerLightmap for shadow mask
