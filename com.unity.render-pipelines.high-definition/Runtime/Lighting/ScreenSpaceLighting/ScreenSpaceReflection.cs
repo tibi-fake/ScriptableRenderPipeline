@@ -11,6 +11,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         public ClampedFloatParameter screenFadeDistance = new ClampedFloatParameter(0.1f, 0.0f, 1.0f);
         public ClampedFloatParameter minSmoothness = new ClampedFloatParameter(0.9f, 0.0f, 1.0f);
         public ClampedFloatParameter smoothnessFadeStart = new ClampedFloatParameter(0.9f, 0.0f, 1.0f);
+        public BoolParameter         reflectSky          = new BoolParameter(true);
 
         public IntParameter rayMaxIterations = new IntParameter(32);
 
