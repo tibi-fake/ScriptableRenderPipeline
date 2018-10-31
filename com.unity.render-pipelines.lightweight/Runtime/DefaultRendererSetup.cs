@@ -25,6 +25,7 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
         private PostProcessPass m_PostProcessPass;
         private CreateColorRenderTexturesPass m_createColorPass;
         private FinalBlitPass m_FinalBlitPass;
+        private CapturePass m_CapturePass;
         private EndXRRenderingPass m_EndXrRenderingPass;
 
 #if UNITY_EDITOR
@@ -68,6 +69,7 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
             m_RenderTransparentForwardPass = new RenderTransparentForwardPass();
             m_PostProcessPass = new PostProcessPass();
             m_FinalBlitPass = new FinalBlitPass();
+            m_CapturePass = new CapturePass();
             m_EndXrRenderingPass = new EndXRRenderingPass();
 
 #if UNITY_EDITOR
@@ -88,7 +90,7 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
 
             m_Initialized = true;
         }
-        
+
         public static bool RequiresIntermediateColorTexture(ref CameraData cameraData, RenderTextureDescriptor baseDescriptor)
         {
             bool isScaledRender = !Mathf.Approximately(cameraData.renderScale, 1.0f);
@@ -281,7 +283,10 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
                     renderer.EnqueuePass(m_FinalBlitPass);
                 }
             }
-            
+
+            if (m_CapturePass.Setup(renderingData.cameraData.captureActions))
+                renderer.EnqueuePass(m_CapturePass);
+
             if (renderingData.cameraData.isStereoEnabled)
             {
                 renderer.EnqueuePass(m_EndXrRenderingPass);

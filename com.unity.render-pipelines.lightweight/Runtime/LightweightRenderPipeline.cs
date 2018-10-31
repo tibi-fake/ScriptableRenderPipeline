@@ -91,7 +91,7 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
                 cache.mainLightRenderingMode = asset.mainLightRenderingMode;
                 cache.supportsMainLightShadows = asset.supportsMainLightShadows;
                 cache.mainLightShadowmapResolution = asset.mainLightShadowmapResolution;
-                
+
                 // Additional light settings
                 cache.additionalLightsRenderingMode = asset.additionalLightsRenderingMode;
                 cache.maxAdditionalLights = asset.maxAdditionalLightsCount;
@@ -110,7 +110,7 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
                 // Advanced settings
                 cache.supportsDynamicBatching = asset.supportsDynamicBatching;
                 cache.mixedLightingSupported = asset.supportsMixedLighting;
-                
+
                 return cache;
             }
         }
@@ -127,7 +127,7 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
 
             PerCameraBuffer._InvCameraViewProj = Shader.PropertyToID("_InvCameraViewProj");
             PerCameraBuffer._ScaledScreenParams = Shader.PropertyToID("_ScaledScreenParams");
-            
+
             // Let engine know we have MSAA on for cases where we support MSAA backbuffer
             if (QualitySettings.antiAliasing != settings.msaaSampleCount)
                 QualitySettings.antiAliasing = settings.msaaSampleCount;
@@ -135,6 +135,8 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
             Shader.globalRenderPipeline = "LightweightPipeline";
 
             Lightmapping.SetDelegate(lightsDelegate);
+
+            CameraCaptureBridge.enabled = true;
         }
 
         protected override void Dispose(bool disposing)
@@ -150,6 +152,7 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
             renderer.Dispose();
 
             Lightmapping.ResetDelegate();
+            CameraCaptureBridge.enabled = false;
         }
 
         protected override void Render(ScriptableRenderContext renderContext, Camera[] cameras)
@@ -311,6 +314,7 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
             bool canSkipFrontToBackSorting = (camera.opaqueSortMode == OpaqueSortMode.Default && hasHSRGPU) || camera.opaqueSortMode == OpaqueSortMode.NoDistanceSort;
 
             cameraData.defaultOpaqueSortFlags = canSkipFrontToBackSorting ? noFrontToBackOpaqueFlags : commonOpaqueFlags;
+            cameraData.captureActions = CameraCaptureBridge.GetCaptureActions(camera);
         }
 
         static void InitializeRenderingData(PipelineSettings settings, ref CameraData cameraData, ref CullingResults cullResults,
