@@ -42,6 +42,39 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
                         }
                     }
                     break;
+                case EditCenter:
+                    {
+                        if ((InfluenceShape)d.influenceVolume.shape.intValue != InfluenceShape.Box)
+                            break;
+
+                        //override base handle behavior to only translate object along y
+                        using (new Handles.DrawingScope(Matrix4x4.TRS(Vector3.zero, Quaternion.identity, Vector3.one)))
+                        {
+                            EditorGUI.BeginChangeCheck();
+                            var newCapturePosition = Handles.Slider(
+                                probe.transform.position,
+                                probe.transform.rotation * Vector3.up,
+                                HandleUtility.GetHandleSize(probe.transform.position),
+                                Handles.ArrowHandleCap,
+                                0f
+                                );
+                            if (EditorGUI.EndChangeCheck())
+                            {
+                                Vector3 newOffset = Quaternion.Inverse(probe.transform.rotation) * (newCapturePosition - probe.transform.position);
+                                Undo.RecordObjects(new Object[] { probe, probe.transform }, "Translate Influence Position");
+                                Vector3 delta = newCapturePosition - probe.transform.position;
+                                Matrix4x4 oldLocalToWorld = Matrix4x4.TRS(probe.transform.position, probe.transform.rotation, Vector3.one);
+
+                                //call modification to legacy ReflectionProbe
+                                probe.influenceVolume.offset = newOffset;
+
+                                probe.transform.position = newCapturePosition;
+                                d.influenceVolume.offset.vector3Value -= oldLocalToWorld.inverse.MultiplyVector(delta);
+                                d.influenceVolume.Apply();
+                            }
+                        }
+                        break;
+                    }
             }
         }
 
@@ -93,12 +126,13 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
             var c = Gizmos.color;
             var m = Gizmos.matrix;
             Gizmos.matrix = Matrix4x4.TRS(
-                    d.captureMirrorPlanePosition,
+                    d.transform.position,
                     Quaternion.LookRotation(d.captureMirrorPlaneNormal, Vector3.up),
                     Vector3.one);
+            Gizmos.color = Color.white;
+            Gizmos.DrawWireCube(Vector3.zero, new Vector3(d.influenceVolume.boxSize.z, d.influenceVolume.boxSize.x, 0));
             Gizmos.color = k_GizmoMirrorPlaneCamera;
-
-            Gizmos.DrawCube(Vector3.zero, new Vector3(1, 1, 0));
+            Gizmos.DrawCube(Vector3.zero, new Vector3(d.influenceVolume.boxSize.z, d.influenceVolume.boxSize.x, 0));
 
             Gizmos.matrix = m;
             Gizmos.color = c;

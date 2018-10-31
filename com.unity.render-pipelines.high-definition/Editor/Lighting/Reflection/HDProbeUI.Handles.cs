@@ -33,6 +33,12 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
                     break;
                 case EditCenter:
                     {
+                        if (o is PlanarReflectionProbeEditor && (InfluenceShape)d.influenceVolume.shape.intValue == InfluenceShape.Box)
+                        {
+                            //Planar need to update its transform position.
+                            //Let PlanarReflectionProbeUI.Handle do this work.
+                            break;
+                        }
                         using (new Handles.DrawingScope(Matrix4x4.TRS(Vector3.zero, Quaternion.identity, Vector3.one)))
                         {
                             EditorGUI.BeginChangeCheck();
