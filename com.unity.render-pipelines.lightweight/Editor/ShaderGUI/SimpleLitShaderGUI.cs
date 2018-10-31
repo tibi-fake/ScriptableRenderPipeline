@@ -19,9 +19,6 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
             public static GUIContent specularMapLabel = new GUIContent("Specular Map", "Specular Color (RGB)");
             public static readonly string[] smoothnessSourceNames = {"Specular Alpha", "Albedo Alpha"};
             public static GUIContent smoothnessSource = new GUIContent("Smoothness Source", "Here you can choose where the Map based smoothness comes from.");
-            
-            public static GUIContent normalMapText = new GUIContent("Normal Map", "Normal Map");
-            
             public static GUIContent highlightsText = new GUIContent("Specular Highlights", "Specular Highlights");
         }
 
@@ -32,7 +29,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
             smoothnessSourceProp = FindProperty("_SmoothnessSource", properties);
             specularGlossMapProp = FindProperty("_SpecMap", properties);
             specularColorProp = FindProperty("_SpecColor", properties);
-            bumpMapProp = FindProperty("_BumpMap", properties);
+            bumpMapProp = FindProperty("_BumpMap", properties, false);
             emissionMapProp = FindProperty("_EmissionMap", properties);
             emissionColorProp = FindProperty("_EmissionColor", properties);
         }
@@ -59,7 +56,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
             {
                 DoSpecular();
 
-                materialEditor.TexturePropertySingleLine(StylesSimpleLit.normalMapText, bumpMapProp);
+                materialEditor.TexturePropertySingleLine(Styles.normalMapText, bumpMapProp);
 
                 DrawEmissionProperties(material, true);
 

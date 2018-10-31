@@ -252,7 +252,7 @@ namespace UnityEditor
             }
         }
         
-        public virtual void DoNormalArea(MaterialProperty bumpMap, MaterialProperty bumpMapScale = null)
+        public static void DoNormalArea(MaterialEditor materialEditor, MaterialProperty bumpMap, MaterialProperty bumpMapScale = null)
         {
             if (bumpMapScale != null)
             {
@@ -360,7 +360,12 @@ namespace UnityEditor
             Debug.Log("Clicking on " + mat.name + " and bump scale is " + bumpScale);
         }
 
-        protected void DoPopup(GUIContent label, MaterialProperty property, string[] options)
+        public void DoPopup(GUIContent label, MaterialProperty property, string[] options)
+        {
+            DoPopup(label, property, options, materialEditor);
+        }
+
+        public static void DoPopup(GUIContent label, MaterialProperty property, string[] options, MaterialEditor materialEditor)
         {
             if (property == null)
                 throw new ArgumentNullException("property");
@@ -377,6 +382,33 @@ namespace UnityEditor
             }
 
             EditorGUI.showMixedValue = false;
+        }
+        
+        // Copied from shaderGUI as it is a protected function in an abstract class, unavailable to others
+        public new static MaterialProperty FindProperty(string propertyName, MaterialProperty[] properties)
+        {
+            return FindProperty(propertyName, properties, true);
+        }
+
+        // Copied from shaderGUI as it is a protected function in an abstract class, unavailable to others
+        public new static MaterialProperty FindProperty(string propertyName, MaterialProperty[] properties, bool propertyIsMandatory)
+        {
+            for (int index = 0; index < properties.Length; ++index)
+            {
+                if (properties[index] != null && properties[index].name == propertyName)
+                    return properties[index];
+            }
+            if (propertyIsMandatory)
+                throw new ArgumentException("Could not find MaterialProperty: '" + propertyName + "', Num properties: " + (object) properties.Length);
+            return (MaterialProperty) null;
+        }
+        
+        public static void SetKeyword(Material m, string keyword, bool state)
+        {
+            if (state)
+                m.EnableKeyword(keyword);
+            else
+                m.DisableKeyword(keyword);
         }
 
         protected void StoreHeaderState(bool headerState, int index)
