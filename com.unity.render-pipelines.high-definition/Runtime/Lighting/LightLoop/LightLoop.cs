@@ -76,6 +76,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 
         public static int s_TileSizeFptl = 16;
         public static int s_TileSizeClustered = 32;
+        public static int s_TileSizeBigTile = 64;
 
         // feature variants
         public static int s_NumFeatureVariants = 27;
