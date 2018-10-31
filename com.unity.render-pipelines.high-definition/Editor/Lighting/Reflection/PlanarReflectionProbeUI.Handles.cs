@@ -8,25 +8,40 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
     {
         static readonly Color k_GizmoMirrorPlaneCamera = new Color(128f / 255f, 128f / 255f, 233f / 255f, 128f / 255f);
 
-        internal static void DrawHandles(PlanarReflectionProbeUI s, SerializedPlanarReflectionProbe d, Editor o)
+        internal static void DrawHandlesOverride(PlanarReflectionProbeUI s, SerializedPlanarReflectionProbe d, Editor o)
         {
+            //Note: HDProbeUI.DrawHandles is called in parent 
             PlanarReflectionProbe probe = d.target;
-            HDProbeUI.DrawHandles(s, d, o);
 
-            if (probe.useMirrorPlane)
+            switch (EditMode.editMode)
             {
-                var m = Handles.matrix;
-                var mat = Matrix4x4.TRS(probe.transform.position, probe.transform.rotation, Vector3.one*1.5f);
-                using (new Handles.DrawingScope(k_GizmoMirrorPlaneCamera, mat))
-                {
-                    Handles.ArrowHandleCap(
-                        0,
-                        probe.captureMirrorPlaneLocalPosition,
-                        Quaternion.LookRotation(probe.captureMirrorPlaneLocalNormal),
-                        HandleUtility.GetHandleSize(probe.captureMirrorPlaneLocalPosition),
-                        Event.current.type
-                        );
-                }
+                case EditBaseShape:
+                    if ((InfluenceShape)d.influenceVolume.shape.intValue != InfluenceShape.Box)
+                        return;
+
+                    //override base handle behavior to also translate object along x and z axis and offset the y axis
+                    using (new Handles.DrawingScope(Matrix4x4.TRS(Vector3.zero, d.target.transform.rotation, Vector3.one)))
+                    {
+                        //contained must be initialized in all case
+                        s.influenceVolume.boxBaseHandle.center = Quaternion.Inverse(d.target.transform.rotation) * d.target.transform.position + d.influenceVolume.offset.vector3Value;
+                        s.influenceVolume.boxBaseHandle.size = probe.influenceVolume.boxSize;
+
+                        EditorGUI.BeginChangeCheck();
+                        s.influenceVolume.boxBaseHandle.DrawHandle();
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            Undo.RecordObjects(new Object[] { d.target, d.target.transform }, "Modified Planar Base Volume AABB");
+
+                            probe.influenceVolume.boxSize = s.influenceVolume.boxBaseHandle.size;
+
+                            d.target.influenceVolume.offset = new Vector3(0, s.influenceVolume.boxBaseHandle.center.y, 0);
+                            Vector3 centerXZ = s.influenceVolume.boxBaseHandle.center;
+                            centerXZ.y = 0;
+                            Vector3 deltaXZ = d.target.transform.rotation * centerXZ - d.target.transform.position;
+                            d.target.transform.position += deltaXZ;
+                        }
+                    }
+                    break;
             }
         }
 
@@ -36,6 +51,33 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
             HDProbeUI.DrawGizmos(d, gizmoType);
 
             HDProbeUI s;
+            if (!HDProbeEditor.TryGetUIStateFor(d, out s))
+                return;
+            
+            var mat = Matrix4x4.TRS(d.transform.position + d.transform.rotation * d.influenceVolume.offset, d.transform.rotation, Vector3.one);
+
+            //gizmo overrides
+            switch (EditMode.editMode)
+            {
+                case EditBaseShape:
+                    if (d.influenceVolume.shape != InfluenceShape.Box)
+                        break;
+
+                    using (new Handles.DrawingScope(mat))
+                    {
+                        s.influenceVolume.boxBaseHandle.center = Vector3.zero;
+                        s.influenceVolume.boxBaseHandle.size = d.influenceVolume.boxSize;
+                        s.influenceVolume.boxBaseHandle.DrawHull(true);
+                        s.influenceVolume.boxInfluenceHandle.center = d.influenceVolume.boxBlendOffset;
+                        s.influenceVolume.boxInfluenceHandle.size = d.influenceVolume.boxSize + d.influenceVolume.boxBlendSize;
+                        s.influenceVolume.boxInfluenceHandle.DrawHull(false);
+                        s.influenceVolume.boxInfluenceNormalHandle.center = d.influenceVolume.boxBlendNormalOffset;
+                        s.influenceVolume.boxInfluenceNormalHandle.size = d.influenceVolume.boxSize + d.influenceVolume.boxBlendNormalSize;
+                        s.influenceVolume.boxInfluenceNormalHandle.DrawHull(false);
+                    }
+                    break;
+            }
+
             if (!HDProbeEditor.TryGetUIStateFor(d, out s))
                 return;
 

@@ -17,6 +17,12 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
                 case EditBaseShape:
                     //important: following will init the container for box.
                     //This must be done before drawing the contained handles
+                    if(o is PlanarReflectionProbeEditor && (InfluenceShape)d.influenceVolume.shape.intValue == InfluenceShape.Box)
+                    {
+                        //Planar need to update its transform position.
+                        //Let PlanarReflectionProbeUI.Handle do this work.
+                        break;
+                    }
                     InfluenceVolumeUI.DrawHandles_EditBase(s.influenceVolume, d.influenceVolume, o, mat, probe);
                     break;
                 case EditInfluenceShape:
@@ -63,6 +69,12 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
             switch (EditMode.editMode)
             {
                 case EditBaseShape:
+                    if (d is PlanarReflectionProbe && (InfluenceShape)d.influenceVolume.shape == InfluenceShape.Box)
+                    {
+                        //Planar need to update its transform position.
+                        //Let PlanarReflectionProbeUI.Handle do this work.
+                        break;
+                    }
                     InfluenceVolumeUI.DrawGizmos(
                         s.influenceVolume, d.influenceVolume, mat,
                         InfluenceVolumeUI.HandleType.Base,
