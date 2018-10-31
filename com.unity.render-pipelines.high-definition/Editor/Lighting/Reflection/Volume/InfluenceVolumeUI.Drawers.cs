@@ -20,7 +20,6 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
                 case ReflectionProbeType.PlanarReflection:
                     return CED.Group(
                         CED.Action(Drawer_InfluenceAdvancedSwitch),
-                        CED.space,
                         CED.Action(Drawer_FieldShapeType),
                         CED.FadeGroup(
                             (s, d, o, i) => s.IsSectionExpanded_Shape((InfluenceShape)i),
@@ -32,7 +31,6 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
                 case ReflectionProbeType.ReflectionProbe:
                     return CED.Group(
                         CED.Action(Drawer_InfluenceAdvancedSwitch),
-                        CED.space,
                         CED.Action(Drawer_FieldShapeType),
                         CED.FadeGroup(
                             (s, d, o, i) => s.IsSectionExpanded_Shape((InfluenceShape)i),
@@ -63,8 +61,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
                 }
 
                 bool advanced = d.editorAdvancedModeEnabled.boolValue;
-                advanced = !GUILayout.Toggle(!advanced, normalModeContent, EditorStyles.miniButtonLeft, GUILayout.Width(60f), GUILayout.ExpandWidth(false));
-                advanced = GUILayout.Toggle(advanced, advancedModeContent, EditorStyles.miniButtonRight, GUILayout.Width(60f), GUILayout.ExpandWidth(false));
+                advanced = GUILayout.Toggle(advanced, advancedModeContent, EditorStyles.miniButton, GUILayout.Width(60f), GUILayout.ExpandWidth(false));
                 if (d.editorAdvancedModeEnabled.boolValue ^ advanced)
                 {
                     d.editorAdvancedModeEnabled.boolValue = advanced;
