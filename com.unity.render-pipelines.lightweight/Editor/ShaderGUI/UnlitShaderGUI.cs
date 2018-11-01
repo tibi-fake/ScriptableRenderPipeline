@@ -1,6 +1,6 @@
 using System;
 using UnityEngine;
-using UnityEngine..Rendering;
+using UnityEngine.Rendering;
 
 namespace UnityEditor.Rendering.LWRP
 {
