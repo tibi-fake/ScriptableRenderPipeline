@@ -9,7 +9,7 @@ using UnityEditor.ShaderGraph;
 namespace UnityEngine.Rendering.LWRP
 {
     [Serializable]
-    [FormerName("UnityEditor.ShaderGraph.LightWeightUnlitSubShader")]
+    [FormerName("UnityEngine.Experimental.Rendering.LightweightPipeline.LightWeightUnlitSubShader")]
     public class LightWeightUnlitSubShader : IUnlitSubShader
     {
         static readonly NeededCoordinateSpace k_PixelCoordinateSpace = NeededCoordinateSpace.World;

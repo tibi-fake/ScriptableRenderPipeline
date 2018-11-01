@@ -10,7 +10,7 @@ using UnityEngine.Rendering;
 namespace UnityEditor.Rendering.LWRP
 {
     [Serializable]
-    [FormerName("UnityEditor.ShaderGraph.LightWeightPBRSubShader")]
+    [FormerName("UnityEditor.Experimental.Rendering.LightweightPipeline.LightWeightPBRSubShader")]
     public class LightWeightPBRSubShader : IPBRSubShader
     {
         static readonly NeededCoordinateSpace k_PixelCoordinateSpace = NeededCoordinateSpace.World;
