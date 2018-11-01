@@ -107,6 +107,7 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
         [SerializeField] bool m_SoftShadowsSupported = false;
 
         // Advanced settings
+        [SerializeField] bool m_UseSRPBatcher = false;
         [SerializeField] bool m_SupportsDynamicBatching = true;
         [SerializeField] bool m_MixedLightingSupported = true;
         // TODO: Render Pipeline Batcher
@@ -365,6 +366,11 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
             get { return m_ShaderVariantLogLevel; }
         }
 
+        public bool useSRPBatcher
+        {
+            get { return m_UseSRPBatcher; }
+            set { m_UseSRPBatcher = value; }
+        }
 
         public override Material defaultMaterial
         {

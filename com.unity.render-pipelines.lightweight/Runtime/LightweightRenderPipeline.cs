@@ -122,6 +122,8 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
 
             SetSupportedRenderingFeatures();
 
+            GraphicsSettings.useScriptableRenderPipelineBatching = asset.useSRPBatcher;
+
             PerFrameBuffer._GlossyEnvironmentColor = Shader.PropertyToID("_GlossyEnvironmentColor");
             PerFrameBuffer._SubtractiveShadowColor = Shader.PropertyToID("_SubtractiveShadowColor");
 
