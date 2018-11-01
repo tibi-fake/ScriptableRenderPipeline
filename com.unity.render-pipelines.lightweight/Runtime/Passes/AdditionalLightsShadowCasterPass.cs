@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using Unity.Collections;
-using UnityEngine.Rendering;
 
-namespace UnityEngine.Experimental.Rendering.LightweightPipeline
+namespace UnityEngine.Rendering.LWRP
 {
     public class AdditionalLightsShadowCasterPass : ScriptableRenderPass
     {

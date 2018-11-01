@@ -8,7 +8,7 @@ using UnityEngine.VR;
 using XRSettings = UnityEngine.VR.VRSettings;
 #endif
 
-namespace UnityEngine.Experimental.Rendering
+namespace UnityEngine.Rendering
 {
     [Serializable]
     public class XRGraphics

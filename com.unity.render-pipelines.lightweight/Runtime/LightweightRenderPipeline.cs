@@ -1,16 +1,14 @@
 using System;
-using System.Collections.Generic;
 using Unity.Collections;
 #if UNITY_EDITOR
 using UnityEditor;
-using UnityEditor.Experimental.Rendering.LightweightPipeline;
+using UnityEditor.Rendering.LWRP;
 #endif
-using UnityEngine.Rendering;
 using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.Experimental.GlobalIllumination;
 using Lightmapping = UnityEngine.Experimental.GlobalIllumination.Lightmapping;
 
-namespace UnityEngine.Experimental.Rendering.LightweightPipeline
+namespace UnityEngine.Rendering.LWRP
 {
     public interface IBeforeCameraRender
     {

@@ -3,9 +3,8 @@ using System;
 using UnityEditor;
 using UnityEditor.ProjectWindowCallback;
 #endif
-using UnityEngine.Rendering;
 
-namespace UnityEngine.Experimental.Rendering.LightweightPipeline
+namespace UnityEngine.Rendering.LWRP
 {
     public enum ShadowCascadesOption
     {

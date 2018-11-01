@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEditor.Experimental.Rendering;
 
-namespace UnityEngine.Experimental.Rendering.LightweightPipeline
+namespace UnityEngine.Rendering.LWRP
 {
     [CustomEditor(typeof(LightweightRenderPipelineAsset))]
     public class LightweightRenderPipelineAssetEditor : Editor

@@ -2,10 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Unity.Collections;
-using UnityEngine.Rendering;
 using UnityEngine.Rendering.PostProcessing;
 
-namespace UnityEngine.Experimental.Rendering.LightweightPipeline
+namespace UnityEngine.Rendering.LWRP
 {
     public sealed class ScriptableRenderer
     {

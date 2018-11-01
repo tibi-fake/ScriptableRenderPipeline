@@ -1,7 +1,6 @@
 using System;
-using UnityEngine.Rendering;
 
-namespace UnityEngine.Experimental.Rendering.LightweightPipeline {
+namespace UnityEngine.Rendering.LWRP {
     /// <summary>
     /// Generate rendering attachments that can be used for rendering.
     ///

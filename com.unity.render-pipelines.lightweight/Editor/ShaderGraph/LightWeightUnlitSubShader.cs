@@ -5,9 +5,8 @@ using System.Linq;
 using UnityEditor;
 using UnityEditor.Graphing;
 using UnityEditor.ShaderGraph;
-using UnityEngine.Rendering;
 
-namespace UnityEngine.Experimental.Rendering.LightweightPipeline
+namespace UnityEngine.Rendering.LWRP
 {
     [Serializable]
     [FormerName("UnityEditor.ShaderGraph.LightWeightUnlitSubShader")]

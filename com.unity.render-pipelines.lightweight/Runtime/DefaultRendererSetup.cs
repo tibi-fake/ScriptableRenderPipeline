@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine.Rendering;
 
-namespace UnityEngine.Experimental.Rendering.LightweightPipeline
+namespace UnityEngine.Rendering.LWRP
 {
     internal class DefaultRendererSetup : IRendererSetup
     {
