@@ -320,7 +320,7 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
         {
             var visibleLights = cullResults.visibleLights;
 
-            int mainLightIndex = GetMainLight(settings, visibleLights);
+            int mainLightIndex = GetMainLightIndex(settings, visibleLights);
             bool mainLightCastShadows = false;
             bool additionalLightsCastShadows = false;
 
@@ -430,29 +430,39 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
         }
 
         // Main Light is always a directional light
-        static int GetMainLight(PipelineSettings settings, NativeArray<VisibleLight> visibleLights)
+        static int GetMainLightIndex(PipelineSettings settings, NativeArray<VisibleLight> visibleLights)
         {
             int totalVisibleLights = visibleLights.Length;
 
             if (totalVisibleLights == 0 || settings.mainLightRenderingMode != LightRenderingMode.PerPixel)
                 return -1;
 
+            Light sunLight = RenderSettings.sun;
+            int brightestDirectionalLightIndex = -1;
+            float brightestLightIntensity = 0.0f;
             for (int i = 0; i < totalVisibleLights; ++i)
             {
-                VisibleLight currLight = visibleLights[i];
+                VisibleLight currVisibleLight = visibleLights[i];
+                Light currLight = currVisibleLight.light;
 
                 // Particle system lights have the light property as null. We sort lights so all particles lights
                 // come last. Therefore, if first light is particle light then all lights are particle lights.
                 // In this case we either have no main light or already found it.
-                if (currLight.light == null)
+                if (currLight == null)
                     break;
 
-                // In case no shadow light is present we will return the brightest directional light
-                if (currLight.lightType == LightType.Directional)
+                if (currLight == sunLight)
                     return i;
+
+                // In case no shadow light is present we will return the brightest directional light
+                if (currVisibleLight.lightType == LightType.Directional && currLight.intensity > brightestLightIntensity)
+                {
+                    brightestLightIntensity = currLight.intensity;
+                    brightestDirectionalLightIndex = i;
+                }
             }
 
-            return -1;
+            return brightestDirectionalLightIndex;
         }
 
         static void SetupPerFrameShaderConstants()
