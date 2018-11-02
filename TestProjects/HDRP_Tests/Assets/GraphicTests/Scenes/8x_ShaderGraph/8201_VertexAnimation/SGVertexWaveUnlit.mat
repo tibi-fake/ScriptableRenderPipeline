@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: SGVertexWave1
-  m_Shader: {fileID: 4800000, guid: 7673e4256ab954641926d59f47d4499f, type: 3}
+  m_Name: SGVertexWaveUnlit
+  m_Shader: {fileID: 4800000, guid: 3445c625dd5dfc74b9c896b275ad52cd, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0

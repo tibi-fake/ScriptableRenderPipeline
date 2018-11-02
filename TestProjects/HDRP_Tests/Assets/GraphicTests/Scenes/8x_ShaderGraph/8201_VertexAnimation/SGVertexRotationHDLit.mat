@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: SGVertexRotation
-  m_Shader: {fileID: 4800000, guid: 3f08d4d70c34c774993f41347910264e, type: 3}
+  m_Name: SGVertexRotationHDLit
+  m_Shader: {fileID: 4800000, guid: 50860d90075ca5d45b66eef1ad788e96, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
