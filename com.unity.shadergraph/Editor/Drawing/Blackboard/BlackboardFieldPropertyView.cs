@@ -38,7 +38,9 @@ namespace UnityEditor.ShaderGraph.Drawing
             m_ExposedToogle = new Toggle();
             m_ExposedToogle.OnToggleChanged(evt =>
             {
-                m_OnExposedToggle();
+                m_Graph.owner.RegisterCompleteObjectUndo("Change Exposed Toggle");
+                if(m_OnExposedToggle != null)
+                    m_OnExposedToggle();
                 property.generatePropertyBlock = evt.newValue;
                 DirtyNodes(ModificationScope.Graph);
             });
@@ -52,6 +54,7 @@ namespace UnityEditor.ShaderGraph.Drawing
             m_ReferenceNameField.isDelayed = true;
             m_ReferenceNameField.OnValueChanged(newName =>
                 {
+                    m_Graph.owner.RegisterCompleteObjectUndo("Change reference name");
                     if (m_ReferenceNameField.value != m_Property.referenceName)
                     {
                         string newReferenceName = m_Graph.SanitizePropertyReferenceName(newName.newValue, property.guid);
@@ -82,6 +85,7 @@ namespace UnityEditor.ShaderGraph.Drawing
                 var field = new Vector2Field { value = vectorProperty.value };
                 field.OnValueChanged(evt =>
                     {
+                        m_Graph.owner.RegisterCompleteObjectUndo("Change property value");
                         vectorProperty.value = evt.newValue;
                         DirtyNodes();
                     });
@@ -93,6 +97,7 @@ namespace UnityEditor.ShaderGraph.Drawing
                 var field = new Vector3Field { value = vectorProperty.value };
                 field.OnValueChanged(evt =>
                     {
+                        m_Graph.owner.RegisterCompleteObjectUndo("Change property value");
                         vectorProperty.value = evt.newValue;
                         DirtyNodes();
                     });
@@ -104,6 +109,7 @@ namespace UnityEditor.ShaderGraph.Drawing
                 var field = new Vector4Field { value = vectorProperty.value };
                 field.OnValueChanged(evt =>
                     {
+                        m_Graph.owner.RegisterCompleteObjectUndo("Change property value");
                         vectorProperty.value = evt.newValue;
                         DirtyNodes();
                     });
@@ -115,6 +121,7 @@ namespace UnityEditor.ShaderGraph.Drawing
                 var colorField = new ColorField { value = property.defaultValue, showEyeDropper = false, hdr = colorProperty.colorMode == ColorMode.HDR };
                 colorField.OnValueChanged(evt =>
                     {
+                        m_Graph.owner.RegisterCompleteObjectUndo("Change property value");
                         colorProperty.value = evt.newValue;
                         DirtyNodes();
                     });
@@ -122,6 +129,7 @@ namespace UnityEditor.ShaderGraph.Drawing
                 var colorModeField = new EnumField((Enum)colorProperty.colorMode);
                 colorModeField.OnValueChanged(evt =>
                     {
+                        m_Graph.owner.RegisterCompleteObjectUndo("Change Color Mode");
                         if (colorProperty.colorMode == (ColorMode)evt.newValue)
                             return;
                         colorProperty.colorMode = (ColorMode)evt.newValue;
@@ -137,6 +145,7 @@ namespace UnityEditor.ShaderGraph.Drawing
                 var field = new ObjectField { value = textureProperty.value.texture, objectType = typeof(Texture) };
                 field.OnValueChanged(evt =>
                     {
+                        m_Graph.owner.RegisterCompleteObjectUndo("Change property value");
                         textureProperty.value.texture = (Texture)evt.newValue;
                         DirtyNodes();
                     });
@@ -144,6 +153,7 @@ namespace UnityEditor.ShaderGraph.Drawing
                 var defaultModeField = new EnumField((Enum)textureProperty.defaultType);
                 defaultModeField.OnValueChanged(evt =>
                     {
+                        m_Graph.owner.RegisterCompleteObjectUndo("Change Texture Mode");
                         if (textureProperty.defaultType == (TextureShaderProperty.DefaultType)evt.newValue)
                             return;
                         textureProperty.defaultType = (TextureShaderProperty.DefaultType)evt.newValue;
@@ -162,6 +172,7 @@ namespace UnityEditor.ShaderGraph.Drawing
                 var field = new ObjectField { value = textureProperty.value.textureArray, objectType = typeof(Texture2DArray) };
                 field.OnValueChanged(evt =>
                     {
+                        m_Graph.owner.RegisterCompleteObjectUndo("Change property value");
                         textureProperty.value.textureArray = (Texture2DArray)evt.newValue;
                         DirtyNodes();
                     });
@@ -173,6 +184,7 @@ namespace UnityEditor.ShaderGraph.Drawing
                 var field = new ObjectField { value = textureProperty.value.texture, objectType = typeof(Texture3D) };
                 field.OnValueChanged(evt =>
                     {
+                        m_Graph.owner.RegisterCompleteObjectUndo("Change property value");
                         textureProperty.value.texture = (Texture3D)evt.newValue;
                         DirtyNodes();
                     });
@@ -184,6 +196,7 @@ namespace UnityEditor.ShaderGraph.Drawing
                 var field = new ObjectField { value = cubemapProperty.value.cubemap, objectType = typeof(Cubemap) };
                 field.OnValueChanged(evt =>
                     {
+                        m_Graph.owner.RegisterCompleteObjectUndo("Change property value");
                         cubemapProperty.value.cubemap = (Cubemap)evt.newValue;
                         DirtyNodes();
                     });
@@ -194,6 +207,7 @@ namespace UnityEditor.ShaderGraph.Drawing
                 var booleanProperty = (BooleanShaderProperty)property;
                 EventCallback<ChangeEvent<bool>> onBooleanChanged = evt =>
                     {
+                        m_Graph.owner.RegisterCompleteObjectUndo("Change property value");
                         booleanProperty.value = evt.newValue;
                         DirtyNodes();
                     };
@@ -238,6 +252,7 @@ namespace UnityEditor.ShaderGraph.Drawing
                         });
                         defaultField.RegisterCallback<FocusOutEvent>(evt =>
                         {
+                            m_Graph.owner.RegisterCompleteObjectUndo("Change property value");
                             float minValue = Mathf.Min(floatProperty.value, floatProperty.rangeValues.x);
                             float maxValue = Mathf.Max(floatProperty.value, floatProperty.rangeValues.y);
                             floatProperty.rangeValues = new Vector2(minValue, maxValue);
@@ -247,6 +262,7 @@ namespace UnityEditor.ShaderGraph.Drawing
                         });
                         minField.RegisterCallback<InputEvent>(evt =>
                         {
+                            m_Graph.owner.RegisterCompleteObjectUndo("Change Range property minimum");
                             float newValue;
                             if (!float.TryParse(evt.newData, NumberStyles.Float, CultureInfo.InvariantCulture.NumberFormat, out newValue))
                                 newValue = 0f;
@@ -262,6 +278,7 @@ namespace UnityEditor.ShaderGraph.Drawing
                         });
                         maxField.RegisterCallback<InputEvent>(evt =>
                         {
+                            m_Graph.owner.RegisterCompleteObjectUndo("Change Range property maximum");
                             float newValue;
                             if (!float.TryParse(evt.newData, NumberStyles.Float, CultureInfo.InvariantCulture.NumberFormat, out newValue))
                                 newValue = 0f;
@@ -287,6 +304,7 @@ namespace UnityEditor.ShaderGraph.Drawing
                         var defaultField = new IntegerField { value = (int)floatProperty.value };
                         defaultField.OnValueChanged(evt =>
                         {
+                            m_Graph.owner.RegisterCompleteObjectUndo("Change property value");
                             var value = (int)evt.newValue;
                             floatProperty.value = value;
                             this.MarkDirtyRepaint();
@@ -300,6 +318,7 @@ namespace UnityEditor.ShaderGraph.Drawing
                         var defaultField = new FloatField { value = floatProperty.value };
                         defaultField.OnValueChanged(evt =>
                         {
+                            m_Graph.owner.RegisterCompleteObjectUndo("Change property value");
                             var value = (float)evt.newValue;
                             floatProperty.value = value;
                             this.MarkDirtyRepaint();
@@ -313,6 +332,7 @@ namespace UnityEditor.ShaderGraph.Drawing
             var modeField = new EnumField(floatProperty.floatType);
             modeField.OnValueChanged(evt =>
             {
+                m_Graph.owner.RegisterCompleteObjectUndo("Change Vector1 mode");
                 var value = (FloatType)evt.newValue;
                 floatProperty.floatType = value;
                 if (rows != null)
