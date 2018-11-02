@@ -224,6 +224,7 @@ namespace UnityEditor.ShaderGraph.Drawing
 
             if (graphViewChange.movedElements != null)
             {
+                m_Graph.owner.RegisterCompleteObjectUndo("Move Elements");
                 foreach (var element in graphViewChange.movedElements)
                 {
                     var node = element.userData as INode;
