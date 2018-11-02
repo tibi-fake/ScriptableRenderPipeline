@@ -25,7 +25,10 @@ namespace UnityEditor.ShaderGraph.Drawing
         static Type s_ContextualMenuManipulator = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypesOrNothing()).FirstOrDefault(t => t.FullName == "UnityEngine.Experimental.UIElements.ContextualMenuManipulator");
 
         IManipulator m_ResetReferenceMenu;
-        
+
+        public delegate void OnExposedToggle();
+        private OnExposedToggle m_OnExposedToggle;
+
         public BlackboardFieldPropertyView(AbstractMaterialGraph graph, IShaderProperty property)
         {
             AddStyleSheetPath("Styles/ShaderGraphBlackboard");
@@ -35,6 +38,7 @@ namespace UnityEditor.ShaderGraph.Drawing
             m_ExposedToogle = new Toggle();
             m_ExposedToogle.OnToggleChanged(evt =>
             {
+                m_OnExposedToggle();
                 property.generatePropertyBlock = evt.newValue;
                 DirtyNodes(ModificationScope.Graph);
             });
@@ -145,6 +149,11 @@ namespace UnityEditor.ShaderGraph.Drawing
                         textureProperty.defaultType = (TextureShaderProperty.DefaultType)evt.newValue;
                         DirtyNodes(ModificationScope.Graph);
                     });
+                void toggleDefaultModeFieldEnabled()
+                {
+                    defaultModeField.SetEnabled(!defaultModeField.enabledSelf);
+                }
+                m_OnExposedToggle += toggleDefaultModeFieldEnabled;
                 AddRow("Mode", defaultModeField);
             }
             else if (property is Texture2DArrayShaderProperty)
