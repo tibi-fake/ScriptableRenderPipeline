@@ -158,6 +158,7 @@ namespace UnityEditor.ShaderGraph.Drawing
 
         void ConvertToProperty()
         {
+            graph.owner.RegisterCompleteObjectUndo("Convert to Property");
             var selectedNodeViews = selection.OfType<MaterialNodeView>().Select(x => x.node).ToList();
             foreach (var node in selectedNodeViews)
             {
@@ -197,6 +198,7 @@ namespace UnityEditor.ShaderGraph.Drawing
 
         void ConvertToInlineNode()
         {
+            graph.owner.RegisterCompleteObjectUndo("Convert to Inline Node");
             var selectedNodeViews = selection.OfType<MaterialNodeView>()
                 .Select(x => x.node)
                 .OfType<PropertyNode>();
