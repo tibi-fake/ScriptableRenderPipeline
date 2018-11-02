@@ -35,6 +35,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Renamed "Line" shaped lights to "Tube" light
 - Use the "mean height" fog parametrization
 - Shadow quality settings are setup to "All" when using HDRP (Not visile in UI when using SRP). Avoid to have disabled shadow.
+- Updated Shader Graph subshaders to use the new instancing define.
 
 ## [5.0.0-preview] - 2018-09-28
 
