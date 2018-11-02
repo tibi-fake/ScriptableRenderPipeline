@@ -166,6 +166,7 @@ namespace UnityEditor.ShaderGraph.Drawing
 
                 var converter = node as IPropertyFromNode;
                 var prop = converter.AsShaderProperty();
+                prop.displayName = graph.SanitizePropertyName(prop.displayName, prop.guid);
                 graph.AddShaderProperty(prop);
 
                 var propNode = new PropertyNode();
