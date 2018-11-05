@@ -275,7 +275,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
             SetFloat("_Blend", (float)upgradeParams.blendMode);
             SetFloat("_AlphaClip", upgradeParams.alphaClip ? 1 : 0);
             SetFloat("_SpecSource", (float)upgradeParams.specularSource);
-            SetFloat("_GlossinessSource", (float)upgradeParams.glosinessSource);
+            SetFloat("_SmoothnessSource", (float)upgradeParams.glosinessSource);
 
             if (oldShaderName.Contains("Legacy Shaders/Self-Illumin"))
             {
@@ -314,7 +314,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
             }
             else
             {
-                GlossinessSource glossSource = (GlossinessSource)material.GetFloat("_GlossinessSource");
+                GlossinessSource glossSource = (GlossinessSource)material.GetFloat("_SmoothnessSource");
                 bool hasGlossMap = material.GetTexture("_SpecGlossMap");
                 CoreUtils.SetKeyword(material, "_SPECGLOSSMAP", hasGlossMap);
                 CoreUtils.SetKeyword(material, "_SPECULAR_COLOR", !hasGlossMap);

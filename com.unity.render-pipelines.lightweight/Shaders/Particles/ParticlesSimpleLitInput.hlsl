@@ -68,6 +68,8 @@ half4 SampleSpecularGloss(float2 uv, float3 blendUv, half alpha, half4 specColor
 #ifdef _GLOSSINESS_FROM_BASE_ALPHA
     specularGloss.a = alpha;
 #endif
+    specularGloss.a = exp2(10 * specularGloss.a + 1);
+
     return specularGloss;
 }
 

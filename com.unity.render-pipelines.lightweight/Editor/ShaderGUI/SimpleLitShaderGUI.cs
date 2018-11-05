@@ -27,7 +27,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
             base.FindProperties(properties);
             specHighlights = FindProperty("_SpecularHighlights", properties);
             smoothnessSourceProp = FindProperty("_SmoothnessSource", properties);
-            specularGlossMapProp = FindProperty("_SpecMap", properties);
+            specularGlossMapProp = FindProperty("_SpecGlossMap", properties);
             specularColorProp = FindProperty("_SpecColor", properties);
             bumpMapProp = FindProperty("_BumpMap", properties, false);
             emissionMapProp = FindProperty("_EmissionMap", properties);
@@ -115,7 +115,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
             else
             {
                 var smoothnessSource = (SmoothnessSource)material.GetFloat("_SmoothnessSource");
-                bool hasMap = material.GetTexture("_SpecMap");
+                bool hasMap = material.GetTexture("_SpecGlossMap");
                 CoreUtils.SetKeyword(material, "_SPECGLOSSMAP", hasMap);
                 CoreUtils.SetKeyword(material, "_SPECULAR_COLOR", !hasMap);
                 CoreUtils.SetKeyword(material, "_GLOSSINESS_FROM_BASE_ALPHA", smoothnessSource == SmoothnessSource.BaseAlpha);
@@ -215,7 +215,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
             material.SetFloat("_Surface", (float)shaderUpgradeParams.surfaceType);
             material.SetFloat("_Blend", (float)shaderUpgradeParams.blendMode);
             material.SetFloat("_SpecSource", (float)shaderUpgradeParams.specularSource);
-            material.SetFloat("_GlossinessSource", (float)shaderUpgradeParams.glosinessSource);
+            material.SetFloat("_SmoothnessSource", (float)shaderUpgradeParams.glosinessSource);
 
             if (oldShaderName.Contains("Self-Illumin"))
             {

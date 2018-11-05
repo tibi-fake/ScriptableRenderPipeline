@@ -157,7 +157,7 @@ half4 ParticlesLitFragment(VaryingsParticle input) : SV_Target
     half3 emission = half3(0, 0, 0);
 #endif
     half4 specularGloss = SampleSpecularGloss(uv, blendUv, albedo.a, _SpecColor, TEXTURE2D_PARAM(_SpecGlossMap, sampler_SpecGlossMap));
-    half shininess = 0.5;
+    half shininess = specularGloss.a;
     
 #if defined(_DISTORTION_ON)
     diffuse = Distortion(half4(diffuse, alpha), normalTS, _DistortionStrengthScaled, _DistortionBlend, projectedPosition);

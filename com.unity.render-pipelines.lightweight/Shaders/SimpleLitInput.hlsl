@@ -12,7 +12,7 @@ half4 _EmissionColor;
 half _Cutoff;
 CBUFFER_END
 
-TEXTURE2D(_SpecMap);       SAMPLER(sampler_SpecMap);
+TEXTURE2D(_SpecGlossMap);       SAMPLER(sampler_SpecGlossMap);
 
 half4 SampleSpecularGloss(half2 uv, half alpha, half4 specColor, TEXTURE2D_ARGS(specMap, sampler_specMap))
 {

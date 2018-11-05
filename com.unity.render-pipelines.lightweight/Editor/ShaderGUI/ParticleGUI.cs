@@ -163,7 +163,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
                     var enabled = properties.softParticlesEnabled.floatValue;
 
                     EditorGUI.BeginChangeCheck();
-                    enabled = EditorGUILayout.Toggle(ParticleGUI.Styles.softParticlesEnabled, enabled != 0.0f) ? 1.0f : 0.0f;
+                    enabled = EditorGUILayout.Toggle(Styles.softParticlesEnabled, enabled != 0.0f) ? 1.0f : 0.0f;
                     if (EditorGUI.EndChangeCheck())
                     {
                         materialEditor.RegisterPropertyChangeUndo("Soft Particles Enabled");
@@ -173,8 +173,8 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
                     if (enabled != 0.0f)
                     {
                         EditorGUI.indentLevel++;
-                        materialEditor.ShaderProperty(properties.softParticlesNearFadeDistance, ParticleGUI.Styles.softParticlesNearFadeDistanceText);
-                        materialEditor.ShaderProperty(properties.softParticlesFarFadeDistance, ParticleGUI.Styles.softParticlesFarFadeDistanceText);
+                        materialEditor.ShaderProperty(properties.softParticlesNearFadeDistance, Styles.softParticlesNearFadeDistanceText);
+                        materialEditor.ShaderProperty(properties.softParticlesFarFadeDistance, Styles.softParticlesFarFadeDistanceText);
                         EditorGUI.indentLevel--;
                     }
                 }
@@ -185,7 +185,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
                     var enabled = properties.cameraFadingEnabled.floatValue;
 
                     EditorGUI.BeginChangeCheck();
-                    enabled = EditorGUILayout.Toggle(ParticleGUI.Styles.cameraFadingEnabled, enabled != 0.0f) ? 1.0f : 0.0f;
+                    enabled = EditorGUILayout.Toggle(Styles.cameraFadingEnabled, enabled != 0.0f) ? 1.0f : 0.0f;
                     if (EditorGUI.EndChangeCheck())
                     {
                         materialEditor.RegisterPropertyChangeUndo("Camera Fading Enabled");
@@ -195,8 +195,8 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
                     if (enabled != 0.0f)
                     {
                         EditorGUI.indentLevel++;
-                        materialEditor.ShaderProperty(properties.cameraNearFadeDistance, ParticleGUI.Styles.cameraNearFadeDistanceText);
-                        materialEditor.ShaderProperty(properties.cameraFarFadeDistance, ParticleGUI.Styles.cameraFarFadeDistanceText);
+                        materialEditor.ShaderProperty(properties.cameraNearFadeDistance, Styles.cameraNearFadeDistanceText);
+                        materialEditor.ShaderProperty(properties.cameraFarFadeDistance, Styles.cameraFarFadeDistanceText);
                         EditorGUI.indentLevel--;
                     }
                 }
@@ -206,7 +206,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
                 {
                     EditorGUI.BeginChangeCheck();
                     var enabled = properties.distortionEnabled.floatValue;
-                    enabled = EditorGUILayout.Toggle(ParticleGUI.Styles.distortionEnabled, enabled != 0.0f) ? 1.0f : 0.0f;
+                    enabled = EditorGUILayout.Toggle(Styles.distortionEnabled, enabled != 0.0f) ? 1.0f : 0.0f;
                     if (EditorGUI.EndChangeCheck())
                     {
                         materialEditor.RegisterPropertyChangeUndo("Distortion Enabled");
@@ -215,9 +215,13 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
                     
                     if (enabled != 0.0f)
                     {
-                        int indentation = 2;
-                        materialEditor.ShaderProperty(properties.distortionStrength, ParticleGUI.Styles.distortionStrength, indentation);
-                        materialEditor.ShaderProperty(properties.distortionBlend, ParticleGUI.Styles.distortionBlend, indentation);
+                        EditorGUI.indentLevel++;
+                        materialEditor.ShaderProperty(properties.distortionStrength, Styles.distortionStrength);
+                        EditorGUI.BeginChangeCheck();
+                        var blend = EditorGUILayout.Slider(Styles.distortionBlend, properties.distortionBlend.floatValue, 0f, 1f);
+                        if(EditorGUI.EndChangeCheck())
+                            properties.distortionBlend.floatValue = blend;
+                        EditorGUI.indentLevel--;
                     }
                 }
 
@@ -233,19 +237,19 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
             bool useTangents = material.GetTexture("_BumpMap") && useLighting;
 
             if (useLighting)
-                GUILayout.Label(ParticleGUI.Styles.streamNormalText, EditorStyles.label);
+                GUILayout.Label(Styles.streamNormalText, EditorStyles.label);
 
-            GUILayout.Label(ParticleGUI.Styles.streamColorText, EditorStyles.label);
-            GUILayout.Label(ParticleGUI.Styles.streamUVText, EditorStyles.label);
+            GUILayout.Label(Styles.streamColorText, EditorStyles.label);
+            GUILayout.Label(Styles.streamUVText, EditorStyles.label);
 
             if (useFlipbookBlending)
             {
-                GUILayout.Label(ParticleGUI.Styles.streamUV2Text, EditorStyles.label);
-                GUILayout.Label(ParticleGUI.Styles.streamAnimBlendText, EditorStyles.label);
+                GUILayout.Label(Styles.streamUV2Text, EditorStyles.label);
+                GUILayout.Label(Styles.streamAnimBlendText, EditorStyles.label);
             }
 
             if (useTangents)
-                GUILayout.Label(ParticleGUI.Styles.streamTangentText, EditorStyles.label);
+                GUILayout.Label(Styles.streamTangentText, EditorStyles.label);
 
             // Build the list of expected vertex streams
             List<ParticleSystemVertexStream> streams = new List<ParticleSystemVertexStream>();
@@ -267,7 +271,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
                 streams.Add(ParticleSystemVertexStream.Tangent);
 
             // Set the streams on all systems using this material
-            if (GUILayout.Button(ParticleGUI.Styles.streamApplyToAllSystemsText, EditorStyles.miniButton, GUILayout.ExpandWidth(false)))
+            if (GUILayout.Button(Styles.streamApplyToAllSystemsText, EditorStyles.miniButton, GUILayout.ExpandWidth(false)))
             {
                 foreach (ParticleSystemRenderer renderer in renderers)
                 {
@@ -299,6 +303,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
 
             // Lit shader?
             //bool useLighting = (material.GetFloat("_LightingEnabled") > 0.0f);
+            material.EnableKeyword("_RECEIVE_SHADOWS_OFF");
 
             // Note: keywords must be based on Material value not on MaterialProperty due to multi-edit & material animation
             // (MaterialProperty value might come from renderer material property block)

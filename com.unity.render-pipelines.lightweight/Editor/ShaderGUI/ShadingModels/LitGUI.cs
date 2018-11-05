@@ -164,6 +164,8 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
                 isSpecularWorkFlow = (WorkflowMode) material.GetFloat("_WorkflowMode") == WorkflowMode.Specular;
                 if (isSpecularWorkFlow)
                     hasGlossMap = material.GetTexture("_SpecGlossMap") != null;
+                else
+                    hasGlossMap = material.GetTexture("_MetallicGlossMap") != null;
             }
             else
             {

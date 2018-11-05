@@ -75,20 +75,6 @@ Shader "Lightweight Render Pipeline/Lit"
             #pragma exclude_renderers d3d11_9x
             #pragma target 2.0
 
-            
-            // color * saturate(Alpha + k);
-            
-             
-
-
-            // _NORMALMAP
-            // _ALPHATEST_ON
-            // _EMISSION
-            // _MASK
-            // _specularlight
-            // _SPECULAR_SETUP
-            // _ReceiveShadows
-
             // -------------------------------------
             // Material Keywords
             #pragma shader_feature _NORMALMAP

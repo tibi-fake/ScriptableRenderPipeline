@@ -7,10 +7,10 @@ using UnityEditor.Experimental.Rendering.LightweightPipeline;
 
 namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
 {
-    internal class ParticlesLitShader : BaseShaderGUI
+    internal class ParticlesSimpleLitShader : BaseShaderGUI
     {
         // Properties
-        private LitGUI.LitProperties litProperties;
+        private SimpleLitGUI.SimpleLitProperties shadingModelProperties;
         private ParticleGUI.ParticleProperties particleProps;
         
         // List of renderers using this material in the scene, used for validating vertex streams
@@ -19,7 +19,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
         public override void FindProperties(MaterialProperty[] properties)
         {
             base.FindProperties(properties);
-            litProperties = new LitGUI.LitProperties(properties);
+            shadingModelProperties = new SimpleLitGUI.SimpleLitProperties(properties);
             particleProps = new ParticleGUI.ParticleProperties(properties);
         }
         
@@ -34,7 +34,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
             //SetupMaterialWithBlendMode(material, (BlendMode)material.GetFloat("_Blend"));
             ParticleGUI.SetupMaterialWithColorMode(material);
             ParticleGUI.SetMaterialKeywords(material); // Set particle specific keywords
-            LitGUI.SetMaterialKeywords(material, litProperties); // Set lit specific 
+            SimpleLitGUI.SetMaterialKeywords(material); // Set lit specific 
         }
         
         public override void DrawSurfaceOptions(Material material)
@@ -55,7 +55,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
         public override void DrawSurfaceInputs(Material material)
         {
             base.DrawSurfaceInputs(material);
-            LitGUI.Inputs(litProperties, materialEditor);
+            SimpleLitGUI.Inputs(shadingModelProperties, materialEditor);
             DrawEmissionProperties(material, true);
         }
         
@@ -66,6 +66,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
                 materialEditor.ShaderProperty(particleProps.flipbookMode, ParticleGUI.Styles.flipbookMode);
                 ParticleGUI.FadingOptions(material, materialEditor, particleProps);
             }
+            SimpleLitGUI.Advanced(shadingModelProperties);
             base.DrawAdvancedOptions(material);
         }
 

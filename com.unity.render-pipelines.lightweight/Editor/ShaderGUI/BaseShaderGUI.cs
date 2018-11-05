@@ -214,11 +214,14 @@ namespace UnityEditor
         
         public virtual void DrawEmissionProperties(Material material, bool keyword)
         {
-            var emissive = true;
-            var hadEmissionTexture = emissionMapProp.textureValue != null;
-            
-            if (emissionMapProp != null && emissionColorProp != null) // Draw the baseMap, most shader will have at least a baseMap
+            if (emissionMapProp != null && emissionColorProp != null
+            ) // Draw the baseMap, most shader will have at least a baseMap
             {
+                var emissive = true;
+
+                var hadEmissionTexture = emissionMapProp.textureValue != null;
+
+
                 if (!keyword)
                 {
                     materialEditor.TexturePropertyWithHDRColor(Styles.emissionMap, emissionMapProp, emissionColorProp,
@@ -238,17 +241,25 @@ namespace UnityEditor
                     }
                     EditorGUI.EndDisabledGroup();
                 }
+
+                // If texture was assigned and color was black set color to white
+
+
+                var brightness = emissionColorProp.colorValue.maxColorComponent;
+                if (emissionMapProp.textureValue != null && !hadEmissionTexture && brightness <= 0f)
+                    emissionColorProp.colorValue = Color.white;
+
+                // LW does not support RealtimeEmissive. We set it to bake emissive and handle the emissive is black right.
+                if (emissive)
+                {
+                    material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.BakedEmissive;
+                    if (brightness <= 0f)
+                        material.globalIlluminationFlags |= MaterialGlobalIlluminationFlags.EmissiveIsBlack;
+                }
             }
-            // If texture was assigned and color was black set color to white
-            var brightness = emissionColorProp.colorValue.maxColorComponent;
-            if (emissionMapProp.textureValue != null && !hadEmissionTexture && brightness <= 0f)
-                emissionColorProp.colorValue = Color.white;
-            // LW does not support RealtimeEmissive. We set it to bake emissive and handle the emissive is black right.
-            if (emissive)
+            else
             {
-                material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.BakedEmissive;
-                if (brightness <= 0f)
-                    material.globalIlluminationFlags |= MaterialGlobalIlluminationFlags.EmissiveIsBlack;
+                material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.None;
             }
         }
         

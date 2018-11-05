@@ -53,8 +53,10 @@ half4 SampleAlbedo(float2 uv, float3 blendUv, half4 color, float4 particleColor,
     // No distortion Support
     albedo = MixParticleColor(albedo, particleColor, colorAddSubDiff);
     
+    albedo.a = AlphaBlendAndTest(albedo.a, _Cutoff);
+    
  #if defined(SOFTPARTICLES_ON)
-     ALBEDO_MUL *= SoftParticles(SOFT_PARTICLE_NEAR_FADE, SOFT_PARTICLE_INV_FADE_DISTANCE, projectedPosition);
+     ALBEDO_MUL -= 1 - SoftParticles(SOFT_PARTICLE_NEAR_FADE, SOFT_PARTICLE_INV_FADE_DISTANCE, projectedPosition);
  #endif
  
  #if defined(_FADING_ON)
@@ -96,7 +98,7 @@ inline void InitializeParticleLitSurfaceData(float2 uv, float3 blendUv, float4 p
     outSurfaceData.occlusion = 1.0;
 
     outSurfaceData.albedo = AlphaModulate(outSurfaceData.albedo, albedo.a);
-    outSurfaceData.alpha = AlphaBlendAndTest(albedo.a, _Cutoff);
+    outSurfaceData.alpha = albedo.a;// AlphaBlendAndTest(albedo.a, _Cutoff);
 }
 
 #endif // LIGHTWEIGHT_PARTICLES_LIT_INPUT_INCLUDED

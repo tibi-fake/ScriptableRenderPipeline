@@ -22,7 +22,7 @@ Shader "Lightweight Render Pipeline/Particles/Simple Lit"
         _EmissionMap("Emission", 2D) = "white" {}
         
         [HideInInspector] _SpecSource("Specular Color Source", Float) = 0.0
-        [HideInInspector] _GlossinessSource("Glossiness Source", Float) = 0.0
+        [HideInInspector] _SmoothnessSource("Smoothness Source", Float) = 0.0
         [ToggleOff] _SpecularHighlights("Specular Highlights", Float) = 1.0
         [ToggleOff] _GlossyReflections("Glossy Reflections", Float) = 1.0
         
@@ -40,12 +40,14 @@ Shader "Lightweight Render Pipeline/Particles/Simple Lit"
         [HideInInspector] _Surface("__surface", Float) = 0.0
         [HideInInspector] _Blend("__mode", Float) = 0.0
         [HideInInspector] _AlphaClip("__clip", Float) = 0.0
-        [HideInInspector] _EmissionEnabled("__emissionenabled", Float) = 0.0
+        [HideInInspector] _Emission("__emission", Float) = 0.0
         [HideInInspector] _BlendOp("__blendop", Float) = 0.0
         [HideInInspector] _SrcBlend("__src", Float) = 1.0
         [HideInInspector] _DstBlend("__dst", Float) = 0.0
         [HideInInspector] _ZWrite("__zw", Float) = 1.0
         [HideInInspector] _Cull("__cull", Float) = 2.0
+        
+        [ToogleOff] _ReceiveShadows("Receive Shadows", Float) = 1.0
         // Particle specific
         [HideInInspector] _ColorMode("_ColorMode", Float) = 0.0
         [HideInInspector] _BaseColorAddSubDiff("_ColorMode", Vector) = (0,0,0,0)
@@ -91,7 +93,8 @@ Shader "Lightweight Render Pipeline/Particles/Simple Lit"
             // Material Keywords
             #pragma shader_feature _NORMALMAP
             #pragma shader_feature _EMISSION
-            #pragma shader_feature _METALLICGLOSSMAP
+            #pragma shader_feature _ _SPECGLOSSMAP _SPECULAR_COLOR
+            #pragma shader_feature _GLOSSINESS_FROM_BASE_ALPHA
             #pragma shader_feature _RECEIVE_SHADOWS_OFF
             
             // -------------------------------------
@@ -126,5 +129,5 @@ Shader "Lightweight Render Pipeline/Particles/Simple Lit"
     }
 
     Fallback "Lightweight Render Pipeline/Particles/Unlit"
-    CustomEditor "UnityEditor.Experimental.Rendering.LightweightPipeline.ParticlesLitShaderGUI"
+    CustomEditor "UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI.ParticlesSimpleLitShader"
 }
