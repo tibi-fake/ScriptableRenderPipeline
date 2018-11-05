@@ -334,7 +334,8 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
             {
                 configuration |= PerObjectData.LightData;
             }
-            else if (additionalLightsCount > 0 && !useStructuredBufferForLights)
+
+            if (additionalLightsCount > 0 && !useStructuredBufferForLights)
             {
                 configuration |= PerObjectData.LightIndices;
             }
