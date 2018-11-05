@@ -12,7 +12,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
 
     partial class HDProbeUI
     {
-        protected enum Expendable
+        protected enum Expandable
         {
             ProjectionSettings = 1 << 0,
             InfluenceVolume = 1 << 1,
@@ -20,7 +20,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
             AdditionalSettings = 1 << 3
         }
 
-        static ExpendedState<Expendable, HDProbe> expendedState = new ExpendedState<Expendable, HDProbe>(Expendable.ProjectionSettings | Expendable.InfluenceVolume | Expendable.CaptureSettings);
+        protected readonly static ExpandedState<Expandable, HDProbe> k_ExpandedState = new ExpandedState<Expandable, HDProbe>(Expandable.ProjectionSettings | Expandable.InfluenceVolume | Expandable.CaptureSettings);
         
         public static readonly CED.IDrawer[] Inspector;
         
@@ -41,38 +41,17 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
             CED.space
             );
 
-        static CED.IDrawer HeaderMaker(string title, Expendable state, CED.ActionDrawer drawer)
-        {
-            return CED.Action((s, d, o) =>
-            {
-                CoreEditorUtils.DrawSplitter();
-                bool expended = expendedState[state];
-                bool newExpended = CoreEditorUtils.DrawHeaderFoldout(title, expended);
-                if (newExpended ^ expended)
-                    expendedState[state] = newExpended;
-                if (newExpended)
-                {
-                    ++EditorGUI.indentLevel;
-                    drawer(s, d, o);
-                    --EditorGUI.indentLevel;
-                    EditorGUILayout.Space();
-                }
-            });
-        }
-        protected static CED.IDrawer HeaderMaker(string title, Expendable state, CED.IDrawer drawer)
-        {
-            return HeaderMaker(title, state, drawer.Draw);
-        }
-
-        public static readonly CED.IDrawer SectionProxyVolumeSettings = HeaderMaker(
+        public static readonly CED.IDrawer SectionProxyVolumeSettings = CED.FoldoutGroup(
             proxySettingsHeader,
-            Expendable.ProjectionSettings,
+            Expandable.ProjectionSettings,
+            k_ExpandedState,
             Drawer_SectionProxySettings
             );
         
-        public static readonly CED.IDrawer SectionInfluenceVolume = HeaderMaker(
+        public static readonly CED.IDrawer SectionInfluenceVolume = CED.FoldoutGroup(
             InfluenceVolumeUI.influenceVolumeHeader,
-            Expendable.InfluenceVolume,
+            Expandable.InfluenceVolume,
+            k_ExpandedState,
             CED.Select(
                 (s, d, o) => s.influenceVolume,
                 (s, d, o) => d.influenceVolume,
@@ -82,9 +61,10 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
 
         public static readonly CED.IDrawer SectionShapeCheck = CED.Action(Drawer_DifferentShapeError);
 
-        public static readonly CED.IDrawer SectionCaptureSettings = HeaderMaker(
+        public static readonly CED.IDrawer SectionCaptureSettings = CED.FoldoutGroup(
             CaptureSettingsUI.captureSettingsHeaderContent,
-            Expendable.CaptureSettings,
+            Expandable.CaptureSettings,
+            k_ExpandedState,
             CED.Select(
                 (s, d, o) => s.captureSettings,
                 (s, d, o) => d.captureSettings,
@@ -94,7 +74,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
 
         public static readonly CED.IDrawer SectionFrameSettings = CED.Action((s, d, o) =>
         {
-            if (expendedState[Expendable.CaptureSettings])
+            if (k_ExpandedState[Expandable.CaptureSettings])
             {
                 if (s.isFrameSettingsOverriden.target)
                     FrameSettingsUI.Inspector(withOverride: true).Draw(s.frameSettings, d.frameSettings, o);
@@ -104,9 +84,10 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
         });
 
 
-        public static readonly CED.IDrawer SectionFoldoutAdditionalSettings = HeaderMaker(
+        public static readonly CED.IDrawer SectionFoldoutAdditionalSettings = CED.FoldoutGroup(
             additionnalSettingsHeader,
-            Expendable.AdditionalSettings,
+            Expandable.AdditionalSettings,
+            k_ExpandedState,
             Drawer_SectionCustomSettings
             );
 
