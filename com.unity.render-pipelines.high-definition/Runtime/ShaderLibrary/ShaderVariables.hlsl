@@ -128,7 +128,7 @@ CBUFFER_END
 #elif defined(UNITY_SINGLE_PASS_STEREO)
 #if SHADER_STAGE_COMPUTE
     // Currently the Unity engine doesn't automatically update stereo indices, offsets, and matrices for compute shaders.
-    // Instead, we manually update _ComputeEyeIndex in SRP code. 
+    // Instead, we manually update _ComputeEyeIndex in SRP code.
     #define unity_StereoEyeIndex _ComputeEyeIndex
 #else
     CBUFFER_START(UnityStereoEyeIndex)
@@ -263,33 +263,7 @@ CBUFFER_START(UnityGlobal)
     float4 unity_DeltaTime;             // { dt, 1/dt, smoothdt, 1/smoothdt }
     int _FrameCount;
 
-    // Volumetric lighting.
-    float4 _AmbientProbeCoeffs[7];      // 3 bands of SH, packed, rescaled and convolved with the phase function
-
-    float3 _HeightFogBaseScattering;
-    float  _HeightFogBaseExtinction;
-
-    float2 _HeightFogExponents;         // {a, 1/a}
-    float  _HeightFogBaseHeight;
-    float  _GlobalFogAnisotropy;
-
-    float4 _VBufferResolution;          // { w, h, 1/w, 1/h }
-    float4 _VBufferSliceCount;          // { count, 1/count, 0, 0 }
-    float4 _VBufferUvScaleAndLimit;     // Necessary us to work with sub-allocation (resource aliasing) in the RTHandle system
-    float4 _VBufferDepthEncodingParams; // See the call site for description
-    float4 _VBufferDepthDecodingParams; // See the call site for description
-
-    // TODO: these are only used for reprojection.
-    // Once reprojection is performed in a separate pass, we should probably
-    // move these to a dedicated CBuffer to avoid polluting the global one.
-    float4 _VBufferPrevResolution;
-    float4 _VBufferPrevSliceCount;
-    float4 _VBufferPrevUvScaleAndLimit;
-    float4 _VBufferPrevDepthEncodingParams;
-    float4 _VBufferPrevDepthDecodingParams;
-    float  _VBufferMaxLinearDepth;      // The Z coordinate of the middle of the last slice
-    int    _EnableDistantFog;           // bool...
-
+    #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/VolumetricLighting/ShaderVariablesVolumetricLighting.cs.hlsl"
     #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/LightLoop/ShaderVariablesLightLoop.hlsl"
     #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/ScreenSpaceLighting/ShaderVariablesScreenSpaceLighting.hlsl"
     #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/AtmosphericScattering/ShaderVariablesAtmosphericScattering.hlsl"
@@ -315,7 +289,7 @@ float4x4 _PrevViewProjMatrixStereo[2];
 float4   _WorldSpaceCameraPosStereo[2];
 #if SHADER_STAGE_COMPUTE
 // Currently the Unity engine doesn't automatically update stereo indices, offsets, and matrices for compute shaders.
-// Instead, we manually update _ComputeEyeIndex in SRP code. 
+// Instead, we manually update _ComputeEyeIndex in SRP code.
 float _ComputeEyeIndex;
 #endif
 CBUFFER_END
