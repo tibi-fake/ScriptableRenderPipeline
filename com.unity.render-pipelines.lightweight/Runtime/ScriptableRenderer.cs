@@ -328,13 +328,7 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
 
         public static PerObjectData GetPerObjectLightFlags(int mainLightIndex, int additionalLightsCount)
         {
-            var configuration = PerObjectData.ReflectionProbes | PerObjectData.Lightmaps | PerObjectData.LightProbe;
-
-            if (mainLightIndex != -1 || additionalLightsCount > 0)
-            {
-                configuration |= PerObjectData.LightData;
-            }
-
+            var configuration = PerObjectData.ReflectionProbes | PerObjectData.Lightmaps | PerObjectData.LightProbe | PerObjectData.LightData;
             if (additionalLightsCount > 0 && !useStructuredBufferForLights)
             {
                 configuration |= PerObjectData.LightIndices;
