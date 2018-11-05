@@ -7,7 +7,7 @@
 float3 GetAbsolutePositionWS(float3 positionRWS)
 {
 #if (SHADEROPTIONS_CAMERA_RELATIVE_RENDERING != 0)
-    positionRWS += _WorldSpaceCameraPos;
+    positionRWS += GetWorldSpaceCameraPos();
 #endif
     return positionRWS;
 }
@@ -16,7 +16,7 @@ float3 GetAbsolutePositionWS(float3 positionRWS)
 float3 GetCameraRelativePositionWS(float3 positionWS)
 {
 #if (SHADEROPTIONS_CAMERA_RELATIVE_RENDERING != 0)
-    positionWS -= _WorldSpaceCameraPos;
+    positionWS -= GetWorldSpaceCameraPos();
 #endif
     return positionWS;
 }
@@ -33,7 +33,7 @@ float3 GetPrimaryCameraPosition()
 #if (SHADEROPTIONS_CAMERA_RELATIVE_RENDERING != 0)
     return float3(0, 0, 0);
 #else
-    return _WorldSpaceCameraPos;
+    return GetWorldSpaceCameraPos();
 #endif
 }
 
@@ -136,7 +136,7 @@ float4 SampleSkyTexture(float3 texCoord, float lod, int sliceIndex)
 float2 TexCoordStereoOffset(float2 texCoord)
 {
 #if defined(UNITY_SINGLE_PASS_STEREO)
-    return texCoord + float2(unity_StereoEyeIndex * _ScreenSize.x, 0.0);
+    return texCoord + float2(GetStereoEyeIndex() * _ScreenSize.x, 0.0);
 #endif
     return texCoord;
 }

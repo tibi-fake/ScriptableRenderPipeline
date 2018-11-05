@@ -41,7 +41,7 @@ Shader "Hidden/HDRenderPipeline/Sky/HDRISky"
 #if defined(UNITY_SINGLE_PASS_STEREO)
         // The computed PixelCoordToViewDir matrix doesn't seem to capture stereo eye offset. 
         // So for VR, we compute WSPosition using the stereo matrices instead.
-        PositionInputs posInput = GetPositionInput_Stereo(input.positionCS.xy, _ScreenSize.zw, input.positionCS.z, UNITY_MATRIX_I_VP, UNITY_MATRIX_V, unity_StereoEyeIndex);
+        PositionInputs posInput = GetPositionInput_Stereo(input.positionCS.xy, _ScreenSize.zw, input.positionCS.z, UNITY_MATRIX_I_VP, UNITY_MATRIX_V, GetStereoEyeIndex());
         float3 dir = normalize(posInput.positionWS);
 #else
         // Points towards the camera

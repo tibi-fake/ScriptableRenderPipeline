@@ -32,7 +32,7 @@ Shader "Hidden/HDRenderPipeline/CameraMotionVectors"
         {
             float depth = LOAD_TEXTURE2D(_CameraDepthTexture, input.positionCS.xy).x;
 
-            PositionInputs posInput = GetPositionInput_Stereo(input.positionCS.xy, _ScreenSize.zw, depth, UNITY_MATRIX_I_VP, UNITY_MATRIX_V, unity_StereoEyeIndex);
+            PositionInputs posInput = GetPositionInput_Stereo(input.positionCS.xy, _ScreenSize.zw, depth, UNITY_MATRIX_I_VP, UNITY_MATRIX_V, GetStereoEyeIndex());
 
             float4 worldPos = float4(posInput.positionWS, 1.0);
             float4 prevPos = worldPos;

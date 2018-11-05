@@ -181,7 +181,7 @@ uint GetLightClusterIndex(uint2 tileIndex, float linearDepth)
     float logBase = g_fClustBase;
     if (g_isLogBaseBufferEnabled)
     {
-        const uint logBaseIndex = GenerateLogBaseBufferIndex(tileIndex, _NumTileClusteredX, _NumTileClusteredY, unity_StereoEyeIndex);
+        const uint logBaseIndex = GenerateLogBaseBufferIndex(tileIndex, _NumTileClusteredX, _NumTileClusteredY, GetStereoEyeIndex());
         logBase = g_logBaseBuffer[logBaseIndex];
     }
 
@@ -192,7 +192,7 @@ void GetCountAndStartCluster(uint2 tileIndex, uint clusterIndex, uint lightCateg
 {
     int nrClusters = (1 << g_iLog2NumClusters);
 
-    const int idx = GenerateLayeredOffsetBufferIndex(lightCategory, tileIndex, clusterIndex, _NumTileClusteredX, _NumTileClusteredY, nrClusters, unity_StereoEyeIndex);
+    const int idx = GenerateLayeredOffsetBufferIndex(lightCategory, tileIndex, clusterIndex, _NumTileClusteredX, _NumTileClusteredY, nrClusters, GetStereoEyeIndex());
 
     uint dataPair = g_vLayeredOffsetsBuffer[idx];
     start = dataPair & 0x7ffffff;
@@ -201,7 +201,7 @@ void GetCountAndStartCluster(uint2 tileIndex, uint clusterIndex, uint lightCateg
 
 void GetCountAndStartCluster(PositionInputs posInput, uint lightCategory, out uint start, out uint lightCount)
 {
-    // Note: XR depends on unity_StereoEyeIndex already being defined,
+    // Note: XR depends on GetStereoEyeIndex() already being defined,
     // which means ShaderVariables.hlsl needs to be defined ahead of this!
 
     uint2 tileIndex    = posInput.tileCoord;

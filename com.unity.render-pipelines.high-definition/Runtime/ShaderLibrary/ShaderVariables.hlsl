@@ -14,18 +14,22 @@
     #define USING_STEREO_MATRICES
 #endif
 
-#if defined(USING_STEREO_MATRICES)
-    #define glstate_matrix_projection unity_StereoMatrixP[unity_StereoEyeIndex]
-    #define unity_MatrixV unity_StereoMatrixV[unity_StereoEyeIndex]
-    #define unity_MatrixInvV unity_StereoMatrixInvV[unity_StereoEyeIndex]
-    #define unity_MatrixVP unity_StereoMatrixVP[unity_StereoEyeIndex]
+//#if defined(USING_STEREO_MATRICES)
+// These are only accessed in ShaderVariablesMatrixDefsLegacyUnity.hlsl, handled there
+//    #define glstate_matrix_projection unity_StereoMatrixP[GetStereoEyeIndex()]
+//    #define unity_MatrixV unity_StereoMatrixV[GetStereoEyeIndex()]
+//    #define unity_MatrixInvV unity_StereoMatrixInvV[GetStereoEyeIndex()]
+//    #define unity_MatrixVP unity_StereoMatrixVP[GetStereoEyeIndex()]
 
-    #define unity_CameraProjection unity_StereoCameraProjection[unity_StereoEyeIndex]
-    #define unity_CameraInvProjection unity_StereoCameraInvProjection[unity_StereoEyeIndex]
-    #define unity_WorldToCamera unity_StereoWorldToCamera[unity_StereoEyeIndex]
-    #define unity_CameraToWorld unity_StereoCameraToWorld[unity_StereoEyeIndex]
-    #define _WorldSpaceCameraPos _WorldSpaceCameraPosStereo[unity_StereoEyeIndex].xyz
-#endif
+// These are not used at all
+//    #define unity_CameraProjection unity_StereoCameraProjection[GetStereoEyeIndex()]
+//    #define unity_CameraInvProjection unity_StereoCameraInvProjection[GetStereoEyeIndex()]
+//    #define unity_WorldToCamera unity_StereoWorldToCamera[GetStereoEyeIndex()]
+//    #define unity_CameraToWorld unity_StereoCameraToWorld[GetStereoEyeIndex()]
+
+// This is handled below with GetWorldSpaceCameraPos() function
+//    #define _WorldSpaceCameraPos _WorldSpaceCameraPosStereo[GetStereoEyeIndex()].xyz
+//#endif
 
 #define UNITY_LIGHTMODEL_AMBIENT (glstate_lightmodel_ambient * 2)
 
@@ -121,15 +125,13 @@ CBUFFER_END
 #endif
 
 #if defined(UNITY_STEREO_MULTIVIEW_ENABLED) && defined(SHADER_STAGE_VERTEX)
-    #define unity_StereoEyeIndex UNITY_VIEWID
     UNITY_DECLARE_MULTIVIEW(2);
 #elif defined(UNITY_STEREO_INSTANCING_ENABLED) || defined(UNITY_STEREO_MULTIVIEW_ENABLED)
-    static uint unity_StereoEyeIndex;
+    static uint s_StereoEyeIndex;
 #elif defined(UNITY_SINGLE_PASS_STEREO)
 #if SHADER_STAGE_COMPUTE
     // Currently the Unity engine doesn't automatically update stereo indices, offsets, and matrices for compute shaders.
     // Instead, we manually update _ComputeEyeIndex in SRP code.
-    #define unity_StereoEyeIndex _ComputeEyeIndex
 #else
     CBUFFER_START(UnityStereoEyeIndex)
         int unity_StereoEyeIndex;
@@ -184,94 +186,14 @@ SAMPLER(samplerunity_ProbeVolumeSH);
 // Important: please use macros or functions to access the CBuffer data.
 // The member names and data layout can (and will) change!
 CBUFFER_START(UnityGlobal)
-    // ================================
-    //     PER FRAME CONSTANTS
-    // ================================
-    #if !defined(USING_STEREO_MATRICES)
-        float4x4 glstate_matrix_projection;
-        float4x4 unity_MatrixV;
-        float4x4 unity_MatrixInvV;
-        float4x4 unity_MatrixVP;
-        float4 unity_StereoScaleOffset;
-        int unity_StereoEyeIndex;
-    #endif
 
-    // ================================
-    //     PER VIEW CONSTANTS
-    // ================================
-    // TODO: all affine matrices should be 3x4.
-    float4x4 _ViewMatrix;
-    float4x4 _InvViewMatrix;
-    float4x4 _ProjMatrix;
-    float4x4 _InvProjMatrix;
-    float4x4 _ViewProjMatrix;
-    float4x4 _InvViewProjMatrix;
-    float4x4 _NonJitteredViewProjMatrix;
-    float4x4 _PrevViewProjMatrix;       // non-jittered
-
-    float4 _TextureWidthScaling; // 0.5 for SinglePassDoubleWide (stereo) and 1.0 otherwise
-
-    // TODO: put commonly used vars together (below), and then sort them by the frequency of use (descending).
-    // Note: a matrix is 4 * 4 * 4 = 64 bytes (1x cache line), so no need to sort those.
-#if defined(USING_STEREO_MATRICES)
-    float3 _Align16;
-#else
-    float3 _WorldSpaceCameraPos;
-#endif
-    float4 _ScreenSize;                 // { w, h, 1 / w, 1 / h }
-    float4 _ScreenToTargetScale;        // { w / RTHandle.maxWidth, h / RTHandle.maxHeight } : xy = currFrame, zw = prevFrame
-
-    // Values used to linearize the Z buffer (http://www.humus.name/temp/Linearize%20depth.txt)
-    // x = 1 - f/n
-    // y = f/n
-    // z = 1/f - 1/n
-    // w = 1/n
-    // or in case of a reversed depth buffer (UNITY_REVERSED_Z is 1)
-    // x = -1 + f/n
-    // y = 1
-    // z = -1/n + -1/f
-    // w = 1/f
-    float4 _ZBufferParams;
-
-    // x = 1 or -1 (-1 if projection is flipped)
-    // y = near plane
-    // z = far plane
-    // w = 1/far plane
-    float4 _ProjectionParams;
-
-    // x = orthographic camera's width
-    // y = orthographic camera's height
-    // z = unused
-    // w = 1.0 if camera is ortho, 0.0 if perspective
-    float4 unity_OrthoParams;
-
-    // x = width
-    // y = height
-    // z = 1 + 1.0/width
-    // w = 1 + 1.0/height
-    float4 _ScreenParams;
-
-    float4 _FrustumPlanes[6];           // { (a, b, c) = N, d = -dot(N, P) } [L, R, T, B, N, F]
-
-    // TAA Frame Index ranges from 0 to 7. This gives you two rotations per cycle.
-    float4 _TaaFrameRotation;           // { sin(taaFrame * PI/2), cos(taaFrame * PI/2), 0, 0 }
-    // t = animateMaterials ? Time.realtimeSinceStartup : 0.
-    float4 _Time;                       // { t/20, t, t*2, t*3 }
-    float4 _LastTime;                   // { t/20, t, t*2, t*3 }
-    float4 _SinTime;                    // { sin(t/8), sin(t/4), sin(t/2), sin(t) }
-    float4 _CosTime;                    // { cos(t/8), cos(t/4), cos(t/2), cos(t) }
-    float4 unity_DeltaTime;             // { dt, 1/dt, smoothdt, 1/smoothdt }
-    int _FrameCount;
-
+    #include "Packages/com.unity.render-pipelines.high-definition/Runtime/ShaderLibrary/ShaderVariablesPerView.cs.hlsl"
     #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/VolumetricLighting/ShaderVariablesVolumetricLighting.cs.hlsl"
     #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/LightLoop/ShaderVariablesLightLoop.hlsl"
     #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/ScreenSpaceLighting/ShaderVariablesScreenSpaceLighting.hlsl"
     #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/AtmosphericScattering/ShaderVariablesAtmosphericScattering.hlsl"
     #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Material/SubsurfaceScattering/ShaderVariablesSubsurfaceScattering.hlsl"
     #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Material/Decal/ShaderVariablesDecal.hlsl"
-
-    #define DEFAULT_LIGHT_LAYERS 0xFF
-    uint _EnableLightLayers;
 
 CBUFFER_END
 
@@ -288,13 +210,40 @@ float4x4 _InvViewProjMatrixStereo[2];
 float4x4 _PrevViewProjMatrixStereo[2];
 float4   _WorldSpaceCameraPosStereo[2];
 #if SHADER_STAGE_COMPUTE
-// Currently the Unity engine doesn't automatically update stereo indices, offsets, and matrices for compute shaders.
-// Instead, we manually update _ComputeEyeIndex in SRP code.
 float _ComputeEyeIndex;
 #endif
 CBUFFER_END
 
 #endif // USING_STEREO_MATRICES
+
+int GetStereoEyeIndex()
+{
+#if defined(UNITY_STEREO_MULTIVIEW_ENABLED) && defined(SHADER_STAGE_VERTEX)
+    return UNITY_VIEWID;
+    UNITY_DECLARE_MULTIVIEW(2);
+#elif defined(UNITY_STEREO_INSTANCING_ENABLED) || defined(UNITY_STEREO_MULTIVIEW_ENABLED)
+    return s_StereoEyeIndex;
+#elif defined(UNITY_SINGLE_PASS_STEREO)
+#if SHADER_STAGE_COMPUTE
+    // Currently the Unity engine doesn't automatically update stereo indices, offsets, and matrices for compute shaders.
+    // Instead, we manually update _ComputeEyeIndex in SRP code.
+    return _ComputeEyeIndex;
+#else
+    return unity_StereoEyeIndex;
+#endif
+#else
+    return 0;
+#endif
+}
+
+float3 GetWorldSpaceCameraPos()
+{
+#if defined(USING_STEREO_MATRICES)
+    return _WorldSpaceCameraPosStereo[GetStereoEyeIndex()].xyz;
+#else
+    return _WorldSpaceCameraPos;
+#endif
+}
 
 // Note: To sample camera depth in HDRP we provide these utils functions because the way we store the depth mips can change
 // Currently it's an atlas and it's layout can be found at ComputePackedMipChainInfo in HDUtils.cs
@@ -329,7 +278,7 @@ float4x4 ApplyCameraTranslationToMatrix(float4x4 modelMatrix)
 {
     // To handle camera relative rendering we substract the camera position in the model matrix
 #if (SHADEROPTIONS_CAMERA_RELATIVE_RENDERING != 0)
-    modelMatrix._m03_m13_m23 -= _WorldSpaceCameraPos;
+    modelMatrix._m03_m13_m23 -= GetWorldSpaceCameraPos();
 #endif
     return modelMatrix;
 }
@@ -337,8 +286,9 @@ float4x4 ApplyCameraTranslationToMatrix(float4x4 modelMatrix)
 float4x4 ApplyCameraTranslationToInverseMatrix(float4x4 inverseModelMatrix)
 {
 #if (SHADEROPTIONS_CAMERA_RELATIVE_RENDERING != 0)
+    float3 camPos = GetWorldSpaceCameraPos();
     // To handle camera relative rendering we need to apply translation before converting to object space
-    float4x4 translationMatrix = { { 1.0, 0.0, 0.0, _WorldSpaceCameraPos.x },{ 0.0, 1.0, 0.0, _WorldSpaceCameraPos.y },{ 0.0, 0.0, 1.0, _WorldSpaceCameraPos.z },{ 0.0, 0.0, 0.0, 1.0 } };
+    float4x4 translationMatrix = { { 1.0, 0.0, 0.0, camPos.x },{ 0.0, 1.0, 0.0, camPos.y },{ 0.0, 0.0, 1.0, camPos.z },{ 0.0, 0.0, 0.0, 1.0 } };
     return mul(inverseModelMatrix, translationMatrix);
 #else
     return inverseModelMatrix;

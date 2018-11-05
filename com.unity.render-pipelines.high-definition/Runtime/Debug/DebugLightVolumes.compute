@@ -26,7 +26,7 @@ void LightVolumeGradient(uint2 groupThreadId : SV_GroupThreadID, uint2 groupId :
 {
 	// Fetch the current pixel coordinate
 	uint2 currentPixelCoordinate = groupId * DEBUG_LIGHT_VOLUME_TILE_SIZE + groupThreadId;
-    currentPixelCoordinate.x = currentPixelCoordinate.x + (unity_StereoEyeIndex * _ScreenSize.x);
+    currentPixelCoordinate.x = currentPixelCoordinate.x + (GetStereoEyeIndex() * _ScreenSize.x);
 
 	// Lightcount at this pixel
     float lightCount = _DebugLightCountBuffer[currentPixelCoordinate];
@@ -48,7 +48,7 @@ void LightVolumeColors(uint2 groupThreadId : SV_GroupThreadID, uint2 groupId : S
 {
 	// Fetch the current pixel coordinate
 	uint2 currentPixelCoordinate = groupId * DEBUG_LIGHT_VOLUME_TILE_SIZE + groupThreadId;
-    currentPixelCoordinate.x = currentPixelCoordinate.x + (unity_StereoEyeIndex * _ScreenSize.x);
+    currentPixelCoordinate.x = currentPixelCoordinate.x + (GetStereoEyeIndex() * _ScreenSize.x);
 
 	// Lightcount at this pixel
     float lightCount = _DebugLightCountBuffer[currentPixelCoordinate];

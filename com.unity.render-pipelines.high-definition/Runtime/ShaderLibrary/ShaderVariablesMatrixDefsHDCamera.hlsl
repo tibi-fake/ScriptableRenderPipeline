@@ -7,14 +7,14 @@
 
 #if defined(USING_STEREO_MATRICES)
 
-#define UNITY_MATRIX_V     _ViewMatrixStereo[unity_StereoEyeIndex]
-#define UNITY_MATRIX_I_V   _InvViewMatrixStereo[unity_StereoEyeIndex]
-#define UNITY_MATRIX_P     OptimizeProjectionMatrix(_ProjMatrixStereo[unity_StereoEyeIndex])
-#define UNITY_MATRIX_I_P   _InvProjMatrixStereo[unity_StereoEyeIndex]
-#define UNITY_MATRIX_VP    _ViewProjMatrixStereo[unity_StereoEyeIndex]
-#define UNITY_MATRIX_I_VP  _InvViewProjMatrixStereo[unity_StereoEyeIndex]
-#define UNITY_MATRIX_UNJITTERED_VP _ViewProjMatrixStereo[unity_StereoEyeIndex] // Since VR doesn't need to add jitter, just use normal VP matrix
-#define UNITY_MATRIX_PREV_VP _PrevViewProjMatrixStereo[unity_StereoEyeIndex]
+#define UNITY_MATRIX_V     _ViewMatrixStereo[GetStereoEyeIndex()]
+#define UNITY_MATRIX_I_V   _InvViewMatrixStereo[GetStereoEyeIndex()]
+#define UNITY_MATRIX_P     OptimizeProjectionMatrix(_ProjMatrixStereo[GetStereoEyeIndex()])
+#define UNITY_MATRIX_I_P   _InvProjMatrixStereo[GetStereoEyeIndex()]
+#define UNITY_MATRIX_VP    _ViewProjMatrixStereo[GetStereoEyeIndex()]
+#define UNITY_MATRIX_I_VP  _InvViewProjMatrixStereo[GetStereoEyeIndex()]
+#define UNITY_MATRIX_UNJITTERED_VP _ViewProjMatrixStereo[GetStereoEyeIndex()] // Since VR doesn't need to add jitter, just use normal VP matrix
+#define UNITY_MATRIX_PREV_VP _PrevViewProjMatrixStereo[GetStereoEyeIndex()]
 
 #else
 
