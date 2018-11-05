@@ -203,6 +203,12 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
                     return;
                 }
 
+                if (pipelineInstance.settings.additionalLightsRenderingMode == LightRenderingMode.Disabled ||
+                    pipelineInstance.settings.maxAdditionalLights == 0)
+                {
+                    cullingParameters.cullingOptions |= CullingOptions.DisablePerObjectCulling;
+                }
+                
                 cullingParameters.shadowDistance = Mathf.Min(cameraData.maxShadowDistance, camera.farClipPlane);
 
                 context.ExecuteCommandBuffer(cmd);
