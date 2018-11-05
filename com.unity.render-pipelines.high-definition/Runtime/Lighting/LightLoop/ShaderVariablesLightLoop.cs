@@ -1,12 +1,6 @@
 
 namespace UnityEngine.Experimental.Rendering.HDPipeline
 {
-/*    [GenerateHLSL]
-    public enum LightCount
-    {
-        s_MaxEnv2DLight = 32
-    };*/
-
     [GenerateHLSL(needAccessors = false, omitStructDeclaration = true)]
     public unsafe struct ShaderVariablesLightLoop
     {
