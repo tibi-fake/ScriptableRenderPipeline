@@ -222,7 +222,6 @@ namespace UnityEditor.ShaderGraph
             m_RemovedNodes.Clear();
             m_PastedNodes.Clear();
             m_groupNodeStruct.Clear();
-            //m_Groups.Clear();
             m_AddedGroups.Clear();
             m_RemovedGroups.Clear();
             m_AddedEdges.Clear();
@@ -254,13 +253,6 @@ namespace UnityEditor.ShaderGraph
             m_GroupNodes.Add(groupData.guid, new List<AbstractMaterialNode>());
         }
 
-        //public void AddGroup(GroupData groupData)
-        //{
-        //    if (m_Groups.Contains(groupData))
-        //        return;
-        //    m_Groups.Add(groupData);
-        //}
-
         public void RemoveGroup(GroupData groupData)
         {
             RemoveGroupNoValidate(groupData);
@@ -286,7 +278,6 @@ namespace UnityEditor.ShaderGraph
 
         public void SetNodeGroup(AbstractMaterialNode node, GroupData group)
         {
-            // TODO: Record this change in a list with node id, previous group id, and new node id
             // Checking if the groupdata is null. If it is, then it means node has been removed out of a group.
             // If the group data is null, then maybe the old group id should be removed
             Guid groupGuid;
@@ -314,21 +305,7 @@ namespace UnityEditor.ShaderGraph
                 m_GroupNodes[group.guid].Add(node);
 
             m_groupNodeStruct.Add(groupStruct);
-            //node.groupGuid = group.guid;
         }
-
-//        void AddNodesToGroupDict(GroupData groupData)
-//        {
-//            //m_GraphView.nodes.ToList().OfType<MaterialNodeView>().FirstOrDefault(p => p.node != null && p.node.guid == node.guid);
-//            //m_GraphView.graphElements.ToList().OfType<MaterialGraphGroup>();
-//
-//            foreach (GraphElement element in group.containedElements)
-//            {
-//
-//            }
-//        }
-
-
 
         void AddNodeNoValidate(INode node)
         {
@@ -716,19 +693,6 @@ namespace UnityEditor.ShaderGraph
                     m_AddedEdges.Remove(edge);
                 }
             }
-
-            // Get removed nodes, check their group id and then check if that group is empty
-            // TODO: the above written
-
-//            foreach (INode node in m_RemovedNodes)
-//            {
-//                AbstractMaterialNode absNode = node as AbstractMaterialNode;
-//
-//                if (absNode.groupGuid != Guid.Empty && !m_GroupNodes[absNode.groupGuid].Any())
-//                {
-//                    RemoveGroup();
-//                }
-//            }
         }
 
         public void ReplaceWith(IGraph other)
@@ -764,7 +728,6 @@ namespace UnityEditor.ShaderGraph
                 removedGroupDatas.AddRange(m_Groups);
                 foreach (var groupData in removedGroupDatas)
                 {
-                    Debug.Log("ReplaceWith GroupData:: " + groupData.title);
                     RemoveGroupNoValidate(groupData);
                 }
             }
