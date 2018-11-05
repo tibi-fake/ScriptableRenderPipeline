@@ -161,8 +161,6 @@ namespace UnityEditor.ShaderGraph.Drawing
             string title = "New Material Group";
             GroupData groupData = new GroupData(title, pos);
 
-            // This works...
-            //graph.AddGroup(groupData);
             graph.owner.RegisterCompleteObjectUndo("Creating Group Node");
             graph.AddGroupData(groupData);
 
@@ -172,11 +170,9 @@ namespace UnityEditor.ShaderGraph.Drawing
                 {
                     MaterialNodeView materialNodeView = selectable as MaterialNodeView;
                     AbstractMaterialNode abstractMaterialNode = materialNodeView.node;
-                    //abstractMaterialNode.groupGuid = groupData.guid;
                     graph.SetNodeGroup(abstractMaterialNode, groupData);
                 }
             }
-
         }
 
         void RemoveFromGroupNode(ContextualMenu.MenuAction a)
