@@ -326,15 +326,17 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
             return clearFlag;
         }
 
-        public static PerObjectData GetRendererConfiguration(int additionalLightsCount)
+        public static PerObjectData GetPerObjectLightFlags(int mainLightIndex, int additionalLightsCount)
         {
             var configuration = PerObjectData.ReflectionProbes | PerObjectData.Lightmaps | PerObjectData.LightProbe;
-            if (additionalLightsCount > 0)
+
+            if (mainLightIndex != -1 || additionalLightsCount > 0)
             {
-                if (useStructuredBufferForLights)
-                    configuration |= PerObjectData.LightData;
-                else
-                    configuration |= PerObjectData.LightIndices;
+                configuration |= PerObjectData.LightData;
+            }
+            else if (additionalLightsCount > 0 && !useStructuredBufferForLights)
+            {
+                configuration |= PerObjectData.LightIndices;
             }
 
             return configuration;
