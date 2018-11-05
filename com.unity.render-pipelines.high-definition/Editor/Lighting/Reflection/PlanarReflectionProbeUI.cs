@@ -58,7 +58,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
         internal PlanarReflectionProbeUI()
         {
             //remove normal edition tool and capture point for planar
-            toolBars = new[] { ToolBar.InfluenceShape | ToolBar.Blend }; 
+            toolBars = new[] { ToolBar.InfluenceShape | ToolBar.Blend, ToolBar.CapturePosition }; 
         }
     }
 }

@@ -78,16 +78,17 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
                                 );
                             if (EditorGUI.EndChangeCheck())
                             {
-                                Vector3 newOffset = Quaternion.Inverse(probe.transform.rotation) * (newCapturePosition - probe.transform.position);
                                 Undo.RecordObjects(new Object[] { probe, probe.transform }, "Translate Influence Position");
                                 Vector3 delta = newCapturePosition - probe.transform.position;
                                 Matrix4x4 oldLocalToWorld = Matrix4x4.TRS(probe.transform.position, probe.transform.rotation, Vector3.one);
-
-                                //call modification to legacy ReflectionProbe
-                                probe.influenceVolume.offset = newOffset;
-
                                 probe.transform.position = newCapturePosition;
-                                d.influenceVolume.offset.vector3Value -= oldLocalToWorld.inverse.MultiplyVector(delta);
+                                Vector3 offset = d.influenceVolume.offset.vector3Value - oldLocalToWorld.inverse.MultiplyVector(delta);
+
+                                //clamp offset value
+                                float extend = probe.influenceVolume.boxSize.y * 0.5f;
+                                offset.y = Mathf.Clamp(offset.y, -extend, extend);
+                                d.influenceVolume.offset.vector3Value = offset;
+
                                 d.influenceVolume.Apply();
                             }
                         }
@@ -149,6 +150,10 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
                     Vector3.one);
             Gizmos.color = Color.white;
             Gizmos.DrawWireCube(Vector3.zero, new Vector3(d.influenceVolume.boxSize.z, d.influenceVolume.boxSize.x, 0));
+            Color c2 = InfluenceVolumeUI.k_GizmoThemeColorInfluenceNormal.linear;
+            c2.a = 1f;
+            Gizmos.color = c2;
+            Gizmos.DrawLine(Vector3.zero, Vector3.forward);
             Gizmos.color = k_GizmoMirrorPlaneCamera;
             Gizmos.DrawCube(Vector3.zero, new Vector3(d.influenceVolume.boxSize.z, d.influenceVolume.boxSize.x, 0));
 
