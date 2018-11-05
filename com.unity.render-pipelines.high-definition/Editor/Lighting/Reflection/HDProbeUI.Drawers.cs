@@ -20,7 +20,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
             AdditionalSettings = 1 << 3
         }
 
-        protected readonly static ExpandedState<Expandable, HDProbe> k_ExpandedState = new ExpandedState<Expandable, HDProbe>(Expandable.ProjectionSettings | Expandable.InfluenceVolume | Expandable.CaptureSettings);
+        protected readonly static ExpandedState<Expandable, HDProbe> k_ExpandedState = new ExpandedState<Expandable, HDProbe>(Expandable.ProjectionSettings | Expandable.InfluenceVolume | Expandable.CaptureSettings, "HDRP");
         
         public static readonly CED.IDrawer[] Inspector;
         
