@@ -195,6 +195,10 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
 
         static void DrawSphereFadeHandle(InfluenceVolumeUI s, SerializedInfluenceVolume d, Editor o, Transform transform, HierarchicalSphere sphere, SerializedProperty radius)
         {
+            //init parent sphere for clamping
+            s.sphereBaseHandle.center = Vector3.zero;
+            s.sphereBaseHandle.radius = d.sphereRadius.floatValue;
+
             using (new Handles.DrawingScope(Matrix4x4.TRS(transform.position, transform.rotation, Vector3.one)))
             {
                 sphere.center = Vector3.zero;

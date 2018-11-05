@@ -26,6 +26,8 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
             );
 
             Gizmos_CapturePoint(reflectionProbe);
+
+            DrawVerticalRay(reflectionProbe.transform);
         }
 
         static void Gizmos_CapturePoint(ReflectionProbe target)
@@ -34,7 +36,6 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
                 sphere = Resources.GetBuiltinResource<Mesh>("New-Sphere.fbx");
             if(material == null)
                 material = new Material(Shader.Find("Debug/ReflectionProbePreview"));
-
             var probe = target.GetComponent<HDAdditionalReflectionData>();
             var probePositionSettings = ProbeCapturePositionSettings.ComputeFrom(probe, null);
             HDRenderUtilities.ComputeCameraSettingsFromProbeSettings(
