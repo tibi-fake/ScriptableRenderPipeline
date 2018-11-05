@@ -22,23 +22,41 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
                     //override base handle behavior to also translate object along x and z axis and offset the y axis
                     using (new Handles.DrawingScope(Matrix4x4.TRS(Vector3.zero, d.target.transform.rotation, Vector3.one)))
                     {
-                        //contained must be initialized in all case
-                        s.influenceVolume.boxBaseHandle.center = Quaternion.Inverse(d.target.transform.rotation) * d.target.transform.position + d.influenceVolume.offset.vector3Value;
+                        Vector3 origin = Quaternion.Inverse(probe.transform.rotation) * probe.transform.position;
+                        s.influenceVolume.boxBaseHandle.center = origin + probe.influenceVolume.offset;
                         s.influenceVolume.boxBaseHandle.size = probe.influenceVolume.boxSize;
 
                         EditorGUI.BeginChangeCheck();
                         s.influenceVolume.boxBaseHandle.DrawHandle();
                         if (EditorGUI.EndChangeCheck())
                         {
-                            Undo.RecordObjects(new Object[] { d.target, d.target.transform }, "Modified Planar Base Volume AABB");
+                            Undo.RecordObjects(new Object[] { probe, probe.transform }, "Modified Planar Base Volume AABB");
 
-                            probe.influenceVolume.boxSize = s.influenceVolume.boxBaseHandle.size;
+                            Vector3 size = s.influenceVolume.boxBaseHandle.size;
 
-                            d.target.influenceVolume.offset = new Vector3(0, s.influenceVolume.boxBaseHandle.center.y, 0);
+                            //clamp offset value
+                            float extend = probe.influenceVolume.boxSize.y * 0.5f;
+                            float offset = s.influenceVolume.boxBaseHandle.center.y - origin.y;
+                            if(offset < -extend)
+                            {
+                                size.y += 2f * (-offset - extend);
+                                offset = -extend;
+                            }
+                            if (offset > extend)
+                            {
+                                size.y += 2f * (offset - extend);
+                                offset = extend;
+                            }
+                            if(size.y < 0)
+                            {
+                                size.y = 0;
+                            }
+                            probe.influenceVolume.boxSize = size;
+                            probe.influenceVolume.offset = new Vector3(0, offset, 0);
                             Vector3 centerXZ = s.influenceVolume.boxBaseHandle.center;
-                            centerXZ.y = 0;
-                            Vector3 deltaXZ = d.target.transform.rotation * centerXZ - d.target.transform.position;
-                            d.target.transform.position += deltaXZ;
+                            centerXZ.y = origin.y;
+                            Vector3 deltaXZ = probe.transform.rotation * centerXZ - probe.transform.position;
+                            probe.transform.position += deltaXZ;
                         }
                     }
                     break;
