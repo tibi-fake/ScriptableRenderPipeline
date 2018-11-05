@@ -7,11 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [5.1.0-preview] - 2018-10-18
 
 ### Added
+- Add y offset for PlanarReflectionProbe and offset tool
 
 ### Fixed
+- Fix cubemap assignation on custom ReflectoinProbe
+- Fix reflection probe's capture settings's shadow distance
 
 ### Changed
 - Renamed Line shaped lights to Tube light
+- Updated default FrameSettings used for realtime reflection probe (at HDRenderPipelineAsset creation)
 
 ## [5.0.0-preview] - 2018-09-28
 
