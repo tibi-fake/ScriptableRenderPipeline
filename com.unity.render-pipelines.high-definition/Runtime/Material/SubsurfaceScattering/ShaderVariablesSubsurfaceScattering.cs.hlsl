@@ -13,6 +13,7 @@
     uint _EnableSubsurfaceScattering;
     float _TexturingModeFlags;
     float _TransmissionFlags;
+    float _SSPad;
 
 
 #endif

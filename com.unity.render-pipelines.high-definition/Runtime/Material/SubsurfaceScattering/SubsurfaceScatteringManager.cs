@@ -121,8 +121,18 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             RTHandles.Release(m_HTile);
         }
 
-        public void PushGlobalParams(HDCamera hdCamera, CommandBuffer cmd, DiffusionProfileSettings sssParameters)
+        public void PushGlobalParams(HDCamera hdCamera, CommandBuffer cmd, DiffusionProfileSettings sssParameters, HDGlobalsConstantBuffer hdCB)
         {
+            hdCB._EnableSubsurfaceScattering = hdCamera.frameSettings.enableSubsurfaceScattering ? 1u : 0u;
+            hdCB._TexturingModeFlags = sssParameters.texturingModeFlags;
+            hdCB._TransmissionFlags = sssParameters.transmissionFlags;
+
+            hdCB._ThicknessRemaps = sssParameters.thicknessRemaps;
+            hdCB._ShapeParams = sssParameters.shapeParams;
+            hdCB._TransmissionTintsAndFresnel0 = hdCamera.frameSettings.enableTransmission ? sssParameters.transmissionTintsAndFresnel0 : sssParameters.disabledTransmissionTintsAndFresnel0;
+            hdCB._WorldScales = sssParameters.worldScales;
+
+
             // Broadcast SSS parameters to all shaders.
             cmd.SetGlobalInt(HDShaderIDs._EnableSubsurfaceScattering, hdCamera.frameSettings.enableSubsurfaceScattering ? 1 : 0);
             unsafe

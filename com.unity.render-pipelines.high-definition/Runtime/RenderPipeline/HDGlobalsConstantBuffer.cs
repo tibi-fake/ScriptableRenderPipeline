@@ -5,6 +5,36 @@ using UnityEngine.Rendering;
 
 namespace UnityEngine.Experimental.Rendering.HDPipeline
 {
+    public static class CBArrayAccessor
+    {
+        public static unsafe void Set(float *dst, Vector4[] newValArr, int arrSizeInFloats, ref bool dirtyFlag)
+        {
+            fixed (Vector4* newVals = newValArr)
+            {
+                if (!dirtyFlag)
+                {
+                    // Do memory compare first
+                    float* a = dst;
+                    float* b = (float*) newVals;
+                    for (int i = 0; i < arrSizeInFloats; ++i)
+                    {
+                        if (*(a++) != *(b++))
+                        {
+                            dirtyFlag = true;
+                            break;
+                        }
+                    }
+
+                    if (!dirtyFlag)
+                        return;
+                }
+
+                Buffer.MemoryCopy(newVals, dst, arrSizeInFloats * 4, arrSizeInFloats * 4);
+            }
+        }
+
+    }
+
     public static class CBAccessor<T>
     {
         public delegate ref T Accessor();
@@ -62,11 +92,62 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
     {
         private struct GlobalsCB
         {
+            public ShaderVariablesSubsurfaceScattering m_SS;
             public ShaderVariablesDecal m_Decal;
         }
 
         private GlobalsCB m_CB;
 
+        // Subsurface scattering
+        public uint _EnableSubsurfaceScattering { set { CBAccessor<uint>.Set(() => ref m_CB.m_SS._EnableSubsurfaceScattering, value, ref IsDirty); } }
+        public uint _TexturingModeFlags { set { CBAccessor<uint>.Set(() => ref m_CB.m_SS._TexturingModeFlags, value, ref IsDirty); } }
+        public uint _TransmissionFlags { set { CBAccessor<uint>.Set(() => ref m_CB.m_SS._TransmissionFlags, value, ref IsDirty); } }
+
+        public unsafe Vector4[] _ThicknessRemaps {
+            set
+            {
+                fixed (float* dst = m_CB.m_SS._ThicknessRemaps)
+                {
+                    CBArrayAccessor.Set(dst, value,
+                        DiffusionProfileConstants.DIFFUSION_PROFILE_COUNT * 4, ref IsDirty);
+                }
+            }
+        }
+
+        public unsafe Vector4[] _ShapeParams {
+            set
+            {
+                fixed (float* dst = m_CB.m_SS._ShapeParams)
+                {
+                    CBArrayAccessor.Set(dst, value,
+                        DiffusionProfileConstants.DIFFUSION_PROFILE_COUNT * 4, ref IsDirty);
+                }
+            }
+        }
+
+        public unsafe Vector4[] _TransmissionTintsAndFresnel0 {
+            set
+            {
+                fixed (float* dst = m_CB.m_SS._TransmissionTintsAndFresnel0)
+                {
+                    CBArrayAccessor.Set(dst, value,
+                        DiffusionProfileConstants.DIFFUSION_PROFILE_COUNT * 4, ref IsDirty);
+                }
+            }
+        }
+
+        public unsafe Vector4[] _WorldScales {
+            set
+            {
+                fixed (float* dst = m_CB.m_SS._WorldScales)
+                {
+                    CBArrayAccessor.Set(dst, value,
+                        DiffusionProfileConstants.DIFFUSION_PROFILE_COUNT * 4, ref IsDirty);
+                }
+            }
+        }
+
+        // Decals
         public Vector2 _DecalAtlasResolution { set { CBAccessor<Vector2>.Set(() => ref m_CB.m_Decal._DecalAtlasResolution, value, ref IsDirty); } }
         public uint _EnableDecals { set { CBAccessor<uint>.Set(() => ref m_CB.m_Decal._EnableDecals, value, ref IsDirty); } }
 //        public uint _DecalCount { set { CBAccessor<uint>.Set(() => ref m_CB.m_Decal._DecalCount, value, ref IsDirty); } }

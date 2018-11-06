@@ -670,7 +670,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             using (new ProfilingSample(cmd, "Push Global Parameters", CustomSamplerId.PushGlobalParameters.GetSampler()))
             {
                 // Set up UnityPerFrame CBuffer.
-                m_SSSBufferManager.PushGlobalParams(hdCamera, cmd, sssParameters);
+                m_SSSBufferManager.PushGlobalParams(hdCamera, cmd, sssParameters, m_GlobalsCB);
 
                 m_DbufferManager.PushGlobalParams(hdCamera, cmd, m_GlobalsCB);
 

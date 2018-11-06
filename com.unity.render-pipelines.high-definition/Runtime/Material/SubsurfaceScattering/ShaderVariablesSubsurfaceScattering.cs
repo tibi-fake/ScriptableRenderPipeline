@@ -16,9 +16,12 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 
         // Warning: Unity is not able to losslessly transfer integers larger than 2^24 to the shader system.
         // Therefore, we bitcast uint to float in C#, and bitcast back to uint in the shader.
-        public uint   _EnableSubsurfaceScattering; // Globally toggles subsurface and transmission scattering on/off
-        public float  _TexturingModeFlags;         // 1 bit/profile; 0 = PreAndPostScatter, 1 = PostScatter
-        public float  _TransmissionFlags;          // 1 bit/profile; 0 = regular, 1 = thin
+        // Except in constantbuffers where we control the exact bit patterns
+        public uint _EnableSubsurfaceScattering; // Globally toggles subsurface and transmission scattering on/off
+        public uint _TexturingModeFlags;         // 1 bit/profile; 0 = PreAndPostScatter, 1 = PostScatter
+        public uint _TransmissionFlags;          // 1 bit/profile; 0 = regular, 1 = thin
+
+        public float _SSPad;
 
     }
 }

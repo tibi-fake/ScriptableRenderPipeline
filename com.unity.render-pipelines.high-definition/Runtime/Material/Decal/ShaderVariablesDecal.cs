@@ -7,7 +7,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         public Vector2  _DecalAtlasResolution;
         public uint    _EnableDecals;
 
-        public uint _DecalPad;
+        public uint _DecalPad; // Need padding to be float4-aligned
         // Decal count moved to light loop struct
     }
 }
