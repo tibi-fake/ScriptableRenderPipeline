@@ -52,6 +52,8 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         public int _DebugSingleShadowIndex;
 
         public int _EnvSliceSize;
+
+        public uint    _DecalCount;
     }
 }
 

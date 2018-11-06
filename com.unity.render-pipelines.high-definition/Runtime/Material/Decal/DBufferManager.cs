@@ -51,7 +51,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 
             // to avoid temporary allocations, because number of render targets is not passed explicitly to SetRenderTarget, but rather deduces it from array size
             RenderTargetIdentifier[] RTIDs = rtCount4 ? m_RTIDs4 : m_RTIDs3;
-            
+
             // this clears the targets
             Color clearColor = new Color(0.0f, 0.0f, 0.0f, 1.0f);
             Color clearColorNormal = new Color(0.5f, 0.5f, 0.5f, 1.0f); // for normals 0.5 is neutral
@@ -86,16 +86,21 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             cmd.SetGlobalTexture(HDShaderIDs._DecalHTileTexture, m_HTile);
         }
 
-        public void PushGlobalParams(HDCamera hdCamera, CommandBuffer cmd)
+        public void PushGlobalParams(HDCamera hdCamera, CommandBuffer cmd, HDGlobalsConstantBuffer hdCB)
         {
             if (hdCamera.frameSettings.enableDecals)
             {
+                hdCB._EnableDecals = enableDecals ? 1u : 0u;
+                hdCB._DecalAtlasResolution = new Vector2(HDUtils.hdrpSettings.decalSettings.atlasWidth,
+                    HDUtils.hdrpSettings.decalSettings.atlasHeight);
+
                 cmd.SetGlobalInt(HDShaderIDs._EnableDecals, enableDecals ? 1 : 0);
                 cmd.SetGlobalVector(HDShaderIDs._DecalAtlasResolution, new Vector2(HDUtils.hdrpSettings.decalSettings.atlasWidth, HDUtils.hdrpSettings.decalSettings.atlasHeight));
                 BindBufferAsTextures(cmd);
             }
             else
             {
+                hdCB._EnableDecals = 0u;
                 cmd.SetGlobalInt(HDShaderIDs._EnableDecals, 0);
                 // We still bind black textures to make sure that something is bound (can be a problem on some platforms)
                 for (int i = 0; i < m_BufferCount; ++i)

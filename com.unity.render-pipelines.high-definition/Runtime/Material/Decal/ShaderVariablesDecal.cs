@@ -6,7 +6,9 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
     {
         public Vector2  _DecalAtlasResolution;
         public uint    _EnableDecals;
-        public uint    _DecalCount;
+
+        public uint _DecalPad;
+        // Decal count moved to light loop struct
     }
 }
 

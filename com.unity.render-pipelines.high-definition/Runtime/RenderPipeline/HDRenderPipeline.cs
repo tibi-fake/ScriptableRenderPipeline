@@ -214,6 +214,8 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 
         ComputeBuffer m_DepthPyramidMipLevelOffsetsBuffer = null;
 
+        private HDGlobalsConstantBuffer m_GlobalsCB = null;
+
         public HDRenderPipeline(HDRenderPipelineAsset asset)
         {
             m_Asset = asset;
@@ -332,6 +334,8 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 
             // Propagate it to the debug menu
             m_DebugDisplaySettings.msaaSamples = m_MSAASamples;
+
+            m_GlobalsCB = new HDGlobalsConstantBuffer();
 
             m_MRTWithSSS = new RenderTargetIdentifier[2 + m_SSSBufferManager.sssBufferCount];
 #if ENABLE_RAYTRACING
@@ -630,6 +634,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 m_IBLFilterArray[bsdfIdx].Cleanup();
             }
 
+            m_GlobalsCB?.Dispose();
             HDCamera.ClearAll();
 
             DestroyRenderTextures();
@@ -667,7 +672,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 // Set up UnityPerFrame CBuffer.
                 m_SSSBufferManager.PushGlobalParams(hdCamera, cmd, sssParameters);
 
-                m_DbufferManager.PushGlobalParams(hdCamera, cmd);
+                m_DbufferManager.PushGlobalParams(hdCamera, cmd, m_GlobalsCB);
 
                 m_VolumetricLightingSystem.PushGlobalParams(hdCamera, cmd, m_FrameCount);
 
@@ -718,6 +723,8 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                     cmd.SetGlobalTexture(HDShaderIDs._SsrLightingTexture, m_SsrLightingTexture);
                 else
                     cmd.SetGlobalTexture(HDShaderIDs._SsrLightingTexture, RuntimeUtilities.transparentTexture);
+
+                m_GlobalsCB.UploadAndBind(cmd);
             }
         }
 

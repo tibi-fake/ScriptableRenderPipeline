@@ -8,7 +8,7 @@
 // PackingRules = Exact
     float2 _DecalAtlasResolution;
     uint _EnableDecals;
-    uint _DecalCount;
+    uint _DecalPad;
 
 
 #endif
