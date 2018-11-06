@@ -16,13 +16,20 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         public static void RegisterProbe(HDProbe probe) => s_Instance.RegisterProbe(probe);
         public static void UnregisterProbe(HDProbe probe) => s_Instance.UnregisterProbe(probe);
 
-        public static void RenderAndUpdateRealtimeRenderData(
+        public static void RenderAndUpdateRealtimeRenderDataIfRequired(
             IEnumerable<HDProbe> probes,
             Transform viewerTransform
         )
         {
             foreach (var probe in probes)
-                RenderAndUpdateRealtimeRenderData(probe, viewerTransform);
+            {
+                if (DoesRealtimeProbeNeedToBeUpdated(probe))
+                {
+                    RenderAndUpdateRealtimeRenderData(probe, viewerTransform);
+                    probe.wasRenderedAfterOnEnable = true;
+                    probe.lastRenderedFrame = Time.frameCount;
+                }
+            }
         }
 
         public static void RenderAndUpdateRealtimeRenderData(
@@ -128,6 +135,23 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 
             probe.SetTexture(targetMode, target);
             return target;
+        }
+
+        static bool DoesRealtimeProbeNeedToBeUpdated(HDProbe probe)
+        {
+            // Discard (real time, every frame) probe already rendered this frame
+            // Discard (real time, OnEnable) probe already rendered after on enable
+            if (probe.mode == ProbeSettings.Mode.Realtime)
+            {
+                switch (probe.realtimeMode)
+                {
+                    case ProbeSettings.RealtimeMode.EveryFrame:
+                        return probe.lastRenderedFrame != Time.frameCount;
+                    case ProbeSettings.RealtimeMode.OnEnable:
+                        return !probe.wasRenderedAfterOnEnable;
+                }
+            }
+            return true;
         }
     }
 

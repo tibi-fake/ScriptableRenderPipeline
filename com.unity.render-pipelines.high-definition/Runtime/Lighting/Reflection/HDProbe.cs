@@ -2,6 +2,7 @@ using System;
 
 namespace UnityEngine.Experimental.Rendering.HDPipeline
 {
+    [ExecuteInEditMode]
     public abstract partial class HDProbe : MonoBehaviour
     {
         [Serializable]
@@ -101,7 +102,8 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         // General
         public ProbeSettings.ProbeType type { get => m_ProbeSettings.type; protected set => m_ProbeSettings.type = value; }
         /// <summary>The capture mode.</summary>
-        public virtual ProbeSettings.Mode mode { get => m_ProbeSettings.mode; set => m_ProbeSettings.mode = value; }
+        public ProbeSettings.Mode mode { get => m_ProbeSettings.mode; set => m_ProbeSettings.mode = value; }
+        public ProbeSettings.RealtimeMode realtimeMode { get => m_ProbeSettings.realtimeMode; set => m_ProbeSettings.realtimeMode = value; }
 
         // Lighting
         /// <summary>Light layer to use by this probe.</summary>
@@ -159,6 +161,9 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         }
         internal ProbeSettingsOverride settingsOverrides => m_ProbeSettingsOverride;
 
+        internal bool wasRenderedAfterOnEnable { get; set; } = false;
+        internal int lastRenderedFrame { get; set; } = int.MinValue;
+
         // API
         /// <summary>
         /// Prepare the probe for culling.
@@ -171,6 +176,8 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 
         void OnEnable()
         {
+            Debug.Log("onenable");
+            wasRenderedAfterOnEnable = false;
             PrepareCulling();
             HDProbeSystem.RegisterProbe(this);
         }

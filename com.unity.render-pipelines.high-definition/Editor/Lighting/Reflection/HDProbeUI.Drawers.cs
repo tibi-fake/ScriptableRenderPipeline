@@ -164,19 +164,27 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
                 if (EditorGUI.EndChangeCheck())
                     s.SetModeTarget(p.probeSettings.mode.intValue);
 
-                // Baked: nothing
-                // Realtime: nothing
-                // Custom: specific settings
-                if (p.probeSettings.mode.intValue == (int)ProbeSettings.Mode.Custom)
+                switch ((ProbeSettings.Mode)p.probeSettings.mode.intValue)
                 {
-                    EditorGUI.showMixedValue = p.customTexture.hasMultipleDifferentValues;
-                    EditorGUI.BeginChangeCheck();
-                    var customTexture = EditorGUILayout.ObjectField(
-                        _.GetContent("Texture"), p.customTexture.objectReferenceValue, provider.customTextureType, false
-                    );
-                    EditorGUI.showMixedValue = false;
-                    if (EditorGUI.EndChangeCheck())
-                        p.customTexture.objectReferenceValue = customTexture;
+                    case ProbeSettings.Mode.Realtime:
+                        {
+                            EditorGUI.showMixedValue = p.probeSettings.realtimeMode.hasMultipleDifferentValues;
+                            EditorGUILayout.PropertyField(p.probeSettings.realtimeMode);
+                            EditorGUI.showMixedValue = false;
+                            break;
+                        }
+                    case ProbeSettings.Mode.Custom:
+                        {
+                            EditorGUI.showMixedValue = p.customTexture.hasMultipleDifferentValues;
+                            EditorGUI.BeginChangeCheck();
+                            var customTexture = EditorGUILayout.ObjectField(
+                                _.GetContent("Texture"), p.customTexture.objectReferenceValue, provider.customTextureType, false
+                            );
+                            EditorGUI.showMixedValue = false;
+                            if (EditorGUI.EndChangeCheck())
+                                p.customTexture.objectReferenceValue = customTexture;
+                            break;
+                        }
                 }
             }
 

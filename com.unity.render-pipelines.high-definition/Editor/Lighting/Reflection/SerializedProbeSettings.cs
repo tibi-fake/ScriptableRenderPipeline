@@ -27,6 +27,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
 
         internal SerializedProperty type;
         internal SerializedProperty mode;
+        internal SerializedProperty realtimeMode;
         internal SerializedProperty lightingMultiplier;
         internal SerializedProperty lightingWeight;
         internal SerializedProperty lightingLightLayer;
@@ -42,6 +43,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
 
             type = root.Find((ProbeSettings p) => p.type);
             mode = root.Find((ProbeSettings p) => p.mode);
+            realtimeMode = root.Find((ProbeSettings p) => p.realtimeMode);
             lightingMultiplier = root.FindPropertyRelative("lighting.multiplier");
             lightingWeight = root.FindPropertyRelative("lighting.weight");
             lightingLightLayer = root.FindPropertyRelative("lighting.lightLayer");

@@ -64,6 +64,14 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             Custom
         }
 
+        public enum RealtimeMode
+        {
+            /// <summary>The real time probe will be rendered when a camera see its influence, once per frame.</summary>
+            EveryFrame,
+            /// <summary>The real time probe will be rendered when a camera see its influence, once after OnEnable.</summary>
+            OnEnable
+        }
+
         /// <summary>Lighting parameters for the probe.</summary>
         [Serializable]
         public struct Lighting
@@ -114,6 +122,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         public static ProbeSettings @default = new ProbeSettings
         {
             type = ProbeType.ReflectionProbe,
+            realtimeMode = RealtimeMode.EveryFrame,
             mode = Mode.Baked,
             camera = CameraSettings.@default,
             influence = null,
@@ -126,6 +135,8 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         public ProbeType type;
         /// <summary>The mode of the probe.</summary>
         public Mode mode;
+        /// <summary>The mode of the probe.</summary>
+        public RealtimeMode realtimeMode;
         /// <summary>The lighting of the probe.</summary>
         public Lighting lighting;
         /// <summary>The influence volume of the probe.</summary>
