@@ -4,7 +4,7 @@ using UnityEngine.Experimental.UIElements;
 
 namespace UnityEditor.ShaderGraph.Drawing.Slots
 {
-    public class LabelSlotControlView : VisualElement
+    class LabelSlotControlView : VisualElement
     {
         public LabelSlotControlView(string label)
         {

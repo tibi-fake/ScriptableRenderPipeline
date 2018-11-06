@@ -3,7 +3,7 @@ using UnityEngine.Experimental.UIElements;
 
 namespace UnityEditor.ShaderGraph.Drawing
 {
-    public class PropertyRow : VisualElement
+    class PropertyRow : VisualElement
     {
         VisualElement m_ContentContainer;
         VisualElement m_LabelContainer;

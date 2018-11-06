@@ -7,7 +7,7 @@ using ContextualMenu = UnityEngine.Experimental.UIElements.DropdownMenu;
 
 namespace UnityEditor.ShaderGraph.Drawing
 {
-    public static class CompatibilityExtensions
+    static class CompatibilityExtensions
     {
         public static void AppendAction(this ContextualMenu contextualMenu, string actionName, Action action, Func<ContextualMenu.MenuAction.StatusFlags> actionStatusCallback)
         {

@@ -4,7 +4,7 @@ using UnityEngine.Experimental.UIElements.StyleSheets;
 
 namespace UnityEditor.ShaderGraph.Drawing
 {
-    public class GradientEdge : Edge
+    class GradientEdge : Edge
     {
         const string k_InputColorProperty = "edge-input-color";
         const string k_OutputColorProperty = "edge-output-color";

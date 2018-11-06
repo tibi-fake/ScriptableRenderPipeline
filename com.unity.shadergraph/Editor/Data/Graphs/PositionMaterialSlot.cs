@@ -5,7 +5,7 @@ using UnityEngine.Experimental.UIElements;
 namespace UnityEditor.ShaderGraph
 {
     [Serializable]
-    public class PositionMaterialSlot : SpaceMaterialSlot, IMayRequirePosition
+    class PositionMaterialSlot : SpaceMaterialSlot, IMayRequirePosition
     {
         public PositionMaterialSlot()
         {}

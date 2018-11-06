@@ -9,7 +9,7 @@ using UnityEditor.ShaderGraph.Drawing.Controls;
 
 namespace UnityEditor.ShaderGraph.Drawing
 {
-    public class PBRSettingsView : VisualElement
+    class PBRSettingsView : VisualElement
     {
         PBRMasterNode m_Node;
         public PBRSettingsView(PBRMasterNode node)

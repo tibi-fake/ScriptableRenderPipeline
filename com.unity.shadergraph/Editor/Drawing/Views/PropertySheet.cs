@@ -4,7 +4,7 @@ using UnityEngine.Experimental.UIElements;
 
 namespace UnityEditor.ShaderGraph.Drawing
 {
-    public class PropertySheet : VisualElement
+    class PropertySheet : VisualElement
     {
         VisualElement m_ContentContainer;
         VisualElement m_HeaderContainer;

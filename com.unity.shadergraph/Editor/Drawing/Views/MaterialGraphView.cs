@@ -16,7 +16,7 @@ using ContextualMenu = UnityEngine.Experimental.UIElements.DropdownMenu;
 
 namespace UnityEditor.ShaderGraph.Drawing
 {
-    public sealed class MaterialGraphView : GraphView
+    sealed class MaterialGraphView : GraphView
     {
         public MaterialGraphView()
         {
@@ -455,7 +455,7 @@ namespace UnityEditor.ShaderGraph.Drawing
         #endregion
     }
 
-    public static class GraphViewExtensions
+    static class GraphViewExtensions
     {
         internal static void InsertCopyPasteGraph(this MaterialGraphView graphView, CopyPasteGraph copyGraph)
         {

@@ -8,7 +8,7 @@ using Object = UnityEngine.Object;
 namespace UnityEditor.ShaderGraph.Drawing.Controls
 {
     [AttributeUsage(AttributeTargets.Property)]
-    public class DefaultControlAttribute : Attribute, IControlAttribute
+    class DefaultControlAttribute : Attribute, IControlAttribute
     {
         public VisualElement InstantiateControl(AbstractMaterialNode node, PropertyInfo propertyInfo)
         {

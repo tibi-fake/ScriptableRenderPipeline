@@ -7,7 +7,7 @@ using UnityEngine.Experimental.UIElements;
 namespace UnityEditor.ShaderGraph
 {
     [Serializable]
-    public class UVMaterialSlot : Vector2MaterialSlot, IMayRequireMeshUV
+    class UVMaterialSlot : Vector2MaterialSlot, IMayRequireMeshUV
     {
         [SerializeField]
         UVChannel m_Channel = UVChannel.UV0;

@@ -9,7 +9,7 @@ using System.Globalization;
 namespace UnityEditor.ShaderGraph.Drawing.Controls
 {
     [AttributeUsage(AttributeTargets.Property)]
-    public class SliderControlAttribute : Attribute, IControlAttribute
+    class SliderControlAttribute : Attribute, IControlAttribute
     {
         string m_Label;
         bool m_DisplayMinMax;
@@ -26,7 +26,7 @@ namespace UnityEditor.ShaderGraph.Drawing.Controls
         }
     }
 
-    public class SliderControlView : VisualElement, INodeModificationListener
+    class SliderControlView : VisualElement, INodeModificationListener
     {
         AbstractMaterialNode m_Node;
         PropertyInfo m_PropertyInfo;

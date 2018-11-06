@@ -7,7 +7,7 @@ using Object = UnityEngine.Object;
 
 namespace UnityEditor.ShaderGraph.Drawing.Slots
 {
-    public class CubemapSlotControlView : VisualElement
+    class CubemapSlotControlView : VisualElement
     {
         CubemapInputMaterialSlot m_Slot;
 

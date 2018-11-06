@@ -8,7 +8,7 @@ using UnityEngine.Experimental.UIElements;
 namespace UnityEditor.ShaderGraph
 {
     [Serializable]
-    public class CubemapInputMaterialSlot : CubemapMaterialSlot
+    class CubemapInputMaterialSlot : CubemapMaterialSlot
     {
         [SerializeField]
         private SerializableCubemap m_Cubemap = new SerializableCubemap();

@@ -5,7 +5,7 @@ using UnityEngine.Experimental.UIElements;
 
 namespace UnityEditor.ShaderGraph.Drawing.Slots
 {
-    public class ColorRGBASlotControlView : VisualElement
+    class ColorRGBASlotControlView : VisualElement
     {
         ColorRGBAMaterialSlot m_Slot;
 

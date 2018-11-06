@@ -9,7 +9,7 @@ using UnityEngine.Experimental.UIElements;
 namespace UnityEditor.ShaderGraph
 {
     [Serializable]
-    public class DynamicValueMaterialSlot : MaterialSlot, IMaterialSlotHasValue<Matrix4x4>
+    class DynamicValueMaterialSlot : MaterialSlot, IMaterialSlotHasValue<Matrix4x4>
     {
         [SerializeField]
         private Matrix4x4 m_Value;

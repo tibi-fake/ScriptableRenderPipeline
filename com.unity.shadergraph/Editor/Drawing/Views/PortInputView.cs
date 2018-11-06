@@ -6,7 +6,7 @@ using UnityEngine.Experimental.UIElements.StyleSheets;
 
 namespace UnityEditor.ShaderGraph.Drawing
 {
-    public class PortInputView : GraphElement, IDisposable
+    class PortInputView : GraphElement, IDisposable
     {
         const string k_EdgeColorProperty = "edge-color";
 

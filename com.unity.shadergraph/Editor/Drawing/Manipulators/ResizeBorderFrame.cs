@@ -5,7 +5,7 @@ using UnityEngine.Experimental.UIElements;
 using UnityEditor.ShaderGraph.Drawing;
 using UnityEngine.Networking;
 
-public class ResizeBorderFrame : VisualElement
+class ResizeBorderFrame : VisualElement
 {
     List<ResizeSideHandle> m_ResizeSideHandles;
 

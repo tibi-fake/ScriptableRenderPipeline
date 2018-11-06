@@ -11,7 +11,7 @@ using UnityEngine.Rendering;
 namespace UnityEditor.ShaderGraph
 {
     [Serializable]
-    public abstract class MasterNode<T> : AbstractMaterialNode, IMasterNode, IHasSettings
+    abstract class MasterNode<T> : AbstractMaterialNode, IMasterNode, IHasSettings
         where T : class, ISubShader
     {
         [NonSerialized]

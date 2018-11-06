@@ -6,7 +6,7 @@ using UnityEngine.Experimental.UIElements;
 
 namespace UnityEditor.ShaderGraph.Drawing
 {
-    public class NodeSettingsView : VisualElement
+    class NodeSettingsView : VisualElement
     {
         VisualElement m_ContentContainer;
 

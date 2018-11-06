@@ -5,7 +5,7 @@ using UnityEngine.Experimental.UIElements;
 
 namespace UnityEditor.ShaderGraph.Drawing.Slots
 {
-    public class UVSlotControlView : VisualElement
+    class UVSlotControlView : VisualElement
     {
         UVMaterialSlot m_Slot;
 

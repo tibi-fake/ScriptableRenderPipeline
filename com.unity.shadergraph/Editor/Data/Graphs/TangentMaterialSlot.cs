@@ -5,7 +5,7 @@ using UnityEngine.Experimental.UIElements;
 namespace UnityEditor.ShaderGraph
 {
     [Serializable]
-    public class TangentMaterialSlot : SpaceMaterialSlot, IMayRequireTangent
+    class TangentMaterialSlot : SpaceMaterialSlot, IMayRequireTangent
     {
         public TangentMaterialSlot()
         {}

@@ -18,7 +18,7 @@ using UnityEngine.Rendering;
 
 namespace UnityEditor.ShaderGraph.Drawing
 {
-    public class MaterialGraphEditWindow : EditorWindow
+    class MaterialGraphEditWindow : EditorWindow
     {
         [SerializeField]
         string m_Selected;

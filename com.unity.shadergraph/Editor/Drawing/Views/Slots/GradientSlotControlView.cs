@@ -10,7 +10,7 @@ using Object = UnityEngine.Object;
 
 namespace UnityEditor.ShaderGraph.Drawing.Slots
 {
-    public class GradientSlotControlView : VisualElement
+    class GradientSlotControlView : VisualElement
     {
         GradientInputMaterialSlot m_Slot;
 

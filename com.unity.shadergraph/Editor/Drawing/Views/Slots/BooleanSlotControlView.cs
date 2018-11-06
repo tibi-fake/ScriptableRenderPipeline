@@ -5,7 +5,7 @@ using UnityEngine.Experimental.UIElements;
 
 namespace UnityEditor.ShaderGraph.Drawing.Slots
 {
-    public class BooleanSlotControlView : VisualElement
+    class BooleanSlotControlView : VisualElement
     {
         BooleanMaterialSlot m_Slot;
 

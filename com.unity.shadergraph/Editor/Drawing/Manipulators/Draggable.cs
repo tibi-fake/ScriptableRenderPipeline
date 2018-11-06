@@ -4,7 +4,7 @@ using UnityEngine.Experimental.UIElements;
 
 namespace UnityEditor.ShaderGraph.Drawing
 {
-    public class Draggable : MouseManipulator
+    class Draggable : MouseManipulator
     {
         Action<Vector2> m_Handler;
 

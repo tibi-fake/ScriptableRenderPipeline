@@ -4,9 +4,9 @@ using UnityEditor.Experimental.UIElements;
 using UnityEngine.Experimental.UIElements;
 using UnityEditor.ShaderGraph.Drawing.Controls;
 
-namespace UnityEditor.ShaderGraph.Drawing.Slots
+namespace UnityEditor.Experimental.Rendering.HDPipeline.Drawing.Slots
 {
-    public class DiffusionProfileSlotControlView : VisualElement
+    class DiffusionProfileSlotControlView : VisualElement
     {
         DiffusionProfileInputMaterialSlot m_Slot;
 

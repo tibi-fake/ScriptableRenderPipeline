@@ -9,7 +9,7 @@ using UnityEditor.Experimental.UIElements;
 namespace UnityEditor.ShaderGraph.Drawing.Controls
 {
     [AttributeUsage(AttributeTargets.Property)]
-    public class ChannelEnumControlAttribute : Attribute, IControlAttribute
+    class ChannelEnumControlAttribute : Attribute, IControlAttribute
     {
         string m_Label;
         int m_SlotId;
@@ -26,7 +26,7 @@ namespace UnityEditor.ShaderGraph.Drawing.Controls
         }
     }
 
-    public class ChannelEnumControlView : VisualElement, INodeModificationListener
+    class ChannelEnumControlView : VisualElement, INodeModificationListener
     {
         AbstractMaterialNode m_Node;
         PropertyInfo m_PropertyInfo;

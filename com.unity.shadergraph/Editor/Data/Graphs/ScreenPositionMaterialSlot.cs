@@ -7,7 +7,7 @@ using UnityEngine.Experimental.UIElements;
 namespace UnityEditor.ShaderGraph
 {
     [Serializable]
-    public class ScreenPositionMaterialSlot : Vector4MaterialSlot, IMayRequireScreenPosition
+    class ScreenPositionMaterialSlot : Vector4MaterialSlot, IMayRequireScreenPosition
     {
         [SerializeField]
         ScreenSpaceType m_ScreenSpaceType;

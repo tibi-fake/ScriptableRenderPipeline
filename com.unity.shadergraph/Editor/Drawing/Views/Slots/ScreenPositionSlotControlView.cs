@@ -5,7 +5,7 @@ using UnityEngine.Experimental.UIElements;
 
 namespace UnityEditor.ShaderGraph.Drawing.Slots
 {
-    public class ScreenPositionSlotControlView : VisualElement
+    class ScreenPositionSlotControlView : VisualElement
     {
         ScreenPositionMaterialSlot m_Slot;
 
