@@ -176,7 +176,6 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 
         void OnEnable()
         {
-            Debug.Log("onenable");
             wasRenderedAfterOnEnable = false;
             PrepareCulling();
             HDProbeSystem.RegisterProbe(this);
