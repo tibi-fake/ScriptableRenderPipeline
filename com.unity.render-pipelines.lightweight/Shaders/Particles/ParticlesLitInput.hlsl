@@ -71,7 +71,7 @@ inline void InitializeParticleLitSurfaceData(float2 uv, float3 blendUv, float4 p
 
     half4 albedo = SampleAlbedo(uv, blendUv, _BaseColor, particleColor, projectedPosition, TEXTURE2D_PARAM(_BaseMap, sampler_BaseMap)); 
 
-#if defined(_METALLICGLOSSMAP)
+#if defined(_METALLICSPECGLOSSMAP)
     half2 metallicGloss = BlendTexture(TEXTURE2D_PARAM(_MetallicGlossMap, sampler_MetallicGlossMap), uv, blendUv).ra * half2(1.0, _Smoothness);
 #else
     half2 metallicGloss = half2(_Metallic, _Smoothness);
@@ -98,7 +98,7 @@ inline void InitializeParticleLitSurfaceData(float2 uv, float3 blendUv, float4 p
     outSurfaceData.occlusion = 1.0;
 
     outSurfaceData.albedo = AlphaModulate(outSurfaceData.albedo, albedo.a);
-    outSurfaceData.alpha = albedo.a;// AlphaBlendAndTest(albedo.a, _Cutoff);
+    outSurfaceData.alpha = albedo.a;
 }
 
 #endif // LIGHTWEIGHT_PARTICLES_LIT_INPUT_INCLUDED

@@ -84,7 +84,7 @@ Shader "Lightweight Render Pipeline/Particles/Lit"
             // Material Keywords
             #pragma shader_feature _NORMALMAP
             #pragma shader_feature _EMISSION
-            #pragma shader_feature _ _SPECGLOSSMAP _SPECULAR_COLOR
+            #pragma shader_feature _METALLICSPECGLOSSMAP
             #pragma shader_feature _RECEIVE_SHADOWS_OFF
             
             // -------------------------------------
@@ -107,6 +107,7 @@ Shader "Lightweight Render Pipeline/Particles/Lit"
 
             // -------------------------------------
             // Unity defined keywords
+            #pragma multi_compile _ LIGHTMAP_ON
             #pragma multi_compile_fog
 
             #pragma vertex ParticlesLitVertex

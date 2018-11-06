@@ -82,7 +82,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
             bool normalMap = material.GetTexture("_BumpMap");
 
             CoreUtils.SetKeyword(material, "_SAMPLE_GI", sampleGI && !normalMap);
-            CoreUtils.SetKeyword(material, "_SAMPLE_GI_NORMALMAP", sampleGI && normalMap);
+            CoreUtils.SetKeyword(material, "_NORMALMAP", sampleGI && normalMap);
         }
     }
 }

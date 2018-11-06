@@ -154,7 +154,7 @@ half4 ParticlesLitFragment(VaryingsParticle input) : SV_Target
     
     InputData inputData = (InputData)0;
     InitializeInputData(input, surfaceData.normalTS, inputData);
-
+    //return half4(inputData.bakedGI, 1);
     half4 color = LightweightFragmentPBR(inputData, surfaceData.albedo,
         surfaceData.metallic, half3(0, 0, 0), surfaceData.smoothness, surfaceData.occlusion, surfaceData.emission, surfaceData.alpha);
     

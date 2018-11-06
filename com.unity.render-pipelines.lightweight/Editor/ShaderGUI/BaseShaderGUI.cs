@@ -79,7 +79,7 @@ namespace UnityEditor
         public bool m_FirstTimeApply = true;
 
         private const string k_KeyPrefix = "LightweightRP:Material:UI_State:";
-        private string m_HeaderStateKey;
+        private string m_HeaderStateKey = null;
         protected uint defaultHeaderState = 0;
         private const int queueOffsetRange = 50;
 
@@ -107,7 +107,10 @@ namespace UnityEditor
 
             var surfaceState = EditorGUILayout.BeginFoldoutHeaderGroup(GetHeaderState(0), Styles.SurfaceOptions);
             if(surfaceState){
+                EditorGUI.BeginChangeCheck();
                 DrawSurfaceOptions(material);
+                if (EditorGUI.EndChangeCheck())
+                    MaterialChanged(material);
                 EditorGUILayout.Space();
             }
             EditorGUILayout.EndFoldoutHeaderGroup();
@@ -116,7 +119,10 @@ namespace UnityEditor
             var inputState = EditorGUILayout.BeginFoldoutHeaderGroup(GetHeaderState(1), Styles.SurfaceInputs);
             if (inputState)
             {
+                EditorGUI.BeginChangeCheck();
                 DrawSurfaceInputs(material);
+                if (EditorGUI.EndChangeCheck())
+                    MaterialChanged(material);
                 EditorGUILayout.Space();
             }
             EditorGUILayout.EndFoldoutHeaderGroup();
@@ -125,14 +131,18 @@ namespace UnityEditor
             var advanced = EditorGUILayout.BeginFoldoutHeaderGroup(GetHeaderState(2), Styles.AdvancedLabel);
             if (advanced)
             {
+                EditorGUI.BeginChangeCheck();
                 DrawAdvancedOptions(material);
+                if (EditorGUI.EndChangeCheck())
+                    MaterialChanged(material);
             }
             EditorGUILayout.EndFoldoutHeaderGroup();
             StoreHeaderState(advanced, 2);
 
+            EditorGUI.BeginChangeCheck();
             DrawAdditionalFoldouts(material);
-
-            MaterialChanged(material);
+            if (EditorGUI.EndChangeCheck())
+                MaterialChanged(material);
         }
 
         public override void OnGUI(MaterialEditor materialEditorIn, MaterialProperty[] properties)
@@ -214,52 +224,40 @@ namespace UnityEditor
         
         public virtual void DrawEmissionProperties(Material material, bool keyword)
         {
-            if (emissionMapProp != null && emissionColorProp != null
-            ) // Draw the baseMap, most shader will have at least a baseMap
+            var emissive = true;
+            var hadEmissionTexture = emissionMapProp.textureValue != null;
+
+            if (!keyword)
             {
-                var emissive = true;
-
-                var hadEmissionTexture = emissionMapProp.textureValue != null;
-
-
-                if (!keyword)
-                {
-                    materialEditor.TexturePropertyWithHDRColor(Styles.emissionMap, emissionMapProp, emissionColorProp,
-                        false);
-                }
-                else
-                {
-                    // Emission for GI?
-                    emissive = materialEditor.EmissionEnabledProperty();
-
-                    EditorGUI.BeginDisabledGroup(!emissive);
-                    {
-                        // Texture and HDR color controls
-                        materialEditor.TexturePropertyWithHDRColor(Styles.emissionMap, emissionMapProp,
-                            emissionColorProp,
-                            false);
-                    }
-                    EditorGUI.EndDisabledGroup();
-                }
-
-                // If texture was assigned and color was black set color to white
-
-
-                var brightness = emissionColorProp.colorValue.maxColorComponent;
-                if (emissionMapProp.textureValue != null && !hadEmissionTexture && brightness <= 0f)
-                    emissionColorProp.colorValue = Color.white;
-
-                // LW does not support RealtimeEmissive. We set it to bake emissive and handle the emissive is black right.
-                if (emissive)
-                {
-                    material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.BakedEmissive;
-                    if (brightness <= 0f)
-                        material.globalIlluminationFlags |= MaterialGlobalIlluminationFlags.EmissiveIsBlack;
-                }
+                materialEditor.TexturePropertyWithHDRColor(Styles.emissionMap, emissionMapProp, emissionColorProp,
+                    false);
             }
             else
             {
-                material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.None;
+                // Emission for GI?
+                emissive = materialEditor.EmissionEnabledProperty();
+
+                EditorGUI.BeginDisabledGroup(!emissive);
+                {
+                    // Texture and HDR color controls
+                    materialEditor.TexturePropertyWithHDRColor(Styles.emissionMap, emissionMapProp,
+                        emissionColorProp,
+                        false);
+                }
+                EditorGUI.EndDisabledGroup();
+            }
+
+            // If texture was assigned and color was black set color to white
+            var brightness = emissionColorProp.colorValue.maxColorComponent;
+            if (emissionMapProp.textureValue != null && !hadEmissionTexture && brightness <= 0f)
+                emissionColorProp.colorValue = Color.white;
+
+            // LW does not support RealtimeEmissive. We set it to bake emissive and handle the emissive is black right.
+            if (emissive)
+            {
+                material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.BakedEmissive;
+                if (brightness <= 0f)
+                    material.globalIlluminationFlags |= MaterialGlobalIlluminationFlags.EmissiveIsBlack;
             }
         }
         

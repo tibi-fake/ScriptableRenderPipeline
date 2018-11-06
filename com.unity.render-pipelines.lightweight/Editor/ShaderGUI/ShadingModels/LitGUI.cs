@@ -122,7 +122,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
                     hasGlossMap ? null : properties.specColor);
             }
 
-            bool showSmoothnessScale = hasGlossMap;
+            bool showSmoothnessScale = hasGlossMap && properties.smoothnessScale != null;
             if (properties.smoothnessMapChannel != null)
             {
                 int smoothnessChannel = (int) properties.smoothnessMapChannel.floatValue;
@@ -175,8 +175,8 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
             CoreUtils.SetKeyword(material, "_SPECULAR_SETUP", isSpecularWorkFlow);
 
             CoreUtils.SetKeyword(material, "_METALLICSPECGLOSSMAP", hasGlossMap);
-            CoreUtils.SetKeyword(material, "_SPECGLOSSMAP", hasGlossMap && isSpecularWorkFlow);
-            CoreUtils.SetKeyword(material, "_METALLICGLOSSMAP", hasGlossMap && !isSpecularWorkFlow);
+            //CoreUtils.SetKeyword(material, "_SPECGLOSSMAP", hasGlossMap && isSpecularWorkFlow);
+            //CoreUtils.SetKeyword(material, "_METALLICGLOSSMAP", hasGlossMap && !isSpecularWorkFlow);
 
             CoreUtils.SetKeyword(material, "_NORMALMAP", material.GetTexture("_BumpMap"));
 

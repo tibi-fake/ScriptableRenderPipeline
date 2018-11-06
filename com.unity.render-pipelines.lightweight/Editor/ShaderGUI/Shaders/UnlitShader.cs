@@ -54,14 +54,18 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
         {
             base.DrawSurfaceInputs(material);
             UnlitGUI.Inputs(shadingModelProperties, materialEditor);
-            DrawEmissionProperties(material, true);
             DrawBaseTileOffset();
         }
 
         public override void DrawAdvancedOptions(Material material)
         {
+            EditorGUI.BeginChangeCheck();
             UnlitGUI.Advanced(shadingModelProperties);
             base.DrawAdvancedOptions(material);
+            if (EditorGUI.EndChangeCheck())
+            {
+                MaterialChanged(material);
+            }
         }
 
         public override void AssignNewShaderToMaterial(Material material, Shader oldShader, Shader newShader)

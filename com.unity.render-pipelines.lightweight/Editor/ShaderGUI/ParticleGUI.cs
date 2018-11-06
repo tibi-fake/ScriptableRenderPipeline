@@ -307,8 +307,8 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
 
             // Note: keywords must be based on Material value not on MaterialProperty due to multi-edit & material animation
             // (MaterialProperty value might come from renderer material property block)
-            BaseShaderGUI.SetKeyword(material, "_NORMALMAP", material.GetTexture("_BumpMap"));
-            BaseShaderGUI.SetKeyword(material, "_METALLICGLOSSMAP", (material.GetTexture("_MetallicGlossMap") != null));
+            //BaseShaderGUI.SetKeyword(material, "_NORMALMAP", material.GetTexture("_BumpMap"));
+            //BaseShaderGUI.SetKeyword(material, "_METALLICGLOSSMAP", (material.GetTexture("_MetallicGlossMap") != null));
 
             // A material's GI flag internally keeps track of whether emission is enabled at all, it's enabled but has no effect
             // or is enabled and may be modified at runtime. This state depends on the values of the current flag and emissive color.

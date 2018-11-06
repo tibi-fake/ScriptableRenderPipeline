@@ -29,7 +29,12 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
 
         public static void Inputs(UnlitProperties properties, MaterialEditor materialEditor)
         {
-            BaseShaderGUI.DoNormalArea(materialEditor, properties.bumpMapProp);
+            if (properties.sampleGIProp != null)
+            {
+                EditorGUI.BeginDisabledGroup(properties.sampleGIProp.floatValue < 0.5f);
+                BaseShaderGUI.DoNormalArea(materialEditor, properties.bumpMapProp);
+                EditorGUI.EndDisabledGroup();
+            }
         }
         
         public static void Advanced(UnlitProperties properties)
@@ -42,11 +47,11 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
 
         public static void SetMaterialKeywords(Material material)
         {
-            bool sampleGI = material.GetFloat("_SampleGI") >= 1.0f;
+            bool sampleGI = material.GetFloat("_SampleGI") > 0.5f;
             bool normalMap = material.GetTexture("_BumpMap");
 
             CoreUtils.SetKeyword(material, "_SAMPLE_GI", sampleGI && !normalMap);
-            CoreUtils.SetKeyword(material, "_SAMPLE_GI_NORMALMAP", sampleGI && normalMap);
+            CoreUtils.SetKeyword(material, "_NORMALMAP", sampleGI && normalMap);
         }
     }
 }
