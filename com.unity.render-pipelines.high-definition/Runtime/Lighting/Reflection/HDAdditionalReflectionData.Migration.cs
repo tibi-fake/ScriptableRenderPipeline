@@ -33,14 +33,14 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 {
                     t.influenceVolume.boxSize = t.reflectionProbe.size;
 #pragma warning disable 618
-                    t.influenceVolume.sphereRadius = t.influenceSphereRadius;
-                    t.influenceVolume.shape = t.influenceShape; //must be done after each size transfert
-                    t.influenceVolume.boxBlendDistancePositive = t.blendDistancePositive;
-                    t.influenceVolume.boxBlendDistanceNegative = t.blendDistanceNegative;
-                    t.influenceVolume.boxBlendNormalDistancePositive = t.blendNormalDistancePositive;
-                    t.influenceVolume.boxBlendNormalDistanceNegative = t.blendNormalDistanceNegative;
-                    t.influenceVolume.boxSideFadePositive = t.boxSideFadePositive;
-                    t.influenceVolume.boxSideFadeNegative = t.boxSideFadeNegative;
+                    t.influenceVolume.sphereRadius = t.m_ObsoleteInfluenceSphereRadius;
+                    t.influenceVolume.shape = t.m_ObsoleteInfluenceShape; //must be done after each size transfert
+                    t.influenceVolume.boxBlendDistancePositive = t.m_ObsoleteBlendDistancePositive;
+                    t.influenceVolume.boxBlendDistanceNegative = t.m_ObsoleteBlendDistanceNegative;
+                    t.influenceVolume.boxBlendNormalDistancePositive = t.m_ObsoleteBlendNormalDistancePositive;
+                    t.influenceVolume.boxBlendNormalDistanceNegative = t.m_ObsoleteBlendNormalDistanceNegative;
+                    t.influenceVolume.boxSideFadePositive = t.m_ObsoleteBoxSideFadePositive;
+                    t.influenceVolume.boxSideFadeNegative = t.m_ObsoleteBoxSideFadeNegative;
 #pragma warning restore 618
                     //Note: former editor parameters will be recreated as if non existent.
                     //User will lose parameters corresponding to non used mode between simplified and advanced
@@ -90,22 +90,22 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         #region Deprecated Fields
 #pragma warning disable 649 //never assigned
         //data only kept for migration, to be removed in future version
-        [SerializeField, System.Obsolete("influenceShape is deprecated, use influenceVolume parameters instead")]
-        InfluenceShape influenceShape;
-        [SerializeField, System.Obsolete("influenceSphereRadius is deprecated, use influenceVolume parameters instead")]
-        float influenceSphereRadius = 3.0f;
-        [SerializeField, System.Obsolete("blendDistancePositive is deprecated, use influenceVolume parameters instead")]
-        Vector3 blendDistancePositive = Vector3.zero;
-        [SerializeField, System.Obsolete("blendDistanceNegative is deprecated, use influenceVolume parameters instead")]
-        Vector3 blendDistanceNegative = Vector3.zero;
-        [SerializeField, System.Obsolete("blendNormalDistancePositive is deprecated, use influenceVolume parameters instead")]
-        Vector3 blendNormalDistancePositive = Vector3.zero;
-        [SerializeField, System.Obsolete("blendNormalDistanceNegative is deprecated, use influenceVolume parameters instead")]
-        Vector3 blendNormalDistanceNegative = Vector3.zero;
-        [SerializeField, System.Obsolete("boxSideFadePositive is deprecated, use influenceVolume parameters instead")]
-        Vector3 boxSideFadePositive = Vector3.one;
-        [SerializeField, System.Obsolete("boxSideFadeNegative is deprecated, use influenceVolume parameters instead")]
-        Vector3 boxSideFadeNegative = Vector3.one;
+        [SerializeField, FormerlySerializedAs("influenceShape"), System.Obsolete("influenceShape is deprecated, use influenceVolume parameters instead")]
+        InfluenceShape m_ObsoleteInfluenceShape;
+        [SerializeField, FormerlySerializedAs("influenceSphereRadius"), System.Obsolete("influenceSphereRadius is deprecated, use influenceVolume parameters instead")]
+        float m_ObsoleteInfluenceSphereRadius = 3.0f;
+        [SerializeField, FormerlySerializedAs("blendDistancePositive"), System.Obsolete("blendDistancePositive is deprecated, use influenceVolume parameters instead")]
+        Vector3 m_ObsoleteBlendDistancePositive = Vector3.zero;
+        [SerializeField, FormerlySerializedAs("blendDistanceNegative"), System.Obsolete("blendDistanceNegative is deprecated, use influenceVolume parameters instead")]
+        Vector3 m_ObsoleteBlendDistanceNegative = Vector3.zero;
+        [SerializeField, FormerlySerializedAs("blendNormalDistancePositive"), System.Obsolete("blendNormalDistancePositive is deprecated, use influenceVolume parameters instead")]
+        Vector3 m_ObsoleteBlendNormalDistancePositive = Vector3.zero;
+        [SerializeField, FormerlySerializedAs("blendNormalDistanceNegative"), System.Obsolete("blendNormalDistanceNegative is deprecated, use influenceVolume parameters instead")]
+        Vector3 m_ObsoleteBlendNormalDistanceNegative = Vector3.zero;
+        [SerializeField, FormerlySerializedAs("boxSideFadePositive"), System.Obsolete("boxSideFadePositive is deprecated, use influenceVolume parameters instead")]
+        Vector3 m_ObsoleteBoxSideFadePositive = Vector3.one;
+        [SerializeField, FormerlySerializedAs("boxSideFadeNegative"), System.Obsolete("boxSideFadeNegative is deprecated, use influenceVolume parameters instead")]
+        Vector3 m_ObsoleteBoxSideFadeNegative = Vector3.one;
         #pragma warning restore 649 //never assigned
         #endregion
     }

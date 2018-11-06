@@ -26,8 +26,6 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
             );
 
             Gizmos_CapturePoint(reflectionProbe);
-
-            DrawVerticalRay(reflectionProbe.transform);
         }
 
         static void Gizmos_CapturePoint(ReflectionProbe target)
