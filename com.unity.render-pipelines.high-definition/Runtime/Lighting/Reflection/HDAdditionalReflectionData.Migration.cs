@@ -31,6 +31,17 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 }),
                 MigrationStep.New(Version.UseInfluenceVolume, (HDAdditionalReflectionData t) =>
                 {
+                    // Previously, the capture position of a reflection probe was the position of the game object
+                    //   and the center of the influence volume is (transform.position + reflectionProbe.center) in world space
+                    // Now, the center of the influence volume is the position of the transform and the capture position
+                    //   is t.probeSettings.proxySettings.capturePositionProxySpace and is in capture space
+
+                    var capturePositionWS = t.transform.position;
+                    t.transform.position += t.reflectionProbe.center;
+                    var capturePositionPS = t.proxyToWorld.inverse * capturePositionWS;
+                    t.m_ProbeSettings.proxySettings.capturePositionProxySpace = capturePositionPS;
+                    t.m_ProbeSettings.proxySettings.mirrorPositionProxySpace = capturePositionPS;
+
                     t.influenceVolume.boxSize = t.reflectionProbe.size;
 #pragma warning disable 618
                     t.influenceVolume.sphereRadius = t.m_ObsoleteInfluenceSphereRadius;
@@ -42,8 +53,6 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                     t.influenceVolume.boxSideFadePositive = t.m_ObsoleteBoxSideFadePositive;
                     t.influenceVolume.boxSideFadeNegative = t.m_ObsoleteBoxSideFadeNegative;
 #pragma warning restore 618
-                    //Note: former editor parameters will be recreated as if non existent.
-                    //User will lose parameters corresponding to non used mode between simplified and advanced
                 }),
                 MigrationStep.New(Version.MergeEditors, (HDAdditionalReflectionData t) =>
                 {
@@ -54,7 +63,6 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 MigrationStep.New(Version.AddCaptureSettingsAndFrameSettings, (HDAdditionalReflectionData t) =>
                 {
 #pragma warning disable 618
-                    t.m_ObsoleteCaptureSettings.shadowDistance = t.reflectionProbe.shadowDistance;
                     t.m_ObsoleteCaptureSettings.cullingMask = t.reflectionProbe.cullingMask;
 #if UNITY_EDITOR //m_UseOcclusionCulling is not exposed in c# !
                     var serializedReflectionProbe = new UnityEditor.SerializedObject(t.reflectionProbe);
@@ -73,8 +81,6 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 MigrationStep.New(Version.ProbeSettings, (HDAdditionalReflectionData t) =>
                 {
 #pragma warning disable 618
-                    // TODO: shadow distance is not yet handled
-                    // ?? = t.m_ObsoleteCaptureSettings.shadowDistance;
                     t.m_ProbeSettings.camera.culling.cullingMask = t.m_ObsoleteCaptureSettings.cullingMask;
                     t.m_ProbeSettings.camera.culling.useOcclusionCulling = t.m_ObsoleteCaptureSettings.useOcclusionCulling;
                     t.m_ProbeSettings.camera.frustum.nearClipPlane = t.m_ObsoleteCaptureSettings.nearClipPlane;
