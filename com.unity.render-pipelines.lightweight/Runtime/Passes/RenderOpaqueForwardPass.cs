@@ -98,16 +98,14 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
         {
             switch (flags)
             {
-                case CameraClearFlags.Nothing:
-                case CameraClearFlags.SolidColor:
-                    return RenderBufferLoadAction.Clear;
-                    break;
-                case CameraClearFlags.Depth:
-                    return RenderBufferLoadAction.Load;
-                    break;
                 case CameraClearFlags.Skybox:
+                case CameraClearFlags.SolidColor:
                 default:
                     return RenderBufferLoadAction.DontCare;
+                    break;
+                case CameraClearFlags.Depth:
+                case CameraClearFlags.Nothing:
+                    return RenderBufferLoadAction.Load;
                     break;
             }
         }
@@ -117,16 +115,14 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
             switch (flags)
             {
                 case CameraClearFlags.Skybox:
-                case CameraClearFlags.Depth:
                 case CameraClearFlags.SolidColor:
-                    return RenderBufferLoadAction.Clear;
+                case CameraClearFlags.Depth:
+                default:
+                    return RenderBufferLoadAction.DontCare;
                     break;
                 case CameraClearFlags.Nothing:
                     return RenderBufferLoadAction.Load;
                     break;
-                default:
-                  return RenderBufferLoadAction.DontCare;
-                  break;
             }
         }
     }
