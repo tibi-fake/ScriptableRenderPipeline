@@ -213,10 +213,11 @@ CBUFFER_START(UnityGlobal)
 
     // TODO: put commonly used vars together (below), and then sort them by the frequency of use (descending).
     // Note: a matrix is 4 * 4 * 4 = 64 bytes (1x cache line), so no need to sort those.
-#if defined(USING_STEREO_MATRICES)
-    float3 _Align16;
-#else
+#ifndef USING_STEREO_MATRICES
     float3 _WorldSpaceCameraPos;
+    float  _Pad0;
+    float3 _WorldSpaceCameraTranslation;
+    float  _Pad1;
 #endif
     float4 _ScreenSize;                 // { w, h, 1 / w, 1 / h }
     float4 _ScreenToTargetScale;        // { w / RTHandle.maxWidth, h / RTHandle.maxHeight } : xy = currFrame, zw = prevFrame
@@ -269,15 +270,17 @@ CBUFFER_START(UnityGlobal)
     float3 _HeightFogBaseScattering;
     float  _HeightFogBaseExtinction;
 
-    float2 _HeightFogExponents;         // {a, 1/a}
+    float2 _HeightFogExponents;         // { 1/H, H }
     float  _HeightFogBaseHeight;
     float  _GlobalFogAnisotropy;
 
     float4 _VBufferResolution;          // { w, h, 1/w, 1/h }
     float4 _VBufferSliceCount;          // { count, 1/count, 0, 0 }
     float4 _VBufferUvScaleAndLimit;     // Necessary us to work with sub-allocation (resource aliasing) in the RTHandle system
-    float4 _VBufferDepthEncodingParams; // See the call site for description
-    float4 _VBufferDepthDecodingParams; // See the call site for description
+    float4 _VBufferDistanceEncodingParams; // See the call site for description
+    float4 _VBufferDistanceDecodingParams; // See the call site for description
+    float  _VBufferLastSliceDist;       // The distance to the middle of the last slice
+    int    _EnableDistantFog;           // bool...
 
     // TODO: these are only used for reprojection.
     // Once reprojection is performed in a separate pass, we should probably
@@ -287,8 +290,6 @@ CBUFFER_START(UnityGlobal)
     float4 _VBufferPrevUvScaleAndLimit;
     float4 _VBufferPrevDepthEncodingParams;
     float4 _VBufferPrevDepthDecodingParams;
-    float  _VBufferMaxLinearDepth;      // The Z coordinate of the middle of the last slice
-    int    _EnableDistantFog;           // bool...
 
     #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/LightLoop/ShaderVariablesLightLoop.hlsl"
     #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/ScreenSpaceLighting/ShaderVariablesScreenSpaceLighting.hlsl"

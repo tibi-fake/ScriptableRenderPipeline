@@ -63,15 +63,19 @@ float4 EvaluateAtmosphericScattering(PositionInputs posInput, float3 V)
         }
         case FOGTYPE_VOLUMETRIC:
         {
+            float3 F     = GetViewForwardDir();
+            float  FdotV = dot(F, -V);
+            float  linearDistance = posInput.linearDepth * rcp(FdotV); // TODO: use positionWS
+
             float4 value = SampleVBuffer(TEXTURE3D_PARAM(_VBufferLighting, s_linear_clamp_sampler),
                                          posInput.positionNDC,
-                                         posInput.linearDepth,
+                                         linearDistance,
                                          _VBufferResolution,
                                          _VBufferSliceCount.xy,
                                          _VBufferUvScaleAndLimit.xy,
                                          _VBufferUvScaleAndLimit.zw,
-                                         _VBufferDepthEncodingParams,
-                                         _VBufferDepthDecodingParams,
+                                         _VBufferDistanceEncodingParams,
+                                         _VBufferDistanceDecodingParams,
                                          true, false);
 
             // TODO: add some slowly animated noise (dither?) to the reconstructed value.
@@ -80,15 +84,13 @@ float4 EvaluateAtmosphericScattering(PositionInputs posInput, float3 V)
 
             // TODO: if 'posInput.linearDepth' is computed using 'posInput.positionWS',
             // and the latter resides on the far plane, the computation will be numerically unstable.
-            float linearDepthDelta = posInput.linearDepth - _VBufferMaxLinearDepth;
+            float linearDistanceDelta = linearDistance - _VBufferLastSliceDist;
 
-            if ((_EnableDistantFog != 0) && (linearDepthDelta > 0))
+            if ((_EnableDistantFog != 0) && (linearDistanceDelta > 0))
             {
                 // Apply the distant (fallback) fog.
-                float3 F     = GetViewForwardDir();
-                float  FdotV = dot(F, -V);
-                float  dist  = linearDepthDelta * rcp(FdotV);
-                float  start = _VBufferMaxLinearDepth * rcp(FdotV);
+                float  dist  = linearDistanceDelta;
+                float  start = _VBufferLastSliceDist;
 
                 float3 positionWS  = GetCurrentViewPosition() - start * V;
                 float  startHeight = positionWS.y;

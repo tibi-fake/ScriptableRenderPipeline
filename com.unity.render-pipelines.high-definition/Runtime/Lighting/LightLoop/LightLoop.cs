@@ -387,24 +387,34 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             m_ShadowManager = null;
         }
 
+        int GetNumTileBigTileX(HDCamera hdCamera)
+        {
+            return HDUtils.DivRoundUp((int)hdCamera.screenSize.x, LightDefinitions.s_TileSizeBigTile);
+        }
+
+        int GetNumTileBigTileY(HDCamera hdCamera)
+        {
+            return HDUtils.DivRoundUp((int)hdCamera.screenSize.y, LightDefinitions.s_TileSizeBigTile);
+        }
+
         int GetNumTileFtplX(HDCamera hdCamera)
         {
-            return ((int)hdCamera.screenSize.x + (LightDefinitions.s_TileSizeFptl - 1)) / LightDefinitions.s_TileSizeFptl;
+            return HDUtils.DivRoundUp((int)hdCamera.screenSize.x, LightDefinitions.s_TileSizeFptl);
         }
 
         int GetNumTileFtplY(HDCamera hdCamera)
         {
-            return ((int)hdCamera.screenSize.y + (LightDefinitions.s_TileSizeFptl - 1)) / LightDefinitions.s_TileSizeFptl;
+            return HDUtils.DivRoundUp((int)hdCamera.screenSize.y, LightDefinitions.s_TileSizeFptl);
         }
 
         int GetNumTileClusteredX(HDCamera hdCamera)
         {
-            return ((int)hdCamera.screenSize.x + (LightDefinitions.s_TileSizeClustered - 1)) / LightDefinitions.s_TileSizeClustered;
+            return HDUtils.DivRoundUp((int)hdCamera.screenSize.x, LightDefinitions.s_TileSizeClustered);
         }
 
         int GetNumTileClusteredY(HDCamera hdCamera)
         {
-            return ((int)hdCamera.screenSize.y + (LightDefinitions.s_TileSizeClustered - 1)) / LightDefinitions.s_TileSizeClustered;
+            return HDUtils.DivRoundUp((int)hdCamera.screenSize.y, LightDefinitions.s_TileSizeClustered);
         }
 
         public bool GetFeatureVariantsEnabled()
@@ -2076,11 +2086,13 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 
             int decalDatasCount = Math.Min(DecalSystem.m_DecalDatasCount, m_MaxDecalsOnScreen);
 
+            // Broadcast these globally, as they are useful for other passes as well.
+            cmd.SetGlobalInt(HDShaderIDs._EnvLightIndexShift, m_lightList.lights.Count);
+            cmd.SetGlobalInt(HDShaderIDs._DecalIndexShift, m_lightList.lights.Count + m_lightList.envLights.Count);
+            cmd.SetGlobalInt(HDShaderIDs._DensityVolumeIndexShift, m_lightList.lights.Count + m_lightList.envLights.Count + decalDatasCount);
+
             bool isOrthographic = camera.orthographic;
             cmd.SetComputeIntParam(buildPerVoxelLightListShader, HDShaderIDs.g_isOrthographic, isOrthographic ? 1 : 0);
-            cmd.SetComputeIntParam(buildPerVoxelLightListShader, HDShaderIDs._EnvLightIndexShift, m_lightList.lights.Count);
-            cmd.SetComputeIntParam(buildPerVoxelLightListShader, HDShaderIDs._DecalIndexShift, m_lightList.lights.Count + m_lightList.envLights.Count);
-            cmd.SetComputeIntParam(buildPerVoxelLightListShader, HDShaderIDs._DensityVolumeIndexShift, m_lightList.lights.Count + m_lightList.envLights.Count + decalDatasCount);
             cmd.SetComputeIntParam(buildPerVoxelLightListShader, HDShaderIDs.g_iNrVisibLights, m_lightCount);
             cmd.SetComputeMatrixArrayParam(buildPerVoxelLightListShader, HDShaderIDs.g_mScrProjectionArr, projscrArr);
             cmd.SetComputeMatrixArrayParam(buildPerVoxelLightListShader, HDShaderIDs.g_mInvScrProjectionArr, invProjscrArr);
@@ -2428,6 +2440,9 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 cmd.SetGlobalInt(HDShaderIDs._EnvLightCount, m_lightList.envLights.Count);
                 cmd.SetGlobalBuffer(HDShaderIDs._DecalDatas, m_DecalDatas);
                 cmd.SetGlobalInt(HDShaderIDs._DecalCount, DecalSystem.m_DecalDatasCount);
+
+                cmd.SetGlobalInt(HDShaderIDs._NumTileBigTileX, GetNumTileBigTileX(hdCamera));
+                cmd.SetGlobalInt(HDShaderIDs._NumTileBigTileY, GetNumTileBigTileY(hdCamera));
 
                 cmd.SetGlobalInt(HDShaderIDs._NumTileFtplX, GetNumTileFtplX(hdCamera));
                 cmd.SetGlobalInt(HDShaderIDs._NumTileFtplY, GetNumTileFtplY(hdCamera));

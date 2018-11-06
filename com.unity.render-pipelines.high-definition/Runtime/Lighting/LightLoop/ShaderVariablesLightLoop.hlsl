@@ -6,10 +6,10 @@
     uint _PunctualLightCount;
     uint _AreaLightCount;
     uint _EnvLightCount;
+
     uint _EnvProxyCount;
     int  _EnvLightSkyEnabled;         // TODO: make it a bool
     int _DirectionalShadowIndex;
-
     float _MicroShadowOpacity;
 
     uint _NumTileFtplX;
@@ -27,11 +27,10 @@
     int g_iLog2NumClusters; // We need to always define these to keep constant buffer layouts compatible
 
     uint g_isLogBaseBufferEnabled;
-    //#endif
 
-    //#ifdef USE_CLUSTERED_LIGHTLIST
     uint _NumTileClusteredX;
     uint _NumTileClusteredY;
+    //#endif
     
     float4 _ShadowAtlasSize;
     float4 _CascadeShadowAtlasSize;
@@ -47,11 +46,11 @@
 
     #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/LightDefinition.cs.hlsl"
 
-    StructuredBuffer<uint>  g_vLightListGlobal;      // don't support Buffer yet in unity
-
-    StructuredBuffer<uint>  g_vLayeredOffsetsBuffer;     // don't support Buffer yet in unity
-    StructuredBuffer<float> g_logBaseBuffer;            // don't support Buffer yet in unity
-                                                        //#endif
+    // don't support Buffer yet in unity
+    StructuredBuffer<uint>  g_vBigTileLightList;
+    StructuredBuffer<uint>  g_vLightListGlobal;
+    StructuredBuffer<uint>  g_vLayeredOffsetsBuffer;
+    StructuredBuffer<float> g_logBaseBuffer;
 
     #ifdef USE_INDIRECT
         StructuredBuffer<uint> g_TileFeatureFlags;
