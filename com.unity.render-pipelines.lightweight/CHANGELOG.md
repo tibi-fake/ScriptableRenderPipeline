@@ -13,8 +13,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Shader variables `unity_4LightIndices0` and `unity_4LightIndices1` are now declared as `unity_PerObjectLightIndices` array.
 
 ### Fixed
-- Light are now being properly culled based on the light `Culling Mask`. [case 1058836](https://issuetracker.unity3d.com/issues/lwrp-light-layer-culling-not-working)
-- Scene view mode now renders baked lightmap correctly. [1092227](https://issuetracker.unity3d.com/issues/lwrp-scene-view-modes-render-objects-black)
+- LWRP now correctly culls Lights based on their `Culling Mask`. [case 1058836](https://issuetracker.unity3d.com/issues/lwrp-light-layer-culling-not-working)
+- Scene view mode now renders baked lightmaps correctly. [1092227](https://issuetracker.unity3d.com/issues/lwrp-scene-view-modes-render-objects-black)
 
 ## [5.0.0-preview] - 2018-09-28
 ### Added
