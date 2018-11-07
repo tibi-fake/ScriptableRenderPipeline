@@ -63,6 +63,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 MigrationStep.New(Version.AddCaptureSettingsAndFrameSettings, (HDAdditionalReflectionData t) =>
                 {
 #pragma warning disable 618
+                    t.m_ObsoleteCaptureSettings = t.m_ObsoleteCaptureSettings ?? new ObsoleteCaptureSettings();
                     t.m_ObsoleteCaptureSettings.cullingMask = t.reflectionProbe.cullingMask;
 #if UNITY_EDITOR //m_UseOcclusionCulling is not exposed in c# !
                     var serializedReflectionProbe = new UnityEditor.SerializedObject(t.reflectionProbe);

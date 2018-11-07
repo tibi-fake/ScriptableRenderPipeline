@@ -27,6 +27,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline.Tests
                 AssetDatabase.ImportAsset(m_GeneratedPrefabFileName);
 
                 instance = AssetDatabase.LoadAssetAtPath<GameObject>(m_GeneratedPrefabFileName);
+                instance.hideFlags = HideFlags.None;
             }
 
             public void Dispose() => AssetDatabase.DeleteAsset(m_GeneratedPrefabFileName);
@@ -79,13 +80,19 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline.Tests
                 using (new DefaultTest(
                     nameof(MigrateFromLegacyProbe),
                     GeneratePrefabYAML(legacyProbeData),
-                    out GameObject instance
+                    out GameObject prefab
                 ))
                 {
                     var influencePositionWS = legacyProbeData.capturePositionWS + legacyProbeData.boxOffset;
-                    var capturePositionPS = legacyProbeData.boxProjection ? -legacyProbeData.boxOffset : Vector3.zero;
+                    var capturePositionPS = legacyProbeData.boxProjection ? legacyProbeData.boxOffset : Vector3.zero;
 
-                    var probe = instance.GetComponent<HDAdditionalReflectionData>();
+                    var instance = GameObject.Instantiate(prefab);
+
+                    var probe = instance.GetComponent<HDAdditionalReflectionData>()
+                        ?? instance.AddComponent<HDAdditionalReflectionData>();
+                    prefab.SetActive(true);
+                    probe.enabled = true;
+
                     var settings = probe.settings;
                     Assert.AreEqual(influencePositionWS, probe.transform.position);
                     Assert.AreEqual(capturePositionPS, settings.proxySettings.capturePositionProxySpace);
