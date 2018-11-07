@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [5.1.0-preview] - 2018-10-18
 ### Fixed
 - LWRP now respects the iOS Player setting **Force hard shadows**. When you enable this setting, hardware filtering of shadows is disabled.
+- Shadow bias calculation was incorrect with both Shadergraph shaders and Terrain, this is now corrected.
+- If a camera was rendering into a target texture, it could create a FinalBlit pass which was not needed.
 
 ### Added
 

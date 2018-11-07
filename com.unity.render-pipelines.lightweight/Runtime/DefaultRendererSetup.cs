@@ -163,13 +163,18 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
                 renderer.EnqueuePass(m_ScreenSpaceShadowResolvePass);
             }
 
-            bool requiresRenderToTexture = RequiresIntermediateColorTexture(ref renderingData.cameraData, baseDescriptor)
-                    || m_AfterDepthpasses.Count != 0
-                    || m_AfterOpaquePasses.Count != 0
-                    || m_AfterOpaquePostProcessPasses.Count != 0
-                    || m_AfterSkyboxPasses.Count != 0
-                    || m_AfterTransparentPasses.Count != 0
-                    || m_AfterRenderPasses.Count != 0;
+            bool requiresRenderToTexture = false;
+
+            if (renderingData.cameraData.camera.targetTexture == null || renderingData.cameraData.camera.cameraType == CameraType.SceneView)
+            {
+                requiresRenderToTexture = RequiresIntermediateColorTexture(ref renderingData.cameraData, baseDescriptor)
+                                          || m_AfterDepthpasses.Count != 0
+                                          || m_AfterOpaquePasses.Count != 0
+                                          || m_AfterOpaquePostProcessPasses.Count != 0
+                                          || m_AfterSkyboxPasses.Count != 0
+                                          || m_AfterTransparentPasses.Count != 0
+                                          || m_AfterRenderPasses.Count != 0;
+            }
 
             RenderTargetHandle colorHandle = RenderTargetHandle.CameraTarget;
             RenderTargetHandle depthHandle = RenderTargetHandle.CameraTarget;
