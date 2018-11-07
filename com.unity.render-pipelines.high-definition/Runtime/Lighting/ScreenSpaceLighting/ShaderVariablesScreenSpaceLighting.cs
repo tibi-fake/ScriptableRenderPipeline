@@ -18,7 +18,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         public Vector4 _IndirectLightingMultiplier; // .x indirect diffuse multiplier (use with indirect lighting volume controler)
 
         // Screen space refraction
-        float   _SSRefractionInvScreenWeightDistance;     // Distance for screen space smoothstep with fallback
+        public float   _SSRefractionInvScreenWeightDistance; // Distance for screen space smoothstep with fallback
     }
 }
 
