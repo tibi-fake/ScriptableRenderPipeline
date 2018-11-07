@@ -240,7 +240,12 @@ namespace UnityEditor.ShaderGraph.Drawing
             var icon = property.generatePropertyBlock ? exposedIcon : null;
 
             var field = new BlackboardField(icon, property.displayName, property.propertyType.ToString()) { userData = property };
-            var row = new BlackboardRow(field, new BlackboardFieldPropertyView(field, m_Graph, property));
+
+            var propertyView = new BlackboardFieldPropertyView(field, m_Graph, property);
+            var row = new BlackboardRow(field, propertyView);
+            row.Q<Pill>().RegisterCallback<MouseEnterEvent>(evt => OnMouseHover(evt, property));
+            row.Q<Pill>().RegisterCallback<MouseLeaveEvent>(evt => OnMouseHover(evt, property));
+            //row.RegisterCallback<MouseEnterEvent>(OnMouseHover);
 
             row.userData = property;
             if (index < 0)
@@ -267,6 +272,60 @@ namespace UnityEditor.ShaderGraph.Drawing
                 node.OnEnable();
                 node.Dirty(ModificationScope.Node);
             }
+        }
+
+        void OnMouseHover(EventBase evt, IShaderProperty property)
+        {
+            var graphView = blackboard.GetFirstAncestorOfType<MaterialGraphView>();
+            foreach (var node in graphView.nodes.ToList().OfType<MaterialNodeView>())
+            {
+                if (node.node is PropertyNode)
+                {
+                    PropertyNode propertyNode = (PropertyNode)node.node;
+                    if (propertyNode.propertyGuid == property.guid)
+                    {
+                        if (evt.GetEventTypeId() == MouseEnterEvent.TypeId())
+                        {
+                            node.AddToClassList("hovered");
+                        }
+                        else
+                        {
+                            node.RemoveFromClassList("hovered");
+                        }
+                    }
+                }
+            }
+
+
+
+
+
+
+
+
+//            foreach (var node in m_Graph.GetNodes<PropertyNode>().Where(n => n.propertyGuid == property.guid))
+//            {
+//                Debug.Log(node.name);
+//            }
+
+//            foreach (INode node in m_Graph.GetNodes<INode>())
+//            {
+//                if (node is PropertyNode)
+//                {
+//                    PropertyNode propertyNode = (PropertyNode)node;
+//                    if (propertyNode.propertyGuid == property.guid)
+//                    {
+////                        var ve = (VisualElement)property;
+////                        ve.AddToClassList("hovered");
+//                        Debug.Log(propertyNode.GetVariableNameForSlot(0));
+//                    }
+////                    if (m_PropertyRows.ContainsKey(propertyNode.propertyGuid) && )
+////                    {
+////                        Debug.Log(propertyNode.propertyGuid);
+////                        Debug.Log(propertyNode.GetVariableNameForSlot(0));
+////                    }
+//                }
+//            }
         }
     }
 }
