@@ -102,8 +102,8 @@ float4 unity_RenderingLayer;
 
 // Light Indices block feature
 // These are set internally by the engine upon request by RendererConfiguration.
-real4 unity_PerObjectLightData;
-real4 unity_PerObjectLightIndices[2];
+real4 unity_LightData;
+real4 unity_LightIndices[2];
 
 // Reflection Probe 0 block feature
 // HDR environment map decode instructions
