@@ -15,5 +15,4 @@
     float _TransmissionFlags;
     float _SSPad;
 
-
 #endif

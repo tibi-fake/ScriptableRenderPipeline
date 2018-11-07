@@ -22,7 +22,6 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         public uint _TransmissionFlags;          // 1 bit/profile; 0 = regular, 1 = thin
 
         public float _SSPad;
-
     }
 }
 
