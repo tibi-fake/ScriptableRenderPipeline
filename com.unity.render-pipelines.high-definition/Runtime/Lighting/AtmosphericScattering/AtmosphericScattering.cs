@@ -26,26 +26,6 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 
         public abstract void PushShaderParameters(HDCamera hdCamera, CommandBuffer cmd);
 
-        public static void PushNeutralShaderParameters(HDCamera hdCamera, CommandBuffer cmd)
-        {
-            cmd.SetGlobalInt(HDShaderIDs._AtmosphericScatteringType, (int)FogType.None);
-
-            // In case volumetric lighting is enabled, we need to make sure that all rendering passes
-            // (not just the atmospheric scattering one) receive neutral parameters.
-            if (hdCamera.frameSettings.enableVolumetrics)
-            {
-                var data = DensityVolumeEngineData.GetNeutralValues();
-
-                cmd.SetGlobalVector(HDShaderIDs._HeightFogBaseScattering, data.scattering);
-                cmd.SetGlobalFloat( HDShaderIDs._HeightFogBaseExtinction, data.extinction);
-
-                cmd.SetGlobalVector(HDShaderIDs._HeightFogExponents,  Vector2.one);
-                cmd.SetGlobalFloat( HDShaderIDs._HeightFogBaseHeight, 0.0f);
-                cmd.SetGlobalFloat( HDShaderIDs._GlobalFogAnisotropy, 0.0f);
-                cmd.SetGlobalInt(   HDShaderIDs._EnableDistantFog,    0);
-            }
-        }
-
         // Not used by the volumetric fog.
         public void PushShaderParametersCommon(HDCamera hdCamera, CommandBuffer cmd, FogType type)
         {
