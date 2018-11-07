@@ -34,6 +34,8 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         Vector3 m_ObsoleteSphereBaseOffset;
         [SerializeField, FormerlySerializedAs("m_BoxBaseOffset"), FormerlySerializedAs("m_Offset")]
         Vector3 m_ObsoleteOffset;
+        [Obsolete("Only used for data migration purpose. Don't use this field.")]
+        internal Vector3 obsoleteOffset { get => m_ObsoleteOffset; set => m_ObsoleteOffset = value; }
 #pragma warning restore 649 //never assigned
 
         public void OnBeforeSerialize() { }

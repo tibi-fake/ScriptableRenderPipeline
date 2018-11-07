@@ -36,21 +36,9 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 }),
                 MigrationStep.New(Version.UseInfluenceVolume, (HDAdditionalReflectionData t) =>
                 {
-                    // Previously, the capture position of a reflection probe was the position of the game object
-                    //   and the center of the influence volume is (transform.position + reflectionProbe.center) in world space
-                    // Now, the center of the influence volume is the position of the transform and the capture position
-                    //   is t.probeSettings.proxySettings.capturePositionProxySpace and is in capture space
-
-                    var capturePositionWS = t.transform.position;
-                    // set the transform position to the influence position world space
-                    t.transform.position += t.reflectionProbe.center;
-
-                    var capturePositionPS = t.proxyToWorld.inverse * capturePositionWS;
-                    t.m_ProbeSettings.proxySettings.capturePositionProxySpace = capturePositionPS;
-                    t.m_ProbeSettings.proxySettings.mirrorPositionProxySpace = capturePositionPS;
-
                     t.influenceVolume.boxSize = t.reflectionProbe.size;
 #pragma warning disable 618
+                    t.influenceVolume.obsoleteOffset = t.reflectionProbe.center;
                     t.influenceVolume.sphereRadius = t.m_ObsoleteInfluenceSphereRadius;
                     t.influenceVolume.shape = t.m_ObsoleteInfluenceShape; //must be done after each size transfert
                     t.influenceVolume.boxBlendDistancePositive = t.m_ObsoleteBlendDistancePositive;
@@ -89,10 +77,31 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 MigrationStep.New(Version.ProbeSettings, (HDAdditionalReflectionData t) =>
                 {
 #pragma warning disable 618
+                    // Migrate capture position
+                    // Previously, the capture position of a reflection probe was the position of the game object
+                    //   and the center of the influence volume is (transform.position + t.influenceVolume.m_ObsoleteOffset) in world space
+                    // Now, the center of the influence volume is the position of the transform and the capture position
+                    //   is t.probeSettings.proxySettings.capturePositionProxySpace and is in capture space
+
+                    var capturePositionWS = t.transform.position;
+                    // set the transform position to the influence position world space
+                    t.transform.position += t.influenceVolume.obsoleteOffset;
+
+                    var capturePositionPS = t.proxyToWorld.inverse * capturePositionWS;
+                    t.m_ProbeSettings.proxySettings.capturePositionProxySpace = capturePositionPS;
+                    t.m_ProbeSettings.proxySettings.mirrorPositionProxySpace = capturePositionPS;
+
+                    // Migrating Capture Settings
+                    t.m_ProbeSettings.camera.bufferClearing.clearColorMode = t.m_ObsoleteCaptureSettings.clearColorMode;
+                    t.m_ProbeSettings.camera.bufferClearing.clearDepth = t.m_ObsoleteCaptureSettings.clearDepth;
                     t.m_ProbeSettings.camera.culling.cullingMask = t.m_ObsoleteCaptureSettings.cullingMask;
                     t.m_ProbeSettings.camera.culling.useOcclusionCulling = t.m_ObsoleteCaptureSettings.useOcclusionCulling;
                     t.m_ProbeSettings.camera.frustum.nearClipPlane = t.m_ObsoleteCaptureSettings.nearClipPlane;
                     t.m_ProbeSettings.camera.frustum.farClipPlane = t.m_ObsoleteCaptureSettings.farClipPlane;
+                    t.m_ProbeSettings.camera.volumes.layerMask = t.m_ObsoleteCaptureSettings.volumeLayerMask;
+                    t.m_ProbeSettings.camera.volumes.anchorOverride = t.m_ObsoleteCaptureSettings.volumeAnchorOverride;
+                    t.m_ProbeSettings.camera.frustum.fieldOfView = t.m_ObsoleteCaptureSettings.fieldOfView;
+                    t.m_ProbeSettings.camera.renderingPath = t.m_ObsoleteCaptureSettings.renderingPath;
 #pragma warning restore 618
                 })
             );
