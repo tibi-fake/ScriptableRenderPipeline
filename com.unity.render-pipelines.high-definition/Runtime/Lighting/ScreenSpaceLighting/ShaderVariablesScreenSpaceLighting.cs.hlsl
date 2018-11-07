@@ -15,11 +15,6 @@
     float4 _AmbientOcclusionParam;
     float4 _IndirectLightingMultiplier;
     float _SSRefractionInvScreenWeightDistance;
-    float _SSReflectionInvScreenWeightDistance;
-    int _SSReflectionEnabled;
-    int _SSReflectionProjectionModel;
-    int _SSReflectionHiZRayMarchBehindObject;
-    int _SSRefractionHiZRayMarchBehindObject;
 
 
 #endif
