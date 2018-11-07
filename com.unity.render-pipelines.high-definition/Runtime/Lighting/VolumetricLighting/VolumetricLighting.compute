@@ -412,16 +412,21 @@ void FillVolumetricLightingBuffer(LightLoopContext context, uint featureFlags,
 
     // For now, iterate through all the objects to determine the correct range.
     // TODO: precompute this, of course.
-    for (uint offset = 0; offset < lightCount; offset++)
     {
-        uint objectIndex = FetchIndex(lightStart, offset);
+        uint offset = 0;
 
-        if (objectIndex >= _EnvLightIndexShift)
+        for (; offset < lightCount; offset++)
         {
-            // We have found the last local analytical light.
-            lightCount = offset;
-            break;
+            uint objectIndex = FetchIndex(lightStart, offset);
+
+            if (objectIndex >= _EnvLightIndexShift)
+            {
+                // We have found the last local analytical light.
+                break;
+            }
         }
+
+        lightCount = offset;
     }
 
 #else  // USE_BIG_TILE_LIGHTLIST

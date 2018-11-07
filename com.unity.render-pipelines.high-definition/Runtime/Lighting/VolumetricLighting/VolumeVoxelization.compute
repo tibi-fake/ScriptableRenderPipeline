@@ -145,17 +145,22 @@ void FillVolumetricDensityBuffer(PositionInputs posInput, uint tileIndex, Jitter
 
     // For now, iterate through all the objects to determine the correct range.
     // TODO: precompute this, of course.
-    for (uint offset = 0; offset < volumeCount; offset++)
     {
-        uint objectIndex = FetchIndex(volumeStart, offset);
+        uint offset = 0;
 
-        if (objectIndex >= _DensityVolumeIndexShift)
+        for (; offset < volumeCount; offset++)
         {
-            // We have found the first density volume.
-            volumeCount -= offset;
-            volumeStart += offset;
-            break;
+            uint objectIndex = FetchIndex(volumeStart, offset);
+
+            if (objectIndex >= _DensityVolumeIndexShift)
+            {
+                // We have found the first density volume.
+                break;
+            }
         }
+
+        volumeStart += offset;
+        volumeCount -= offset;
     }
 
 #else  // USE_BIG_TILE_LIGHTLIST
@@ -343,7 +348,7 @@ void VolumeVoxelization(uint2 groupId       : SV_GroupID,
 
     ray.xDirDerivWS = rightDirWS * (rcpLenRightDir * unitDistFaceSize); // Normalize & rescale
     ray.yDirDerivWS = cross(ray.xDirDerivWS, ray.centerDirWS); // Will have the length of 'unitDistFaceSize' by construction
-    ray.jitterDirWS = ray.centerDirWS;             // TODO
+    ray.jitterDirWS = ray.centerDirWS; // TODO
 
     PositionInputs posInput = GetPositionInput(voxelCoord, _VBufferResolution.zw, tileCoord);
 
