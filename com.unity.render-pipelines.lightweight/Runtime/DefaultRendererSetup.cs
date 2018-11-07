@@ -163,6 +163,11 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
                 renderer.EnqueuePass(m_ScreenSpaceShadowResolvePass);
             }
 
+            bool platformNeedsToKillAlpha = Application.platform == RuntimePlatform.IPhonePlayer ||
+                Application.platform == RuntimePlatform.Android ||
+                Application.platform == RuntimePlatform.tvOS;
+            bool killAlpha = !Graphics.preserveFramebufferAlpha && platformNeedsToKillAlpha;
+
             bool requiresRenderToTexture = RequiresIntermediateColorTexture(ref renderingData.cameraData, baseDescriptor)
                     || m_AfterDepthpasses.Count != 0
                     || m_AfterOpaquePasses.Count != 0
@@ -170,7 +175,8 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
                     || m_AfterSkyboxPasses.Count != 0
                     || m_AfterTransparentPasses.Count != 0
                     || m_AfterRenderPasses.Count != 0
-                    || Display.main.requiresBlitToBackbuffer;
+                    || Display.main.requiresBlitToBackbuffer
+                    || killAlpha;
 
             RenderTargetHandle colorHandle = RenderTargetHandle.CameraTarget;
             RenderTargetHandle depthHandle = RenderTargetHandle.CameraTarget;
@@ -265,7 +271,7 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
                 //now blit into the final target
                 if (colorHandle != RenderTargetHandle.CameraTarget)
                 {
-                    m_FinalBlitPass.Setup(baseDescriptor, colorHandle, Display.main.requiresSRGBBlitToBackbuffer);
+                    m_FinalBlitPass.Setup(baseDescriptor, colorHandle, Display.main.requiresSRGBBlitToBackbuffer, killAlpha);
                     renderer.EnqueuePass(m_FinalBlitPass);
                 }
             }
@@ -278,7 +284,7 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
                 }
                 else if (colorHandle != RenderTargetHandle.CameraTarget)
                 {
-                    m_FinalBlitPass.Setup(baseDescriptor, colorHandle, Display.main.requiresSRGBBlitToBackbuffer);
+                    m_FinalBlitPass.Setup(baseDescriptor, colorHandle, Display.main.requiresSRGBBlitToBackbuffer, killAlpha);
                     renderer.EnqueuePass(m_FinalBlitPass);
                 }
             }

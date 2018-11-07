@@ -17,17 +17,19 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
         private RenderTargetHandle colorAttachmentHandle { get; set; }
         private RenderTextureDescriptor descriptor { get; set; }
         private bool requiresSRGConversion { get; set; }
+        private bool killAlpha { get; set; }
 
         /// <summary>
         /// Configure the pass
         /// </summary>
         /// <param name="baseDescriptor"></param>
         /// <param name="colorAttachmentHandle"></param>
-        public void Setup(RenderTextureDescriptor baseDescriptor, RenderTargetHandle colorAttachmentHandle, bool requiresSRGConversion)
+        public void Setup(RenderTextureDescriptor baseDescriptor, RenderTargetHandle colorAttachmentHandle, bool requiresSRGConversion, bool killAlpha)
         {
             this.colorAttachmentHandle = colorAttachmentHandle;
             this.descriptor = baseDescriptor;
             this.requiresSRGConversion = requiresSRGConversion;
+            this.killAlpha = killAlpha;
         }
         
         /// <inheritdoc/>
@@ -46,6 +48,11 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
                 cmd.EnableShaderKeyword(ShaderKeywordStrings.LinearToSRGBConversion);
             else
                 cmd.DisableShaderKeyword(ShaderKeywordStrings.LinearToSRGBConversion);
+
+            if (killAlpha)
+                cmd.EnableShaderKeyword(ShaderKeywordStrings.KillAlpha);
+            else
+                cmd.DisableShaderKeyword(ShaderKeywordStrings.KillAlpha);
 
             // We need to handle viewport on a RT. We do it by rendering a fullscreen quad + viewport
             if (!renderingData.cameraData.isDefaultViewport)
