@@ -24,6 +24,11 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                     t.m_ObsoleteBlendDistancePositive = t.m_ObsoleteBlendDistanceNegative = Vector3.one * t.reflectionProbe.blendDistance;
                     t.weight = t.reflectionProbe.importance;
                     t.multiplier = t.reflectionProbe.intensity;
+                    switch (t.reflectionProbe.refreshMode)
+                    {
+                        case UnityEngine.Rendering.ReflectionProbeRefreshMode.EveryFrame: t.realtimeMode = ProbeSettings.RealtimeMode.EveryFrame; break;
+                        case UnityEngine.Rendering.ReflectionProbeRefreshMode.OnAwake: t.realtimeMode = ProbeSettings.RealtimeMode.OnEnable; break;
+                    }
                     // size and center were kept in legacy until Version.UseInfluenceVolume
                     //   and mode until Version.ModeAndTextures
                     //   and all capture settings are done in Version.AddCaptureSettingsAndFrameSettings
@@ -37,7 +42,9 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                     //   is t.probeSettings.proxySettings.capturePositionProxySpace and is in capture space
 
                     var capturePositionWS = t.transform.position;
+                    // set the transform position to the influence position world space
                     t.transform.position += t.reflectionProbe.center;
+
                     var capturePositionPS = t.proxyToWorld.inverse * capturePositionWS;
                     t.m_ProbeSettings.proxySettings.capturePositionProxySpace = capturePositionPS;
                     t.m_ProbeSettings.proxySettings.mirrorPositionProxySpace = capturePositionPS;

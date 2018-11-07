@@ -61,7 +61,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline.Tests
                     boxOffset = new Vector3(2, 3, 4),
                     boxProjection = true,
                     boxSize = new Vector3(1, 2, 3),
-                    capturePositionWS = new Vector3(2, 3, 4),
+                    capturePositionWS = new Vector3(2, 3.5f, 6),
                     cullingMask = 308,
                     farClipPlane = 850,
                     nearClipPlane = 1.5f,
@@ -71,6 +71,57 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline.Tests
                     refreshMode = (int)ReflectionProbeRefreshMode.EveryFrame,
                     resolution = 256,
                     useOcclusionCulling = false
+                },
+                new LegacyProbeData
+                {
+                    blendDistance = 1.2f,
+                    boxOffset = new Vector3(8, 3, 2),
+                    boxProjection = true,
+                    boxSize = new Vector3(4, 1, 8),
+                    capturePositionWS = new Vector3(4, 6, 3),
+                    cullingMask = 308,
+                    farClipPlane = 850,
+                    nearClipPlane = 1.5f,
+                    importance = 12,
+                    intensity = 1.4f,
+                    mode = (int)ReflectionProbeMode.Realtime,
+                    refreshMode = (int)ReflectionProbeRefreshMode.OnAwake,
+                    resolution = 256,
+                    useOcclusionCulling = false
+                },
+                new LegacyProbeData
+                {
+                    blendDistance = 1.5f,
+                    boxOffset = new Vector3(2, 6, -1),
+                    boxProjection = true,
+                    boxSize = new Vector3(3.5f, 7, 2),
+                    capturePositionWS = new Vector3(1.2f, 4, 5.12f),
+                    cullingMask = 308,
+                    farClipPlane = 850,
+                    nearClipPlane = 1.35f,
+                    importance = 11,
+                    intensity = 1.4f,
+                    mode = (int)ReflectionProbeMode.Baked,
+                    refreshMode = (int)ReflectionProbeRefreshMode.EveryFrame,
+                    resolution = 256,
+                    useOcclusionCulling = true
+                },
+                new LegacyProbeData
+                {
+                    blendDistance = 1.5f,
+                    boxOffset = new Vector3(3, 0, -10),
+                    boxProjection = true,
+                    boxSize = new Vector3(3.5f, 7, 2),
+                    capturePositionWS = new Vector3(1.2f, 4, 5.12f),
+                    cullingMask = 308,
+                    farClipPlane = 870,
+                    nearClipPlane = 5.5f,
+                    importance = 13,
+                    intensity = 1.4f,
+                    mode = (int)ReflectionProbeMode.Custom,
+                    refreshMode = (int)ReflectionProbeRefreshMode.EveryFrame,
+                    resolution = 128,
+                    useOcclusionCulling = true
                 }
             };
 
@@ -84,9 +135,10 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline.Tests
                 ))
                 {
                     var influencePositionWS = legacyProbeData.capturePositionWS + legacyProbeData.boxOffset;
-                    var capturePositionPS = legacyProbeData.boxProjection ? legacyProbeData.boxOffset : Vector3.zero;
+                    var proxyToWorld = Matrix4x4.TRS(legacyProbeData.capturePositionWS, Quaternion.identity, Vector3.one);
+                    var capturePositionPS = (Vector3)(proxyToWorld.inverse * legacyProbeData.capturePositionWS);
 
-                    var instance = GameObject.Instantiate(prefab);
+                    var instance = Object.Instantiate(prefab);
 
                     var probe = instance.GetComponent<HDAdditionalReflectionData>()
                         ?? instance.AddComponent<HDAdditionalReflectionData>();
@@ -114,7 +166,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline.Tests
                         case ReflectionProbeMode.Custom: targetMode = ProbeSettings.Mode.Custom; break;
                         case ReflectionProbeMode.Realtime: targetMode = ProbeSettings.Mode.Realtime; break;
                     }
-                    Assert.AreEqual(settings.mode, targetMode);
+                    Assert.AreEqual(targetMode, settings.mode);
 
                     var targetRealtimeMode = ProbeSettings.RealtimeMode.EveryFrame;
                     switch ((ReflectionProbeRefreshMode)legacyProbeData.refreshMode)
@@ -123,7 +175,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline.Tests
                         case ReflectionProbeRefreshMode.ViaScripting: targetRealtimeMode = ProbeSettings.RealtimeMode.EveryFrame; break;
                         case ReflectionProbeRefreshMode.OnAwake: targetRealtimeMode = ProbeSettings.RealtimeMode.OnEnable; break;
                     }
-                    Assert.AreEqual(settings.realtimeMode, targetRealtimeMode);
+                    Assert.AreEqual(targetRealtimeMode, settings.realtimeMode);
                 }
             }
 
