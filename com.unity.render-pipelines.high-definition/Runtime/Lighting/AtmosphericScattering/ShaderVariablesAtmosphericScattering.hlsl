@@ -1,7 +1,9 @@
 #ifdef SHADER_VARIABLES_INCLUDE_CB
     int     _AtmosphericScatteringType;
     // Common
+    float   _MaxFogDistance;
     float   _FogColorMode;
+    float   _SkyTextureMipCount;
     float4  _FogColorDensity; // color in rgb, density in alpha
     float4  _MipFogParameters;
     // Linear fog
@@ -9,7 +11,9 @@
     // Exp fog
     float4  _ExpFogParameters;
 
-    float   _SkyTextureMipCount;
+    // Volumetrics
+    float  _VBufferLastSliceDist;       // The distance to the middle of the last slice
+    int    _EnableDistantFog;           // bool...
 #else
     TEXTURE3D(_VBufferLighting);
     TEXTURECUBE_ARRAY(_SkyTexture);

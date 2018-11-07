@@ -407,6 +407,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 
 
         public static readonly int _AtmosphericScatteringType      = Shader.PropertyToID("_AtmosphericScatteringType");
+        public static readonly int _MaxFogDistance                 = Shader.PropertyToID("_MaxFogDistance");
         public static readonly int _AmbientProbeCoeffs             = Shader.PropertyToID("_AmbientProbeCoeffs");
         public static readonly int _HeightFogBaseExtinction        = Shader.PropertyToID("_HeightFogBaseExtinction");
         public static readonly int _HeightFogBaseScattering        = Shader.PropertyToID("_HeightFogBaseScattering");

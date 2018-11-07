@@ -279,8 +279,6 @@ CBUFFER_START(UnityGlobal)
     float4 _VBufferUvScaleAndLimit;     // Necessary us to work with sub-allocation (resource aliasing) in the RTHandle system
     float4 _VBufferDistanceEncodingParams; // See the call site for description
     float4 _VBufferDistanceDecodingParams; // See the call site for description
-    float  _VBufferLastSliceDist;       // The distance to the middle of the last slice
-    int    _EnableDistantFog;           // bool...
 
     // TODO: these are only used for reprojection.
     // Once reprojection is performed in a separate pass, we should probably
