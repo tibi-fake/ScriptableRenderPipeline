@@ -731,7 +731,8 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             cmd.SetGlobalMatrix(HDShaderIDs._NonJitteredViewProjMatrix,   nonJitteredViewProjMatrix);
             cmd.SetGlobalMatrix(HDShaderIDs._PrevViewProjMatrix,          prevViewProjMatrix);
             cmd.SetGlobalVector(HDShaderIDs._WorldSpaceCameraPos,         worldSpaceCameraPos);
-            cmd.SetGlobalVector(HDShaderIDs._WorldSpaceCameraTranslation, worldSpaceCameraPos - prevWorldSpaceCameraPos);
+            cmd.SetGlobalVector(HDShaderIDs._PrevCamPosRWS, (ShaderConfig.s_CameraRelativeRendering != 0) ? prevWorldSpaceCameraPos - worldSpaceCameraPos
+                                                                                                          : prevWorldSpaceCameraPos);
             cmd.SetGlobalVector(HDShaderIDs._ScreenSize,                  screenSize);
             cmd.SetGlobalVector(HDShaderIDs._ScreenToTargetScale,         doubleBufferedViewportScale);
             cmd.SetGlobalVector(HDShaderIDs._ZBufferParams,               zBufferParams);

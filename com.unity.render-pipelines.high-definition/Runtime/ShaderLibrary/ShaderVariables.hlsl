@@ -216,7 +216,7 @@ CBUFFER_START(UnityGlobal)
 #ifndef USING_STEREO_MATRICES
     float3 _WorldSpaceCameraPos;
     float  _Pad0;
-    float3 _WorldSpaceCameraTranslation;
+    float3 _PrevCamPosRWS;
     float  _Pad1;
 #endif
     float4 _ScreenSize;                 // { w, h, 1 / w, 1 / h }

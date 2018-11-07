@@ -518,12 +518,10 @@ void FillVolumetricLightingBuffer(LightLoopContext context, uint featureFlags,
         float4 normalizedVoxelValue = linearizedVoxelValue * rcp(dt);
         float4 normalizedBlendValue = normalizedVoxelValue;
 
-        float3 prevCamPosWS = GetCurrentViewPosition() - _WorldSpaceCameraTranslation;
-
         // Reproject the history at 'centerWS'.
         float4 reprojValue = SampleVBuffer(TEXTURE3D_PARAM(_VBufferLightingHistory, s_linear_clamp_sampler),
                                            centerWS,
-                                           prevCamPosWS,
+                                           _PrevCamPosRWS,
                                            _PrevViewProjMatrix,
                                            _VBufferPrevResolution,
                                            _VBufferPrevSliceCount.xy,
