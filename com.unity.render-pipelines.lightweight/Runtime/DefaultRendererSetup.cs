@@ -96,8 +96,10 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
             bool isScaledRender = !Mathf.Approximately(cameraData.renderScale, 1.0f);
             bool isTargetTexture2DArray = baseDescriptor.dimension == TextureDimension.Tex2DArray;
             bool noAutoResolveMsaa = cameraData.msaaSamples > 1 && !SystemInfo.supportsMultisampleAutoResolve;
+            bool isCapturing = cameraData.captureActions != null;
             return noAutoResolveMsaa || cameraData.isSceneViewCamera || isScaledRender || cameraData.isHdrEnabled ||
-                cameraData.postProcessEnabled || cameraData.requiresOpaqueTexture || isTargetTexture2DArray || !cameraData.isDefaultViewport;
+                cameraData.postProcessEnabled || cameraData.requiresOpaqueTexture || isTargetTexture2DArray || !cameraData.isDefaultViewport ||
+                isCapturing;
         }
 
 
@@ -266,6 +268,9 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
                 //now blit into the final target
                 if (colorHandle != RenderTargetHandle.CameraTarget)
                 {
+                    if (m_CapturePass.Setup(colorHandle, renderingData.cameraData.captureActions))
+                        renderer.EnqueuePass(m_CapturePass);
+
                     m_FinalBlitPass.Setup(baseDescriptor, colorHandle);
                     renderer.EnqueuePass(m_FinalBlitPass);
                 }
@@ -279,13 +284,13 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
                 }
                 else if (colorHandle != RenderTargetHandle.CameraTarget)
                 {
+                    if (m_CapturePass.Setup(colorHandle, renderingData.cameraData.captureActions))
+                        renderer.EnqueuePass(m_CapturePass);
+
                     m_FinalBlitPass.Setup(baseDescriptor, colorHandle);
                     renderer.EnqueuePass(m_FinalBlitPass);
                 }
             }
-
-            if (m_CapturePass.Setup(renderingData.cameraData.captureActions))
-                renderer.EnqueuePass(m_CapturePass);
 
             if (renderingData.cameraData.isStereoEnabled)
             {

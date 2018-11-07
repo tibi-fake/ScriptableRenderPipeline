@@ -10,18 +10,20 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
     /// You can use this pass to inject capture commands into a command buffer
     /// with the goal of having camera capture happening in external code.
     /// </summary>
-    public class CapturePass : ScriptableRenderPass
+    internal class CapturePass : ScriptableRenderPass
     {
         const string k_CaptureTag = "Capture Pass";
 
+        private RenderTargetHandle colorAttachmentHandle { get; set; }
         private IEnumerator<Action<RenderTargetIdentifier, CommandBuffer> > captureActions { get; set; }
 
         /// <summary>
         /// Configure the pass
         /// </summary>
         /// <param name="actions"></param>
-        public bool Setup(IEnumerator<Action<RenderTargetIdentifier, CommandBuffer> > actions)
+        public bool Setup(RenderTargetHandle colorAttachmentHandle, IEnumerator<Action<RenderTargetIdentifier, CommandBuffer> > actions)
         {
+            this.colorAttachmentHandle = colorAttachmentHandle;
             captureActions = actions;
             return captureActions != null;
         }
@@ -33,8 +35,10 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
                 throw new ArgumentNullException("renderer");
 
             CommandBuffer cmdBuf = CommandBufferPool.Get(k_CaptureTag);
+            var colorAttachmentIdentifier = colorAttachmentHandle.Identifier();
             for (captureActions.Reset(); captureActions.MoveNext();)
-                captureActions.Current(BuiltinRenderTextureType.CurrentActive, cmdBuf);
+                captureActions.Current(colorAttachmentIdentifier, cmdBuf);
+
             context.ExecuteCommandBuffer(cmdBuf);
             CommandBufferPool.Release(cmdBuf);
         }

@@ -5,7 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [5.1.0-preview] - 2018-10-18
-
+### Added
+- LWRP now uses new Unity recorder extension to make it possible to capture the output of Cameras.
 ## [5.0.0-preview] - 2018-09-28
 ### Added
 - Added occlusion mesh rendering/hookup for VR
