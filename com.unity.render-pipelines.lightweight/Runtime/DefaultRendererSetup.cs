@@ -169,7 +169,8 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
                     || m_AfterOpaquePostProcessPasses.Count != 0
                     || m_AfterSkyboxPasses.Count != 0
                     || m_AfterTransparentPasses.Count != 0
-                    || m_AfterRenderPasses.Count != 0;
+                    || m_AfterRenderPasses.Count != 0
+                    || Display.main.requiresBlitToBackbuffer;
 
             RenderTargetHandle colorHandle = RenderTargetHandle.CameraTarget;
             RenderTargetHandle depthHandle = RenderTargetHandle.CameraTarget;
@@ -264,7 +265,7 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
                 //now blit into the final target
                 if (colorHandle != RenderTargetHandle.CameraTarget)
                 {
-                    m_FinalBlitPass.Setup(baseDescriptor, colorHandle);
+                    m_FinalBlitPass.Setup(baseDescriptor, colorHandle, Display.main.requiresSRGBBlitToBackbuffer);
                     renderer.EnqueuePass(m_FinalBlitPass);
                 }
             }
@@ -277,7 +278,7 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
                 }
                 else if (colorHandle != RenderTargetHandle.CameraTarget)
                 {
-                    m_FinalBlitPass.Setup(baseDescriptor, colorHandle);
+                    m_FinalBlitPass.Setup(baseDescriptor, colorHandle, Display.main.requiresSRGBBlitToBackbuffer);
                     renderer.EnqueuePass(m_FinalBlitPass);
                 }
             }

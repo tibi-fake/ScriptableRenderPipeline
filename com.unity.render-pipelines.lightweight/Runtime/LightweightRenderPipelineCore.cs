@@ -82,6 +82,8 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
         public static readonly string DepthNoMsaa = "_DEPTH_NO_MSAA";
         public static readonly string DepthMsaa2 = "_DEPTH_MSAA_2";
         public static readonly string DepthMsaa4 = "_DEPTH_MSAA_4";
+
+        public static readonly string LinearToSRGBConversion = "_LINEAR_TO_SRGB_CONVERSION";
     }
 
     public sealed partial class LightweightRenderPipeline

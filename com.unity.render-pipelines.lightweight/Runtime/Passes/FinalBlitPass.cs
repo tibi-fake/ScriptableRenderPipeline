@@ -16,16 +16,18 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
 
         private RenderTargetHandle colorAttachmentHandle { get; set; }
         private RenderTextureDescriptor descriptor { get; set; }
+        private bool requiresSRGConversion { get; set; }
 
         /// <summary>
         /// Configure the pass
         /// </summary>
         /// <param name="baseDescriptor"></param>
         /// <param name="colorAttachmentHandle"></param>
-        public void Setup(RenderTextureDescriptor baseDescriptor, RenderTargetHandle colorAttachmentHandle)
+        public void Setup(RenderTextureDescriptor baseDescriptor, RenderTargetHandle colorAttachmentHandle, bool requiresSRGConversion)
         {
             this.colorAttachmentHandle = colorAttachmentHandle;
             this.descriptor = baseDescriptor;
+            this.requiresSRGConversion = requiresSRGConversion;
         }
         
         /// <inheritdoc/>
@@ -39,6 +41,11 @@ namespace UnityEngine.Experimental.Rendering.LightweightPipeline
 
             CommandBuffer cmd = CommandBufferPool.Get(k_FinalBlitTag);
             cmd.SetGlobalTexture("_BlitTex", sourceRT);
+
+            if (requiresSRGConversion)
+                cmd.EnableShaderKeyword(ShaderKeywordStrings.LinearToSRGBConversion);
+            else
+                cmd.DisableShaderKeyword(ShaderKeywordStrings.LinearToSRGBConversion);
 
             // We need to handle viewport on a RT. We do it by rendering a fullscreen quad + viewport
             if (!renderingData.cameraData.isDefaultViewport)
