@@ -28,8 +28,8 @@ AttributesMesh ApplyMeshModification(AttributesMesh input)
 #endif
 
 #ifdef ATTRIBUTES_NEED_TANGENT
-    input.tangentOS.xyz = cross(float3(0,0,1), input.normalOS);
-    input.tangentOS.w = 1;
+    input.tangentOS.xyz = cross(input.normalOS, float3(0, 0, 1));
+    input.tangentOS.w = -1;
 #endif
     return input;
 }

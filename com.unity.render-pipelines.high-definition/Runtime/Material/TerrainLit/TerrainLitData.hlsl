@@ -23,12 +23,14 @@ void GetSurfaceAndBuiltinData(inout FragInputs input, float3 V, inout PositionIn
     {
         float3 normalOS = SAMPLE_TEXTURE2D(_TerrainNormalmapTexture, sampler_Control0, (input.texCoord0.xy + 0.5f) * _TerrainHeightmapRecipSize.xy).rgb * 2 - 1;
         float3 normalWS = mul((float3x3)GetObjectToWorldMatrix(), normalOS);
-        float3 tangentWS = cross(GetObjectToWorldMatrix()._13_23_33, normalWS);
+        float4 tangentWS;
+        tangentWS.xyz = cross(normalWS, GetObjectToWorldMatrix()._13_23_33);
+        tangentWS.w = -1;
         float renormFactor = 1.0 / length(normalWS);
 
         // bitangent on the fly option in xnormal to reduce vertex shader outputs.
         // this is the mikktspace transformation (must use unnormalized attributes)
-        float3x3 worldToTangent = CreateWorldToTangent(normalWS, tangentWS.xyz, 1);
+        float3x3 worldToTangent = CreateWorldToTangent(normalWS, tangentWS.xyz, tangentWS.w);
 
         // surface gradient based formulation requires a unit length initial normal. We can maintain compliance with mikkts
         // by uniformly scaling all 3 vectors since normalization of the perturbed normal will cancel it.
