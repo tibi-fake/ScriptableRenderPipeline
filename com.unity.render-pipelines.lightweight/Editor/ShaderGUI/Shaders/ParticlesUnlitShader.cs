@@ -10,7 +10,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
     internal class ParticlesUnlitShader : BaseShaderGUI
     {
         // Properties
-        private UnlitGUI.UnlitProperties shadingModelProperties;
+        private BakedLitGUI.BakedLitProperties shadingModelProperties;
         private ParticleGUI.ParticleProperties particleProps;
         
         // List of renderers using this material in the scene, used for validating vertex streams
@@ -19,7 +19,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
         public override void FindProperties(MaterialProperty[] properties)
         {
             base.FindProperties(properties);
-            shadingModelProperties = new UnlitGUI.UnlitProperties(properties);
+            shadingModelProperties = new BakedLitGUI.BakedLitProperties(properties);
             particleProps = new ParticleGUI.ParticleProperties(properties);
         }
         
@@ -34,7 +34,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
             //SetupMaterialWithBlendMode(material, (BlendMode)material.GetFloat("_Blend"));
             ParticleGUI.SetupMaterialWithColorMode(material);
             ParticleGUI.SetMaterialKeywords(material); // Set particle specific keywords
-            UnlitGUI.SetMaterialKeywords(material); // Set lit specific 
+            BakedLitGUI.SetMaterialKeywords(material); // Set lit specific 
         }
         
         public override void DrawSurfaceOptions(Material material)
@@ -55,7 +55,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
         public override void DrawSurfaceInputs(Material material)
         {
             base.DrawSurfaceInputs(material);
-            UnlitGUI.Inputs(shadingModelProperties, materialEditor);
+            BakedLitGUI.Inputs(shadingModelProperties, materialEditor);
             DrawEmissionProperties(material, true);
         }
         
@@ -66,7 +66,6 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
                 materialEditor.ShaderProperty(particleProps.flipbookMode, ParticleGUI.Styles.flipbookMode);
                 ParticleGUI.FadingOptions(material, materialEditor, particleProps);
             }
-            //UnlitGUI.Advanced(shadingModelProperties);
             base.DrawAdvancedOptions(material);
         }
 

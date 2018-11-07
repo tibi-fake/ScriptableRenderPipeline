@@ -5,8 +5,18 @@ using UnityEditor.Experimental.Rendering.LightweightPipeline;
 
 namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
 {
-    internal class UnlitShader : BaseShaderGUI
+    internal class BakedLitShader : BaseShaderGUI
     {
+        // Properties
+        private BakedLitGUI.BakedLitProperties shadingModelProperties;
+        
+        // collect properties from the material properties
+        public override void FindProperties(MaterialProperty[] properties)
+        {
+            base.FindProperties(properties);
+            shadingModelProperties = new BakedLitGUI.BakedLitProperties(properties);
+        }
+
         // material changed check
         public override void MaterialChanged(Material material)
         {
@@ -15,6 +25,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
 
             material.shaderKeywords = null;
             SetupMaterialBlendMode(material);
+            BakedLitGUI.SetMaterialKeywords(material);
         }
         
         // material main surface options
@@ -42,7 +53,19 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
         public override void DrawSurfaceInputs(Material material)
         {
             base.DrawSurfaceInputs(material);
+            BakedLitGUI.Inputs(shadingModelProperties, materialEditor);
             DrawBaseTileOffset();
+        }
+
+        public override void DrawAdvancedOptions(Material material)
+        {
+            EditorGUI.BeginChangeCheck();
+            BakedLitGUI.Advanced(shadingModelProperties);
+            base.DrawAdvancedOptions(material);
+            if (EditorGUI.EndChangeCheck())
+            {
+                MaterialChanged(material);
+            }
         }
 
         public override void AssignNewShaderToMaterial(Material material, Shader oldShader, Shader newShader)

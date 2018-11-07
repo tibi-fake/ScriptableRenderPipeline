@@ -59,7 +59,7 @@ half4 MetaFragment(MetaInput input)
     half4 res = 0;
     if (unity_MetaFragmentControl.x)
     {
-        res = half4(input.Albedo, 1);
+        res = half4(input.Albedo, 1.0);
 
         // d3d9 shader compiler doesn't like NaNs and infinity.
         unity_OneOverOutputBoost = saturate(unity_OneOverOutputBoost);

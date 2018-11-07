@@ -293,9 +293,13 @@ namespace UnityEditor
 
             bool alphaClip = material.GetFloat("_AlphaClip") == 1;
             if (alphaClip)
+            {
                 material.EnableKeyword("_ALPHATEST_ON");
+            }
             else
+            {
                 material.DisableKeyword("_ALPHATEST_ON");
+            }
 
             var queueOffset = queueOffsetRange;
             if(material.HasProperty("_QueueOffset"))
@@ -304,17 +308,23 @@ namespace UnityEditor
             SurfaceType surfaceType = (SurfaceType)material.GetFloat("_Surface");
             if (surfaceType == SurfaceType.Opaque)
             {
-                material.SetOverrideTag("RenderType", "");
+                if (alphaClip)
+                    material.SetOverrideTag("RenderType", "TransparentCutout");
+                else
+                    material.SetOverrideTag("RenderType", "Opaque");
                 material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
                 material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
                 material.SetInt("_ZWrite", 1);
                 material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-                material.renderQueue = -1 + queueOffset;
+                material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Geometry + queueOffset;
                 material.SetShaderPassEnabled("ShadowCaster", true);
             }
             else
             {
                 BlendMode blendMode = (BlendMode)material.GetFloat("_Blend");
+                var queue = alphaClip
+                    ? (int) UnityEngine.Rendering.RenderQueue.AlphaTest
+                    : (int) UnityEngine.Rendering.RenderQueue.Transparent;
                 switch (blendMode)
                 {
                     case BlendMode.Alpha:
@@ -323,7 +333,7 @@ namespace UnityEditor
                         material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
                         material.SetInt("_ZWrite", 0);
                         material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-                        material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + queueOffset;
+                        material.renderQueue = queue + queueOffset;
                         material.SetShaderPassEnabled("ShadowCaster", false);
                         break;
                     case BlendMode.Premultiply:
@@ -332,7 +342,7 @@ namespace UnityEditor
                         material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
                         material.SetInt("_ZWrite", 0);
                         material.EnableKeyword("_ALPHAPREMULTIPLY_ON");
-                        material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + queueOffset;
+                        material.renderQueue = queue + queueOffset;
                         material.SetShaderPassEnabled("ShadowCaster", false);
                         break;
                     case BlendMode.Additive:
@@ -341,7 +351,7 @@ namespace UnityEditor
                         material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.One);
                         material.SetInt("_ZWrite", 0);
                         material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-                        material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + queueOffset;
+                        material.renderQueue = queue + queueOffset;
                         material.SetShaderPassEnabled("ShadowCaster", false);
                         break;
                     case BlendMode.Multiply:
@@ -350,11 +360,12 @@ namespace UnityEditor
                         material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
                         material.SetInt("_ZWrite", 0);
                         material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-                        material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + queueOffset;
+                        material.renderQueue = queue + queueOffset;
                         material.SetShaderPassEnabled("ShadowCaster", false);
                         break;
                 }
             }
+            material.SetOverrideTag("RenderType", "TransparentCutout");
         }
 
         [MenuItem("CONTEXT/Material/Test", false, 999)]

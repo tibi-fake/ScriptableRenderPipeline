@@ -41,8 +41,7 @@ Shader "Lightweight Render Pipeline/Lit"
         [HideInInspector] _ZWrite("__zw", Float) = 1.0
         [HideInInspector] _Cull("__cull", Float) = 2.0
 
-        _ReceiveShadows("Receive Shadows", Float) = 1.0
-        
+        _ReceiveShadows("Receive Shadows", Float) = 1.0        
         // Editmode props
         [HideInInspector] _QueueOffset("Queue offset", Float) = 0.0
     }
@@ -104,6 +103,7 @@ Shader "Lightweight Render Pipeline/Lit"
             #pragma multi_compile _ DIRLIGHTMAP_COMBINED
             #pragma multi_compile _ LIGHTMAP_ON
             #pragma multi_compile_fog
+            
 
             //--------------------------------------
             // GPU Instancing
@@ -187,7 +187,7 @@ Shader "Lightweight Render Pipeline/Lit"
             Name "Meta"
             Tags{"LightMode" = "Meta"}
 
-            Cull Off
+            Cull[_Cull]
 
             HLSLPROGRAM
             // Required to compile gles 2.0 with standard srp library
@@ -200,6 +200,7 @@ Shader "Lightweight Render Pipeline/Lit"
             #pragma shader_feature _SPECULAR_SETUP
             #pragma shader_feature _EMISSION
             #pragma shader_feature _METALLICSPECGLOSSMAP
+            #pragma shader_feature _ALPHATEST_ON
             #pragma shader_feature _ _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
 
             #pragma shader_feature _SPECGLOSSMAP

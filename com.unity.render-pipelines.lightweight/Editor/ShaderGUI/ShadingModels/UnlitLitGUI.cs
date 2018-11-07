@@ -4,7 +4,7 @@ using UnityEngine.Experimental.Rendering;
 
 namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
 {
-    public static class UnlitGUI
+    public static class BakedLitGUI
     {
         public static class Styles
         {
@@ -13,13 +13,13 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
 
         }
 
-        public struct UnlitProperties
+        public struct BakedLitProperties
         {
             // Surface Input Props
             public MaterialProperty sampleGIProp;
             public MaterialProperty bumpMapProp;
 
-            public UnlitProperties(MaterialProperty[] properties)
+            public BakedLitProperties(MaterialProperty[] properties)
             {
                 // Surface Input Props
                 sampleGIProp = BaseShaderGUI.FindProperty("_SampleGI", properties, false);
@@ -27,7 +27,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
             }
         }
 
-        public static void Inputs(UnlitProperties properties, MaterialEditor materialEditor)
+        public static void Inputs(BakedLitProperties properties, MaterialEditor materialEditor)
         {
             if (properties.sampleGIProp != null)
             {
@@ -37,7 +37,7 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline.ShaderGUI
             }
         }
         
-        public static void Advanced(UnlitProperties properties)
+        public static void Advanced(BakedLitProperties properties)
         {
             EditorGUI.BeginChangeCheck();
             bool enabled = EditorGUILayout.Toggle(Styles.sampleGILabel, properties.sampleGIProp.floatValue > 0);
