@@ -275,7 +275,10 @@ CBUFFER_START(UnityGlobal)
     float  _GlobalFogAnisotropy;
 
     float4 _VBufferResolution;          // { w, h, 1/w, 1/h }
-    float4 _VBufferSliceCount;          // { count, 1/count, 0, 0 }
+    uint   _VBufferSliceCount;
+    float  _VBufferRcpSliceCount;
+    float  _Pad2;
+    float  _Pad3;
     float4 _VBufferUvScaleAndLimit;     // Necessary us to work with sub-allocation (resource aliasing) in the RTHandle system
     float4 _VBufferDistanceEncodingParams; // See the call site for description
     float4 _VBufferDistanceDecodingParams; // See the call site for description
@@ -284,7 +287,6 @@ CBUFFER_START(UnityGlobal)
     // Once reprojection is performed in a separate pass, we should probably
     // move these to a dedicated CBuffer to avoid polluting the global one.
     float4 _VBufferPrevResolution;
-    float4 _VBufferPrevSliceCount;
     float4 _VBufferPrevUvScaleAndLimit;
     float4 _VBufferPrevDepthEncodingParams;
     float4 _VBufferPrevDepthDecodingParams;

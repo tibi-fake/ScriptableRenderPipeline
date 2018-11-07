@@ -171,9 +171,9 @@ void FillVolumetricDensityBuffer(PositionInputs posInput, uint tileIndex, Jitter
 #endif // USE_BIG_TILE_LIGHTLIST
 
     float t0 = DecodeLogarithmicDepthGeneralized(0, _VBufferDistanceDecodingParams);
-    float de = _VBufferSliceCount.y; // Log-encoded distance between slices
+    float de = _VBufferRcpSliceCount; // Log-encoded distance between slices
 
-    for (uint slice = 0; slice < (uint)_VBufferSliceCount.x; slice++)
+    for (uint slice = 0; slice < _VBufferSliceCount; slice++)
     {
         uint3 voxelCoord = uint3(posInput.positionSS, slice);
 

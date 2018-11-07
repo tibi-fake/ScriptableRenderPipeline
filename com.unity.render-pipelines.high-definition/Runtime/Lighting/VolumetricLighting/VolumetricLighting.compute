@@ -437,7 +437,7 @@ void FillVolumetricLightingBuffer(LightLoopContext context, uint featureFlags,
 #endif // USE_BIG_TILE_LIGHTLIST
 
     float t0 = DecodeLogarithmicDepthGeneralized(0, _VBufferDistanceDecodingParams);
-    float de = _VBufferSliceCount.y; // Log-encoded distance between slices
+    float de = _VBufferRcpSliceCount; // Log-encoded distance between slices
 
     // The contribution of the ambient probe does not depend on the position,
     // only on the direction and the length of the interval.
@@ -449,7 +449,7 @@ void FillVolumetricLightingBuffer(LightLoopContext context, uint featureFlags,
     float3 totalRadiance = 0;
     float  opticalDepth  = 0;
 
-    for (uint slice = 0; slice < (uint)_VBufferSliceCount.x; slice++)
+    for (uint slice = 0; slice < _VBufferSliceCount; slice++)
     {
         uint3 voxelCoord = uint3(posInput.positionSS, slice);
 
@@ -524,7 +524,6 @@ void FillVolumetricLightingBuffer(LightLoopContext context, uint featureFlags,
                                            _PrevCamPosRWS,
                                            _PrevViewProjMatrix,
                                            _VBufferPrevResolution,
-                                           _VBufferPrevSliceCount.xy,
                                            _VBufferPrevUvScaleAndLimit.xy,
                                            _VBufferPrevUvScaleAndLimit.zw,
                                            _VBufferPrevDepthEncodingParams,

@@ -68,7 +68,6 @@ float4 EvaluateAtmosphericScattering(PositionInputs posInput, float3 V)
                                          posInput.positionNDC,
                                          fragDist,
                                          _VBufferResolution,
-                                         _VBufferSliceCount.xy,
                                          _VBufferUvScaleAndLimit.xy,
                                          _VBufferUvScaleAndLimit.zw,
                                          _VBufferDistanceEncodingParams,

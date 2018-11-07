@@ -399,11 +399,11 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         public static readonly int _CornetteShanksConstant         = Shader.PropertyToID("_CornetteShanksConstant");
         public static readonly int _VBufferResolution              = Shader.PropertyToID("_VBufferResolution");
         public static readonly int _VBufferSliceCount              = Shader.PropertyToID("_VBufferSliceCount");
+        public static readonly int _VBufferRcpSliceCount           = Shader.PropertyToID("_VBufferRcpSliceCount");
         public static readonly int _VBufferUvScaleAndLimit         = Shader.PropertyToID("_VBufferUvScaleAndLimit");
-        public static readonly int _VBufferDistanceEncodingParams     = Shader.PropertyToID("_VBufferDistanceEncodingParams");
-        public static readonly int _VBufferDistanceDecodingParams     = Shader.PropertyToID("_VBufferDistanceDecodingParams");
+        public static readonly int _VBufferDistanceEncodingParams  = Shader.PropertyToID("_VBufferDistanceEncodingParams");
+        public static readonly int _VBufferDistanceDecodingParams  = Shader.PropertyToID("_VBufferDistanceDecodingParams");
         public static readonly int _VBufferPrevResolution          = Shader.PropertyToID("_VBufferPrevResolution");
-        public static readonly int _VBufferPrevSliceCount          = Shader.PropertyToID("_VBufferPrevSliceCount");
         public static readonly int _VBufferPrevUvScaleAndLimit     = Shader.PropertyToID("_VBufferPrevUvScaleAndLimit");
         public static readonly int _VBufferPrevDepthEncodingParams = Shader.PropertyToID("_VBufferPrevDepthEncodingParams");
         public static readonly int _VBufferPrevDepthDecodingParams = Shader.PropertyToID("_VBufferPrevDepthDecodingParams");

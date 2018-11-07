@@ -482,14 +482,14 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             var pvp = prevFrameParams.viewportSize;
 
             cmd.SetGlobalVector(HDShaderIDs._VBufferResolution,              new Vector4(cvp.x, cvp.y, 1.0f / cvp.x, 1.0f / cvp.y));
-            cmd.SetGlobalVector(HDShaderIDs._VBufferSliceCount,              new Vector2(cvp.z, 1.0f / cvp.z));
+            cmd.SetGlobalInt(   HDShaderIDs._VBufferSliceCount,              cvp.z);
+            cmd.SetGlobalFloat( HDShaderIDs._VBufferRcpSliceCount,           1.0f / cvp.z);
             cmd.SetGlobalVector(HDShaderIDs._VBufferUvScaleAndLimit,         currFrameParams.ComputeUvScaleAndLimit(bufferSize));
-            cmd.SetGlobalVector(HDShaderIDs._VBufferDistanceEncodingParams,     currFrameParams.depthEncodingParams);
-            cmd.SetGlobalVector(HDShaderIDs._VBufferDistanceDecodingParams,     currFrameParams.depthDecodingParams);
+            cmd.SetGlobalVector(HDShaderIDs._VBufferDistanceEncodingParams,  currFrameParams.depthEncodingParams);
+            cmd.SetGlobalVector(HDShaderIDs._VBufferDistanceDecodingParams,  currFrameParams.depthDecodingParams);
             cmd.SetGlobalFloat( HDShaderIDs._VBufferLastSliceDist,           currFrameParams.ComputeLastSliceDistance());
 
             cmd.SetGlobalVector(HDShaderIDs._VBufferPrevResolution,          new Vector4(pvp.x, pvp.y, 1.0f / pvp.x, 1.0f / pvp.y));
-            cmd.SetGlobalVector(HDShaderIDs._VBufferPrevSliceCount,          new Vector2(pvp.z, 1.0f / pvp.z));
             cmd.SetGlobalVector(HDShaderIDs._VBufferPrevUvScaleAndLimit,     prevFrameParams.ComputeUvScaleAndLimit(bufferSize));
             cmd.SetGlobalVector(HDShaderIDs._VBufferPrevDepthEncodingParams, prevFrameParams.depthEncodingParams);
             cmd.SetGlobalVector(HDShaderIDs._VBufferPrevDepthDecodingParams, prevFrameParams.depthDecodingParams);
