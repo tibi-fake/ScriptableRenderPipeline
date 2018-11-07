@@ -96,6 +96,10 @@ namespace UnityEditor.Experimental.Rendering.LightweightPipeline
             {
                 sourceAssetDependencyPaths.Add(templatePath);
                 sourceAssetDependencyPaths.Add(extraPassesTemplatePath);
+
+                var shaderFiles = Directory.GetFiles(
+                    Path.GetFullPath("Packages/com.unity.render-pipelines.lightweight/ShaderLibrary"));
+                sourceAssetDependencyPaths.AddRange(shaderFiles);
             }
 
             string forwardTemplate = File.ReadAllText(templatePath);
