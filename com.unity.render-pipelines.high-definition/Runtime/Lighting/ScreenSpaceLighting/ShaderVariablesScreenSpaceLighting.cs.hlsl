@@ -14,6 +14,7 @@
     float4 _CameraMotionVectorsScale;
     float4 _AmbientOcclusionParam;
     float4 _IndirectLightingMultiplier;
+    float _SSRefractionInvScreenWeightDistance;
 
 
 #endif

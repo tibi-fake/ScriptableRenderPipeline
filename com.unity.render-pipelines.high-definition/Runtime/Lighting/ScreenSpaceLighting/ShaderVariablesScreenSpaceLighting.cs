@@ -12,13 +12,13 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         public Vector4  _DepthPyramidScale;             // (x,y) = Screen Scale, z = lod count, w = unused
         public Vector4  _CameraMotionVectorsScale;      // (x,y) = Screen Scale, z = lod count, w = unused
 
-        // Screen space refraction
-        float   _SSRefractionInvScreenWeightDistance;     // Distance for screen space smoothstep with fallback
-
         // Ambient occlusion
         public Vector4 _AmbientOcclusionParam; // xyz occlusion color, w directLightStrenght
 
         public Vector4 _IndirectLightingMultiplier; // .x indirect diffuse multiplier (use with indirect lighting volume controler)
+
+        // Screen space refraction
+        float   _SSRefractionInvScreenWeightDistance;     // Distance for screen space smoothstep with fallback
     }
 }
 
