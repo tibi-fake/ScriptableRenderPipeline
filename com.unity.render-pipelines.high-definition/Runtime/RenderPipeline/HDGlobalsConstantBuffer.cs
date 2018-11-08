@@ -95,6 +95,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             public ShaderVariablesSubsurfaceScattering m_SS;
             public ShaderVariablesDecal m_Decal;
             public ShaderVariablesVolumetricLighting m_Vol;
+            public ShaderVariablesScreenSpaceLighting m_SSL;
         }
 
         private GlobalsCB m_CB;
@@ -187,6 +188,18 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 
         public float _VBufferMaxLinearDepth { set { CBAccessor<float>.Set(() => ref m_CB.m_Vol._VBufferMaxLinearDepth, value, ref IsDirty); } }
         public int _EnableDistantFog { set { CBAccessor<int>.Set(() => ref m_CB.m_Vol._EnableDistantFog, value, ref IsDirty); } }
+
+        // ScreenSpaceLighting
+//        public Vector4 _ColorPyramidSize { set { CBAccessor<Vector4>.Set(() => ref m_CB.m_SSL._ColorPyramidSize, value, ref IsDirty); } }
+//        public Vector4 _DepthPyramidSize { set { CBAccessor<Vector4>.Set(() => ref m_CB.m_SSL._DepthPyramidSize, value, ref IsDirty); } }
+        public Vector4 _CameraMotionVectorsSize { set { CBAccessor<Vector4>.Set(() => ref m_CB.m_SSL._CameraMotionVectorsSize, value, ref IsDirty); } }
+//        public Vector4 _ColorPyramidScale { set { CBAccessor<Vector4>.Set(() => ref m_CB.m_SSL._ColorPyramidScale, value, ref IsDirty); } }
+//        public Vector4 _DepthPyramidScale { set { CBAccessor<Vector4>.Set(() => ref m_CB.m_SSL._DepthPyramidScale, value, ref IsDirty); } }
+        public Vector4 _CameraMotionVectorsScale { set { CBAccessor<Vector4>.Set(() => ref m_CB.m_SSL._CameraMotionVectorsScale, value, ref IsDirty); } }
+
+//        public Vector4 _AmbientOcclusionParam { set { CBAccessor<Vector4>.Set(() => ref m_CB.m_SSL._AmbientOcclusionParam, value, ref IsDirty); } }
+        public Vector4 _IndirectLightingMultiplier { set { CBAccessor<Vector4>.Set(() => ref m_CB.m_SSL._IndirectLightingMultiplier, value, ref IsDirty); } }
+        public float _SSRefractionInvScreenWeightDistance { set { CBAccessor<float>.Set(() => ref m_CB.m_SSL._SSRefractionInvScreenWeightDistance, value, ref IsDirty); } }
 
 
         public HDGlobalsConstantBuffer() : base(HDShaderIDs.HDRPGlobals, Marshal.SizeOf<GlobalsCB>(), "HDRPGlobals")

@@ -669,6 +669,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         {
             using (new ProfilingSample(cmd, "Push Global Parameters", CustomSamplerId.PushGlobalParameters.GetSampler()))
             {
+                bool useCB = hdCamera.frameSettings.enableConstantBuffers;
                 // Set up UnityPerFrame CBuffer.
                 m_SSSBufferManager.PushGlobalParams(hdCamera, cmd, sssParameters, m_GlobalsCB);
 
@@ -678,24 +679,44 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 
                 var ssRefraction = VolumeManager.instance.stack.GetComponent<ScreenSpaceRefraction>()
                     ?? ScreenSpaceRefraction.@default;
-                ssRefraction.PushShaderParameters(cmd);
+                ssRefraction.PushShaderParameters(cmd, useCB ? m_GlobalsCB : null);
 
                 // Set up UnityPerView CBuffer.
                 hdCamera.SetupGlobalParams(cmd, m_Time, m_LastTime, m_FrameCount);
 
-                cmd.SetGlobalVector(HDShaderIDs._IndirectLightingMultiplier, new Vector4(VolumeManager.instance.stack.GetComponent<IndirectLightingController>().indirectDiffuseIntensity, 0, 0, 0));
+                if (useCB)
+                    m_GlobalsCB._IndirectLightingMultiplier = new Vector4(
+                        VolumeManager.instance.stack.GetComponent<IndirectLightingController>()
+                            .indirectDiffuseIntensity, 0, 0, 0);
+                else
+                    cmd.SetGlobalVector(HDShaderIDs._IndirectLightingMultiplier, new Vector4(VolumeManager.instance.stack.GetComponent<IndirectLightingController>().indirectDiffuseIntensity, 0, 0, 0));
 
                 if (hdCamera.frameSettings.enableMotionVectors)
                 {
                     var buf = m_SharedRTManager.GetVelocityBuffer();
 
                     cmd.SetGlobalTexture(HDShaderIDs._CameraMotionVectorsTexture, buf);
-                    cmd.SetGlobalVector( HDShaderIDs._CameraMotionVectorsSize, new Vector4(buf.referenceSize.x,
-                                                                                           buf.referenceSize.y,
-                                                                                           1.0f / buf.referenceSize.x,
-                                                                                           1.0f / buf.referenceSize.y));
-                    cmd.SetGlobalVector(HDShaderIDs._CameraMotionVectorsScale, new Vector4(buf.referenceSize.x / (float)buf.rt.width,
-                                                                                           buf.referenceSize.y / (float)buf.rt.height));
+
+                    if (useCB)
+                    {
+                        m_GlobalsCB._CameraMotionVectorsSize = new Vector4(buf.referenceSize.x,
+                            buf.referenceSize.y,
+                            1.0f / buf.referenceSize.x,
+                            1.0f / buf.referenceSize.y);
+                        m_GlobalsCB._CameraMotionVectorsScale = new Vector4(
+                            buf.referenceSize.x / (float) buf.rt.width,
+                            buf.referenceSize.y / (float) buf.rt.height);
+                    }
+                    else
+                    {
+                        cmd.SetGlobalVector(HDShaderIDs._CameraMotionVectorsSize, new Vector4(buf.referenceSize.x,
+                            buf.referenceSize.y,
+                            1.0f / buf.referenceSize.x,
+                            1.0f / buf.referenceSize.y));
+                        cmd.SetGlobalVector(HDShaderIDs._CameraMotionVectorsScale, new Vector4(
+                            buf.referenceSize.x / (float) buf.rt.width,
+                            buf.referenceSize.y / (float) buf.rt.height));
+                    }
                 }
                 else
                 {
@@ -708,7 +729,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 else
                     cmd.SetGlobalTexture(HDShaderIDs._SsrLightingTexture, RuntimeUtilities.transparentTexture);
 
-                if(hdCamera.frameSettings.enableConstantBuffers)
+                if(useCB)
                     m_GlobalsCB.UploadAndBind(cmd);
                 else
                 {

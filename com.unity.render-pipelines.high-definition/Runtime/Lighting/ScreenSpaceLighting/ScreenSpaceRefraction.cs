@@ -33,9 +33,12 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             }
         }
 
-        public virtual void PushShaderParameters(CommandBuffer cmd)
+        public virtual void PushShaderParameters(CommandBuffer cmd, HDGlobalsConstantBuffer hdCB)
         {
-            cmd.SetGlobalFloat(m_InvScreenFadeDistanceID, 1.0f / screenFadeDistance.value);
+            if (hdCB != null)
+                hdCB._SSRefractionInvScreenWeightDistance = 1.0f / screenFadeDistance.value;
+            else
+                cmd.SetGlobalFloat(m_InvScreenFadeDistanceID, 1.0f / screenFadeDistance.value);
         }
 
         protected void FetchIDs(
