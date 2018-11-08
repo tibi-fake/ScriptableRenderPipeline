@@ -5,14 +5,29 @@
 // #pragma enable_d3d11_debug_symbols
 #pragma only_renderers d3d11 ps4 xboxone vulkan metal switch
 
-#pragma kernel VolumetricLightingBruteforceMQ       VolumetricLighting=VolumetricLightingBruteforceMQ       VL_PRESET_MQ ENABLE_REPROJECTION=0 LIGHTLOOP_SINGLE_PASS
-#pragma kernel VolumetricLightingBruteforceReprojMQ VolumetricLighting=VolumetricLightingBruteforceReprojMQ VL_PRESET_MQ ENABLE_REPROJECTION=1 LIGHTLOOP_SINGLE_PASS
-#pragma kernel VolumetricLightingTiledMQ            VolumetricLighting=VolumetricLightingTiledMQ            VL_PRESET_MQ ENABLE_REPROJECTION=0 LIGHTLOOP_TILE_PASS   USE_BIG_TILE_LIGHTLIST
-#pragma kernel VolumetricLightingTiledReprojMQ      VolumetricLighting=VolumetricLightingTiledReprojMQ      VL_PRESET_MQ ENABLE_REPROJECTION=1 LIGHTLOOP_TILE_PASS   USE_BIG_TILE_LIGHTLIST
-#pragma kernel VolumetricLightingBruteforceHQ       VolumetricLighting=VolumetricLightingBruteforceHQ       VL_PRESET_HQ ENABLE_REPROJECTION=0 LIGHTLOOP_SINGLE_PASS
-#pragma kernel VolumetricLightingBruteforceReprojHQ VolumetricLighting=VolumetricLightingBruteforceReprojHQ VL_PRESET_HQ ENABLE_REPROJECTION=1 LIGHTLOOP_SINGLE_PASS
-#pragma kernel VolumetricLightingTiledHQ            VolumetricLighting=VolumetricLightingTiledHQ            VL_PRESET_HQ ENABLE_REPROJECTION=0 LIGHTLOOP_TILE_PASS   USE_BIG_TILE_LIGHTLIST
-#pragma kernel VolumetricLightingTiledReprojHQ      VolumetricLighting=VolumetricLightingTiledReprojHQ      VL_PRESET_HQ ENABLE_REPROJECTION=1 LIGHTLOOP_TILE_PASS   USE_BIG_TILE_LIGHTLIST
+#pragma kernel VolumetricLightingBruteforceMQ            VolumetricLighting=VolumetricLightingBruteforceMQ            LIGHTLOOP_SINGLE_PASS ENABLE_REPROJECTION=0 ENABLE_ANISOTROPY=0 VL_PRESET_MQ
+#pragma kernel VolumetricLightingTiledMQ                 VolumetricLighting=VolumetricLightingTiledMQ                 LIGHTLOOP_TILE_PASS   ENABLE_REPROJECTION=0 ENABLE_ANISOTROPY=0 VL_PRESET_MQ
+#pragma kernel VolumetricLightingBruteforceReprojMQ      VolumetricLighting=VolumetricLightingBruteforceReprojMQ      LIGHTLOOP_SINGLE_PASS ENABLE_REPROJECTION=1 ENABLE_ANISOTROPY=0 VL_PRESET_MQ
+#pragma kernel VolumetricLightingTiledReprojMQ           VolumetricLighting=VolumetricLightingTiledReprojMQ           LIGHTLOOP_TILE_PASS   ENABLE_REPROJECTION=1 ENABLE_ANISOTROPY=0 VL_PRESET_MQ
+
+#pragma kernel VolumetricLightingBruteforceAnisoMQ       VolumetricLighting=VolumetricLightingBruteforceAnisoMQ       LIGHTLOOP_SINGLE_PASS ENABLE_REPROJECTION=0 ENABLE_ANISOTROPY=1 VL_PRESET_MQ
+#pragma kernel VolumetricLightingTiledAnisoMQ            VolumetricLighting=VolumetricLightingTiledAnisoMQ            LIGHTLOOP_TILE_PASS   ENABLE_REPROJECTION=0 ENABLE_ANISOTROPY=1 VL_PRESET_MQ
+#pragma kernel VolumetricLightingBruteforceReprojAnisoMQ VolumetricLighting=VolumetricLightingBruteforceReprojAnisoMQ LIGHTLOOP_SINGLE_PASS ENABLE_REPROJECTION=1 ENABLE_ANISOTROPY=1 VL_PRESET_MQ
+#pragma kernel VolumetricLightingTiledReprojAnisoMQ      VolumetricLighting=VolumetricLightingTiledReprojAnisoMQ      LIGHTLOOP_TILE_PASS   ENABLE_REPROJECTION=1 ENABLE_ANISOTROPY=1 VL_PRESET_MQ
+
+#pragma kernel VolumetricLightingBruteforceHQ            VolumetricLighting=VolumetricLightingBruteforceHQ            LIGHTLOOP_SINGLE_PASS ENABLE_REPROJECTION=0 ENABLE_ANISOTROPY=0 VL_PRESET_HQ
+#pragma kernel VolumetricLightingTiledHQ                 VolumetricLighting=VolumetricLightingTiledHQ                 LIGHTLOOP_TILE_PASS   ENABLE_REPROJECTION=0 ENABLE_ANISOTROPY=0 VL_PRESET_HQ
+#pragma kernel VolumetricLightingBruteforceReprojHQ      VolumetricLighting=VolumetricLightingBruteforceReprojHQ      LIGHTLOOP_SINGLE_PASS ENABLE_REPROJECTION=1 ENABLE_ANISOTROPY=0 VL_PRESET_HQ
+#pragma kernel VolumetricLightingTiledReprojHQ           VolumetricLighting=VolumetricLightingTiledReprojHQ           LIGHTLOOP_TILE_PASS   ENABLE_REPROJECTION=1 ENABLE_ANISOTROPY=0 VL_PRESET_HQ
+
+#pragma kernel VolumetricLightingBruteforceAnisoHQ       VolumetricLighting=VolumetricLightingBruteforceAnisoHQ       LIGHTLOOP_SINGLE_PASS ENABLE_REPROJECTION=0 ENABLE_ANISOTROPY=1 VL_PRESET_HQ
+#pragma kernel VolumetricLightingTiledAnisoHQ            VolumetricLighting=VolumetricLightingTiledAnisoHQ            LIGHTLOOP_TILE_PASS   ENABLE_REPROJECTION=0 ENABLE_ANISOTROPY=1 VL_PRESET_HQ
+#pragma kernel VolumetricLightingBruteforceReprojAnisoHQ VolumetricLighting=VolumetricLightingBruteforceReprojAnisoHQ LIGHTLOOP_SINGLE_PASS ENABLE_REPROJECTION=1 ENABLE_ANISOTROPY=1 VL_PRESET_HQ
+#pragma kernel VolumetricLightingTiledReprojAnisoHQ      VolumetricLighting=VolumetricLightingTiledReprojAnisoHQ      LIGHTLOOP_TILE_PASS   ENABLE_REPROJECTION=1 ENABLE_ANISOTROPY=1 VL_PRESET_HQ
+
+#ifdef LIGHTLOOP_TILE_PASS
+    #define USE_BIG_TILE_LIGHTLIST
+#endif
 
 // Don't want contact shadows. This is the only way that works. :-(
 #define _SURFACE_TYPE_TRANSPARENT
@@ -549,6 +564,7 @@ void FillVolumetricLightingBuffer(LightLoopContext context, uint featureFlags,
         float4 linearizedBlendValue = normalizedBlendValue * dt;
         float4 blendValue = DelinearizeRGBD(linearizedBlendValue);
 
+    #if ENABLE_ANISOTROPY
         // Estimate the influence of the phase function on the results of the current frame.
         float3 phaseCurrFrame;
 
@@ -566,14 +582,26 @@ void FillVolumetricLightingBuffer(LightLoopContext context, uint featureFlags,
         // 'lightingA' and 'lightingB' are jittered, so they change from frame to frame.
         // Therefore, 'phaseCurrFrame' becomes temporarily unstable and can cause flickering in practice. :-(
         blendValue.rgb *= phaseCurrFrame;
+    #endif // ENABLE_ANISOTROPY
 
     #else // ENABLE_REPROJECTION
+
+    #if ENABLE_ANISOTROPY
         float4 blendValue = float4(aggregateLighting.radianceComplete, extinction * dt);
+    #else
+        float4 blendValue = float4(aggregateLighting.radianceNoPhase,  extinction * dt);
+    #endif // ENABLE_ANISOTROPY
+
     #endif // ENABLE_REPROJECTION
 
         // Compute the transmittance from the camera to 't0'.
         float transmittance = TransmittanceFromOpticalDepth(opticalDepth);
-        float phase         = _CornetteShanksConstant;
+
+    #if ENABLE_ANISOTROPY
+        float phase = _CornetteShanksConstant;
+    #else
+        float phase = IsotropicPhaseFunction();
+    #endif // ENABLE_ANISOTROPY
 
         // Integrate the contribution of the probe over the interval.
         // Integral{a, b}{Transmittance(0, t) * L_s(t) dt} = Transmittance(0, a) * Integral{a, b}{Transmittance(0, t - a) * L_s(t) dt}.

@@ -569,22 +569,11 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 
             using (new ProfilingSample(cmd, "Volume Voxelization"))
             {
-                int  numVisibleVolumes   = m_VisibleVolumeBounds.Count;
-                bool highQuality         = preset == VolumetricLightingPreset.High;
-                bool enableTiledLighting = hdCamera.frameSettings.lightLoopSettings.enableBigTilePrepass;
+                int  numVisibleVolumes = m_VisibleVolumeBounds.Count;
+                bool tiledLighting     = hdCamera.frameSettings.lightLoopSettings.enableBigTilePrepass;
+                bool highQuality       = preset == VolumetricLightingPreset.High;
 
-                int kernel;
-
-                if (highQuality)
-                {
-                    kernel = m_VolumeVoxelizationCS.FindKernel(enableTiledLighting ? "VolumeVoxelizationTiledHQ"
-                                                                                   : "VolumeVoxelizationBruteforceHQ");
-                }
-                else
-                {
-                    kernel = m_VolumeVoxelizationCS.FindKernel(enableTiledLighting ? "VolumeVoxelizationTiledMQ"
-                                                                                   : "VolumeVoxelizationBruteforceMQ");
-                }
+                int kernel = (tiledLighting ? 1 : 0) | (highQuality ? 2 : 0);
 
                 var currFrameParams = hdCamera.vBufferParams[0];
                 var cvp = currFrameParams.viewportSize;
@@ -679,40 +668,17 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 
             using (new ProfilingSample(cmd, "Volumetric Lighting"))
             {
+                // Get the interpolated anisotropy value.
+                var fog = VolumeManager.instance.stack.GetComponent<VolumetricFog>();
+
                 // Only available in the Play Mode because all the frame counters in the Edit Mode are broken.
-                bool highQuality         = preset == VolumetricLightingPreset.High;
-                bool enableTiledLighting = hdCamera.frameSettings.lightLoopSettings.enableBigTilePrepass;
-                bool enableReprojection  = Application.isPlaying && hdCamera.camera.cameraType == CameraType.Game &&
-                                           hdCamera.frameSettings.enableReprojectionForVolumetrics;
+                bool tiledLighting      = hdCamera.frameSettings.lightLoopSettings.enableBigTilePrepass;
+                bool enableReprojection = Application.isPlaying && hdCamera.camera.cameraType == CameraType.Game &&
+                                          hdCamera.frameSettings.enableReprojectionForVolumetrics;
+                bool enableAnisotropy   = fog.anisotropy != 0;
+                bool highQuality        = preset == VolumetricLightingPreset.High;
 
-                int kernel;
-
-                if (highQuality)
-                {
-                    if (enableReprojection)
-                    {
-                        kernel = m_VolumetricLightingCS.FindKernel(enableTiledLighting ? "VolumetricLightingTiledReprojHQ"
-                                                                                       : "VolumetricLightingBruteforceReprojHQ");
-                    }
-                    else
-                    {
-                        kernel = m_VolumetricLightingCS.FindKernel(enableTiledLighting ? "VolumetricLightingTiledHQ"
-                                                                                       : "VolumetricLightingBruteforceHQ");
-                    }
-                }
-                else
-                {
-                    if (enableReprojection)
-                    {
-                        kernel = m_VolumetricLightingCS.FindKernel(enableTiledLighting ? "VolumetricLightingTiledReprojMQ"
-                                                                                       : "VolumetricLightingBruteforceReprojMQ");
-                    }
-                    else
-                    {
-                        kernel = m_VolumetricLightingCS.FindKernel(enableTiledLighting ? "VolumetricLightingTiledMQ"
-                                                                                       : "VolumetricLightingBruteforceMQ");
-                    }
-                }
+                int kernel = (tiledLighting ? 1 : 0) | (enableReprojection ? 2 : 0) | (enableAnisotropy ? 4 : 0) | (highQuality ? 8 : 0);
 
                 var currFrameParams = hdCamera.vBufferParams[0];
                 var cvp = currFrameParams.viewportSize;
@@ -734,8 +700,6 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 // Currently, we assume that they are completely uncorrelated, but maybe we should correlate them somehow.
                 m_xySeqOffset.Set(m_xySeq[sampleIndex].x, m_xySeq[sampleIndex].y, m_zSeq[sampleIndex], frameIndex);
 
-                // Get the interpolated anisotropy value.
-                var fog = VolumeManager.instance.stack.GetComponent<VolumetricFog>();
 
                 // TODO: set 'm_VolumetricLightingPreset'.
                 // TODO: set the constant buffer data only once.

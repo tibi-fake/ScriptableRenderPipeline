@@ -5,10 +5,14 @@
 // #pragma enable_d3d11_debug_symbols
 #pragma only_renderers d3d11 ps4 xboxone vulkan metal
 
-#pragma kernel VolumeVoxelizationBruteforceMQ VolumeVoxelization=VolumeVoxelizationBruteforceMQ VL_PRESET_MQ LIGHTLOOP_SINGLE_PASS
-#pragma kernel VolumeVoxelizationTiledMQ      VolumeVoxelization=VolumeVoxelizationTiledMQ      VL_PRESET_MQ LIGHTLOOP_TILE_PASS   USE_BIG_TILE_LIGHTLIST
-#pragma kernel VolumeVoxelizationBruteforceHQ VolumeVoxelization=VolumeVoxelizationBruteforceHQ VL_PRESET_HQ LIGHTLOOP_SINGLE_PASS
-#pragma kernel VolumeVoxelizationTiledHQ      VolumeVoxelization=VolumeVoxelizationTiledHQ      VL_PRESET_HQ LIGHTLOOP_TILE_PASS   USE_BIG_TILE_LIGHTLIST
+#pragma kernel VolumeVoxelizationBruteforceMQ VolumeVoxelization=VolumeVoxelizationBruteforceMQ LIGHTLOOP_SINGLE_PASS VL_PRESET_MQ
+#pragma kernel VolumeVoxelizationTiledMQ      VolumeVoxelization=VolumeVoxelizationTiledMQ      LIGHTLOOP_TILE_PASS   VL_PRESET_MQ
+#pragma kernel VolumeVoxelizationBruteforceHQ VolumeVoxelization=VolumeVoxelizationBruteforceHQ LIGHTLOOP_SINGLE_PASS VL_PRESET_HQ
+#pragma kernel VolumeVoxelizationTiledHQ      VolumeVoxelization=VolumeVoxelizationTiledHQ      LIGHTLOOP_TILE_PASS   VL_PRESET_HQ
+
+#ifdef LIGHTLOOP_TILE_PASS
+    #define USE_BIG_TILE_LIGHTLIST
+#endif
 
 #ifdef VL_PRESET_MQ
     // E.g. for 1080p: (1920/8)x(1080/8)x(64)  =  2,073,600 voxels
