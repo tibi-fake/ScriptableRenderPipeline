@@ -2,42 +2,19 @@ using NUnit.Framework;
 using System;
 using System.IO;
 using UnityEditor;
+using UnityEditor.Experimental.Rendering.TestFramework;
 using UnityEngine.Rendering;
 
 namespace UnityEngine.Experimental.Rendering.HDPipeline.Tests
 {
     public partial class HDAdditionalReflectionDataTests
     {
-        static string ToYAML(Vector3 v) => $"{{x: {v.x}, y: {v.y}, z: {v.z}}}";
-
-        struct DefaultTest : IDisposable
-        {
-            string m_GeneratedPrefabFileName;
-
-            public DefaultTest(string id, string YAML, out GameObject instance)
-            {
-                m_GeneratedPrefabFileName = $"Assets/Temporary/{id}.prefab";
-
-                var fileInfo = new FileInfo(m_GeneratedPrefabFileName);
-                if (!fileInfo.Directory.Exists)
-                    fileInfo.Directory.Create();
-                
-                File.WriteAllText(m_GeneratedPrefabFileName, YAML);
-
-                AssetDatabase.ImportAsset(m_GeneratedPrefabFileName);
-
-                instance = AssetDatabase.LoadAssetAtPath<GameObject>(m_GeneratedPrefabFileName);
-                instance.hideFlags = HideFlags.None;
-            }
-
-            public void Dispose() => AssetDatabase.DeleteAsset(m_GeneratedPrefabFileName);
-        }
-
         public class MigrateReflectionProbeFromVersion_ModeAndTextures
         {
             public class LegacyProbeData
             {
                 public int clearColorMode;
+                public Color backgroundColorHDR;
                 public bool clearDepth;
                 public int cullingMask;
                 public bool useOcclusionCulling;
@@ -58,6 +35,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline.Tests
                 new LegacyProbeData
                 {
                     clearColorMode = (int)HDAdditionalCameraData.ClearColorMode.BackgroundColor,
+                    backgroundColorHDR = new Color(1.5f, 0.56234f, 62.523f, 0.123f),
                     clearDepth = false,
                     cullingMask = 101,
                     useOcclusionCulling = false,
@@ -75,6 +53,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline.Tests
                 new LegacyProbeData
                 {
                     clearColorMode = (int)HDAdditionalCameraData.ClearColorMode.Sky,
+                    backgroundColorHDR = new Color(1.5f, 0.56234f, 62.523f, 0.123f),
                     clearDepth = true,
                     cullingMask = 101,
                     useOcclusionCulling = true,
@@ -92,6 +71,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline.Tests
                 new LegacyProbeData
                 {
                     clearColorMode = (int)HDAdditionalCameraData.ClearColorMode.None,
+                    backgroundColorHDR = new Color(1.5f, 0.56234f, 62.523f, 0.123f),
                     clearDepth = true,
                     cullingMask = 101,
                     useOcclusionCulling = true,
@@ -111,8 +91,8 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline.Tests
             [Test, TestCaseSource(nameof(s_LegacyProbeDatas))]
             public void Test(LegacyProbeData legacyProbeData)
             {
-                using (new DefaultTest(
-                    nameof(MigrateFromLegacyProbe),
+                using (new PrefabMigrationTests(
+                    GetType().Name,
                     GeneratePrefabYAML(legacyProbeData),
                     out GameObject prefab
                 ))
@@ -131,6 +111,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline.Tests
 
                     var settings = probe.settings;
                     Assert.AreEqual((HDAdditionalCameraData.ClearColorMode)legacyProbeData.clearColorMode, settings.camera.bufferClearing.clearColorMode);
+                    Assert.AreEqual(legacyProbeData.backgroundColorHDR, settings.camera.bufferClearing.backgroundColorHDR);
                     Assert.AreEqual(legacyProbeData.clearDepth, settings.camera.bufferClearing.clearDepth);
                     Assert.AreEqual(legacyProbeData.cullingMask, settings.camera.culling.cullingMask);
                     Assert.AreEqual(legacyProbeData.useOcclusionCulling, settings.camera.culling.useOcclusionCulling);
@@ -175,7 +156,7 @@ Transform:
   m_PrefabAsset: {{fileID: 0}}
   m_GameObject: {{fileID: 3102262843427888416}}
   m_LocalRotation: {{x: 0, y: 0, z: 0, w: 1}}
-  m_LocalPosition: {ToYAML(legacyProbeData.capturePositionWS)}
+  m_LocalPosition: {legacyProbeData.capturePositionWS.ToYAML()}
   m_LocalScale: {{x: 1, y: 1, z: 1}}
   m_Children: []
   m_Father: {{fileID: 0}}
@@ -231,7 +212,7 @@ MonoBehaviour:
   m_InfiniteProjection: 1
   m_InfluenceVolume:
     m_Shape: 1
-    m_Offset: {ToYAML(legacyProbeData.influenceOffset)}
+    m_Offset: {legacyProbeData.influenceOffset.ToYAML()}
     m_BoxSize: {{x: 7, y: 8, z: 9}}
     m_BoxBlendDistancePositive: {{x: 1, y: 2, z: 3}}
     m_BoxBlendDistanceNegative: {{x: 1.5, y: 2.5, z: 3.5}}
@@ -295,7 +276,7 @@ MonoBehaviour:
   m_CaptureSettings:
     overrides: 0
     clearColorMode: {legacyProbeData.clearColorMode}
-    backgroundColorHDR: {{r: 0.1882353, g: 0.023529412, b: 0.13529739, a: 0}}
+    backgroundColorHDR: {legacyProbeData.backgroundColorHDR.ToYAML()}
     clearDepth: {(legacyProbeData.clearDepth ? 1 : 0)}
     cullingMask:
       serializedVersion: 2
@@ -443,8 +424,8 @@ MonoBehaviour:
             [Test, TestCaseSource(nameof(s_LegacyProbeDatas))]
             public void Test(LegacyProbeData legacyProbeData)
             {
-                using (new DefaultTest(
-                    nameof(MigrateFromLegacyProbe),
+                using (new PrefabMigrationTests(
+                    GetType().Name,
                     GeneratePrefabYAML(legacyProbeData),
                     out GameObject prefab
                 ))
@@ -522,7 +503,7 @@ Transform:
   m_PrefabAsset: {{fileID: 0}}
   m_GameObject: {{fileID: 4579176910221717176}}
   m_LocalRotation: {{x: 0, y: 0, z: 0, w: 1}}
-  m_LocalPosition: {ToYAML(legacyProbeData.capturePositionWS)}
+  m_LocalPosition: {legacyProbeData.capturePositionWS.ToYAML()}
   m_LocalScale: {{x: 1, y: 1, z: 1}}
   m_Children: []
   m_Father: {{fileID: 0}}
@@ -543,8 +524,8 @@ ReflectionProbe:
   m_TimeSlicingMode: 0
   m_Resolution: {legacyProbeData.resolution}
   m_UpdateFrequency: 0
-  m_BoxSize: {ToYAML(legacyProbeData.boxSize)}
-  m_BoxOffset: {ToYAML(legacyProbeData.boxOffset)}
+  m_BoxSize: {legacyProbeData.boxSize.ToYAML()}
+  m_BoxOffset: {legacyProbeData.boxOffset.ToYAML()}
   m_NearClip: {legacyProbeData.nearClipPlane}
   m_FarClip: {legacyProbeData.farClipPlane}
   m_ShadowDistance: 100

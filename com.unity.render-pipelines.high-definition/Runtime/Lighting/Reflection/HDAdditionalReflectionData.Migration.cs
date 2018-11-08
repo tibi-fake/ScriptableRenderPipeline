@@ -2,9 +2,9 @@ using UnityEngine.Serialization;
 
 namespace UnityEngine.Experimental.Rendering.HDPipeline
 {
-    public sealed partial class HDAdditionalReflectionData : IVersionable<HDAdditionalReflectionData.Version>
+    public sealed partial class HDAdditionalReflectionData : IVersionable<HDAdditionalReflectionData.ReflectionProbeVersion>
     {
-        enum Version
+        enum ReflectionProbeVersion
         {
             First,
             RemoveUsageOfLegacyProbeParamsForStocking,
@@ -16,46 +16,45 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             ProbeSettings
         }
 
-        static readonly MigrationDescription<Version, HDAdditionalReflectionData> k_Migration
+        static readonly MigrationDescription<ReflectionProbeVersion, HDAdditionalReflectionData> k_ReflectionProbeMigration
             = MigrationDescription.New(
-                MigrationStep.New(Version.RemoveUsageOfLegacyProbeParamsForStocking, (HDAdditionalReflectionData t) =>
+                MigrationStep.New(ReflectionProbeVersion.RemoveUsageOfLegacyProbeParamsForStocking, (HDAdditionalReflectionData t) =>
                 {
 #pragma warning disable 618 // Type or member is obsolete
                     t.m_ObsoleteBlendDistancePositive = t.m_ObsoleteBlendDistanceNegative = Vector3.one * t.reflectionProbe.blendDistance;
-                    t.weight = t.reflectionProbe.importance;
-                    t.multiplier = t.reflectionProbe.intensity;
+                    t.m_ObsoleteWeight = t.reflectionProbe.importance;
+                    t.m_ObsoleteMultiplier = t.reflectionProbe.intensity;
                     switch (t.reflectionProbe.refreshMode)
                     {
                         case UnityEngine.Rendering.ReflectionProbeRefreshMode.EveryFrame: t.realtimeMode = ProbeSettings.RealtimeMode.EveryFrame; break;
                         case UnityEngine.Rendering.ReflectionProbeRefreshMode.OnAwake: t.realtimeMode = ProbeSettings.RealtimeMode.OnEnable; break;
                     }
-                    // size and center were kept in legacy until Version.UseInfluenceVolume
-                    //   and mode until Version.ModeAndTextures
-                    //   and all capture settings are done in Version.AddCaptureSettingsAndFrameSettings
 #pragma warning restore 618 // Type or member is obsolete
                 }),
-                MigrationStep.New(Version.UseInfluenceVolume, (HDAdditionalReflectionData t) =>
+                MigrationStep.New(ReflectionProbeVersion.UseInfluenceVolume, (HDAdditionalReflectionData t) =>
                 {
-                    t.influenceVolume.boxSize = t.reflectionProbe.size;
 #pragma warning disable 618
-                    t.influenceVolume.obsoleteOffset = t.reflectionProbe.center;
-                    t.influenceVolume.sphereRadius = t.m_ObsoleteInfluenceSphereRadius;
-                    t.influenceVolume.shape = t.m_ObsoleteInfluenceShape; //must be done after each size transfert
-                    t.influenceVolume.boxBlendDistancePositive = t.m_ObsoleteBlendDistancePositive;
-                    t.influenceVolume.boxBlendDistanceNegative = t.m_ObsoleteBlendDistanceNegative;
-                    t.influenceVolume.boxBlendNormalDistancePositive = t.m_ObsoleteBlendNormalDistancePositive;
-                    t.influenceVolume.boxBlendNormalDistanceNegative = t.m_ObsoleteBlendNormalDistanceNegative;
-                    t.influenceVolume.boxSideFadePositive = t.m_ObsoleteBoxSideFadePositive;
-                    t.influenceVolume.boxSideFadeNegative = t.m_ObsoleteBoxSideFadeNegative;
+                    t.m_ObsoleteInfluenceVolume = t.m_ObsoleteInfluenceVolume ?? new InfluenceVolume();
+                    t.m_ObsoleteInfluenceVolume.boxSize = t.reflectionProbe.size;
+                    t.m_ObsoleteInfluenceVolume.obsoleteOffset = t.reflectionProbe.center;
+                    t.m_ObsoleteInfluenceVolume.sphereRadius = t.m_ObsoleteInfluenceSphereRadius;
+                    t.m_ObsoleteInfluenceVolume.shape = t.m_ObsoleteInfluenceShape; //must be done after each size transfert
+                    t.m_ObsoleteInfluenceVolume.boxBlendDistancePositive = t.m_ObsoleteBlendDistancePositive;
+                    t.m_ObsoleteInfluenceVolume.boxBlendDistanceNegative = t.m_ObsoleteBlendDistanceNegative;
+                    t.m_ObsoleteInfluenceVolume.boxBlendNormalDistancePositive = t.m_ObsoleteBlendNormalDistancePositive;
+                    t.m_ObsoleteInfluenceVolume.boxBlendNormalDistanceNegative = t.m_ObsoleteBlendNormalDistanceNegative;
+                    t.m_ObsoleteInfluenceVolume.boxSideFadePositive = t.m_ObsoleteBoxSideFadePositive;
+                    t.m_ObsoleteInfluenceVolume.boxSideFadeNegative = t.m_ObsoleteBoxSideFadeNegative;
 #pragma warning restore 618
                 }),
-                MigrationStep.New(Version.MergeEditors, (HDAdditionalReflectionData t) =>
+                MigrationStep.New(ReflectionProbeVersion.MergeEditors, (HDAdditionalReflectionData t) =>
                 {
-                    t.m_ProbeSettings.proxySettings.useInfluenceVolumeAsProxyVolume
-                        = t.reflectionProbe.boxProjection;
+#pragma warning disable 618
+                    t.m_ObsoleteInfiniteProjection = !t.reflectionProbe.boxProjection;
+#pragma warning restore 618
                     t.reflectionProbe.boxProjection = false;
                 }),
-                MigrationStep.New(Version.AddCaptureSettingsAndFrameSettings, (HDAdditionalReflectionData t) =>
+                MigrationStep.New(ReflectionProbeVersion.AddCaptureSettingsAndFrameSettings, (HDAdditionalReflectionData t) =>
                 {
 #pragma warning disable 618
                     t.m_ObsoleteCaptureSettings = t.m_ObsoleteCaptureSettings ?? new ObsoleteCaptureSettings();
@@ -68,14 +67,18 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                     t.m_ObsoleteCaptureSettings.farClipPlane = t.reflectionProbe.farClipPlane;
 #pragma warning restore 618
                 }),
-                MigrationStep.New(Version.ModeAndTextures, (HDAdditionalReflectionData t) =>
+                MigrationStep.New(ReflectionProbeVersion.ModeAndTextures, (HDAdditionalReflectionData t) =>
                 {
-                    t.mode = (ProbeSettings.Mode)t.reflectionProbe.mode;
+#pragma warning disable 618
+                    t.m_ObsoleteMode = (ProbeSettings.Mode)t.reflectionProbe.mode;
+#pragma warning restore 618
                     t.SetTexture(ProbeSettings.Mode.Baked, t.reflectionProbe.bakedTexture);
                     t.SetTexture(ProbeSettings.Mode.Custom, t.reflectionProbe.customBakedTexture);
                 }),
-                MigrationStep.New(Version.ProbeSettings, (HDAdditionalReflectionData t) =>
+                MigrationStep.New(ReflectionProbeVersion.ProbeSettings, (HDAdditionalReflectionData t) =>
                 {
+                    k_Migration.ExecuteStep(t, Version.ProbeSettings);
+
 #pragma warning disable 618
                     // Migrate capture position
                     // Previously, the capture position of a reflection probe was the position of the game object
@@ -89,26 +92,13 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 
                     var capturePositionPS = t.proxyToWorld.inverse * capturePositionWS;
                     t.m_ProbeSettings.proxySettings.capturePositionProxySpace = capturePositionPS;
-                    t.m_ProbeSettings.proxySettings.mirrorPositionProxySpace = capturePositionPS;
-
-                    // Migrating Capture Settings
-                    t.m_ProbeSettings.camera.bufferClearing.clearColorMode = t.m_ObsoleteCaptureSettings.clearColorMode;
-                    t.m_ProbeSettings.camera.bufferClearing.clearDepth = t.m_ObsoleteCaptureSettings.clearDepth;
-                    t.m_ProbeSettings.camera.culling.cullingMask = t.m_ObsoleteCaptureSettings.cullingMask;
-                    t.m_ProbeSettings.camera.culling.useOcclusionCulling = t.m_ObsoleteCaptureSettings.useOcclusionCulling;
-                    t.m_ProbeSettings.camera.frustum.nearClipPlane = t.m_ObsoleteCaptureSettings.nearClipPlane;
-                    t.m_ProbeSettings.camera.frustum.farClipPlane = t.m_ObsoleteCaptureSettings.farClipPlane;
-                    t.m_ProbeSettings.camera.volumes.layerMask = t.m_ObsoleteCaptureSettings.volumeLayerMask;
-                    t.m_ProbeSettings.camera.volumes.anchorOverride = t.m_ObsoleteCaptureSettings.volumeAnchorOverride;
-                    t.m_ProbeSettings.camera.frustum.fieldOfView = t.m_ObsoleteCaptureSettings.fieldOfView;
-                    t.m_ProbeSettings.camera.renderingPath = t.m_ObsoleteCaptureSettings.renderingPath;
 #pragma warning restore 618
                 })
             );
 
         [SerializeField, FormerlySerializedAs("version"), FormerlySerializedAs("m_Version")]
         int m_ReflectionProbeVersion;
-        Version IVersionable<Version>.version { get => (Version)m_ReflectionProbeVersion; set => m_ReflectionProbeVersion = (int)value; }
+        ReflectionProbeVersion IVersionable<ReflectionProbeVersion>.version { get => (ReflectionProbeVersion)m_ReflectionProbeVersion; set => m_ReflectionProbeVersion = (int)value; }
 
         #region Deprecated Fields
 #pragma warning disable 649 //never assigned

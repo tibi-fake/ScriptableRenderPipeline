@@ -156,6 +156,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 // Special case here, we reference a component that is a wrapper
                 // So we need to update with the actual value for the proxyVolume
                 settings.proxy = m_ProxyVolume?.proxyVolume;
+                settings.influence = settings.influence ?? new InfluenceVolume();
                 return settings;
             }
         }
@@ -170,9 +171,6 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         /// You should call this method when you update the <see cref="influenceVolume"/> parameters during runtime.
         /// </summary>
         public virtual void PrepareCulling() { }
-
-        // Life cycle methods
-        protected virtual void Awake() => k_Migration.Migrate(this);
 
         void OnEnable()
         {

@@ -14,11 +14,10 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         /// <summary>Reference position to mirror to find the capture point. (world space)</summary>
         public Vector3 referencePosition => transform.TransformPoint(m_LocalReferencePosition);
 
-        protected override void Awake()
+        void Awake()
         {
-            base.Awake();
             type = ProbeSettings.ProbeType.PlanarProbe;
-            k_Migration.Migrate(this);
+            k_PlanarProbeMigration.Migrate(this);
         }
     }
 }
