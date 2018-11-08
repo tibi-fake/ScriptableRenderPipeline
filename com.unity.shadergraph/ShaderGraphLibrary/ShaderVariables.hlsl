@@ -124,8 +124,8 @@ CBUFFER_START(UnityPerDraw : register(b0))
     // z = Texel size on U texture coordinate
     float4 unity_ProbeVolumeParams;
     float4x4 unity_ProbeVolumeWorldToObject;
-    float3 unity_ProbeVolumeSizeInv;
-    float3 unity_ProbeVolumeMin;
+    float4 unity_ProbeVolumeSizeInv;
+    float4 unity_ProbeVolumeMin;
 
     // This contain occlusion factor from 0 to 1 for dynamic objects (no SH here)
     float4 unity_ProbesOcclusion;
