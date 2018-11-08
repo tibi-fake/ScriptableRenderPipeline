@@ -173,7 +173,6 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         public static readonly int _CosTime        = Shader.PropertyToID("_CosTime");
         public static readonly int unity_DeltaTime = Shader.PropertyToID("unity_DeltaTime");
 
-        public static readonly int _TAAEnabled     = Shader.PropertyToID("_TaaEnabled");
 
 
         public static readonly int _EnvLightSkyEnabled = Shader.PropertyToID("_EnvLightSkyEnabled");
@@ -248,7 +247,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         public static readonly int _ScreenToTargetScale = Shader.PropertyToID("_ScreenToTargetScale");
         public static readonly int _PrevViewProjMatrix = Shader.PropertyToID("_PrevViewProjMatrix");
         public static readonly int _FrustumPlanes = Shader.PropertyToID("_FrustumPlanes");
-        public static readonly int _TaaFrameRotation = Shader.PropertyToID("_TaaFrameRotation");
+        public static readonly int _TaaFrameInfo = Shader.PropertyToID("_TaaFrameInfo");
 
         public static readonly int _ViewMatrixStereo = Shader.PropertyToID("_ViewMatrixStereo");
         public static readonly int _ProjMatrixStereo = Shader.PropertyToID("_ProjMatrixStereo");
