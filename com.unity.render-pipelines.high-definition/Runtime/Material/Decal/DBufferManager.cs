@@ -88,24 +88,42 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 
         public void PushGlobalParams(HDCamera hdCamera, CommandBuffer cmd, HDGlobalsConstantBuffer hdCB)
         {
-            if (hdCamera.frameSettings.enableDecals)
+            if (hdCamera.frameSettings.enableConstantBuffers)
             {
-                hdCB._EnableDecals = enableDecals ? 1u : 0u;
-                hdCB._DecalAtlasResolution = new Vector2(HDUtils.hdrpSettings.decalSettings.atlasWidth,
-                    HDUtils.hdrpSettings.decalSettings.atlasHeight);
+                if (hdCamera.frameSettings.enableDecals)
+                {
+                    hdCB._EnableDecals = enableDecals ? 1u : 0u;
+                    hdCB._DecalAtlasResolution = new Vector2(HDUtils.hdrpSettings.decalSettings.atlasWidth,
+                        HDUtils.hdrpSettings.decalSettings.atlasHeight);
 
-                cmd.SetGlobalInt(HDShaderIDs._EnableDecals, enableDecals ? 1 : 0);
-                cmd.SetGlobalVector(HDShaderIDs._DecalAtlasResolution, new Vector2(HDUtils.hdrpSettings.decalSettings.atlasWidth, HDUtils.hdrpSettings.decalSettings.atlasHeight));
-                BindBufferAsTextures(cmd);
+                    BindBufferAsTextures(cmd);
+                }
+                else
+                {
+                    hdCB._EnableDecals = 0u;
+                    // We still bind black textures to make sure that something is bound (can be a problem on some platforms)
+                    for (int i = 0; i < m_BufferCount; ++i)
+                    {
+                        cmd.SetGlobalTexture(m_TextureShaderIDs[i], RuntimeUtilities.blackTexture);
+                    }
+                }
             }
             else
             {
-                hdCB._EnableDecals = 0u;
-                cmd.SetGlobalInt(HDShaderIDs._EnableDecals, 0);
-                // We still bind black textures to make sure that something is bound (can be a problem on some platforms)
-                for (int i = 0; i < m_BufferCount; ++i)
+                if (hdCamera.frameSettings.enableDecals)
                 {
-                    cmd.SetGlobalTexture(m_TextureShaderIDs[i], RuntimeUtilities.blackTexture);
+                    cmd.SetGlobalInt(HDShaderIDs._EnableDecals, enableDecals ? 1 : 0);
+                    cmd.SetGlobalVector(HDShaderIDs._DecalAtlasResolution, new Vector2(HDUtils.hdrpSettings.decalSettings.atlasWidth, HDUtils.hdrpSettings.decalSettings.atlasHeight));
+                    BindBufferAsTextures(cmd);
+                }
+                else
+                {
+                    cmd.SetGlobalInt(HDShaderIDs._EnableDecals, 0);
+                    // We still bind black textures to make sure that something is bound (can be a problem on some platforms)
+                    for (int i = 0; i < m_BufferCount; ++i)
+                    {
+                        cmd.SetGlobalTexture(m_TextureShaderIDs[i], RuntimeUtilities.blackTexture);
+                    }
                 }
             }
         }

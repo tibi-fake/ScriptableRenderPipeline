@@ -708,7 +708,12 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 else
                     cmd.SetGlobalTexture(HDShaderIDs._SsrLightingTexture, RuntimeUtilities.transparentTexture);
 
-                m_GlobalsCB.UploadAndBind(cmd);
+                if(hdCamera.frameSettings.enableConstantBuffers)
+                    m_GlobalsCB.UploadAndBind(cmd);
+                else
+                {
+                    Shader.SetGlobalConstantBuffer(HDShaderIDs.HDRPGlobals, null, 0, 0);
+                }
             }
         }
 
