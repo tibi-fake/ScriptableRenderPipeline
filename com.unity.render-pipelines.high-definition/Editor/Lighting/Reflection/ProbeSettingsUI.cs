@@ -3,7 +3,9 @@ using UnityEngine.Events;
 namespace UnityEditor.Experimental.Rendering.HDPipeline
 {
 
+#pragma warning disable 618 // TODO: update to IUpdateable interface
     sealed internal partial class ProbeSettingsUI : BaseUI<SerializedProbeSettings>
+#pragma warning restore 618
     {
         public InfluenceVolumeUI influence = new InfluenceVolumeUI();
         public CameraSettingsUI camera = new CameraSettingsUI();

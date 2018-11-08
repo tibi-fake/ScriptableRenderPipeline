@@ -6,7 +6,9 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
 {
     using CED = CoreEditorDrawer<LightLoopSettingsUI, SerializedLightLoopSettings>;
 
+#pragma warning disable 618 // TODO: update to IUpdateable interface
     class LightLoopSettingsUI : BaseUI<SerializedLightLoopSettings>
+#pragma warning restore 618
     {
         const string lightLoopSettingsHeaderContent = "Light Loop Settings";
         // Uncomment if you re-enable LIGHTLOOP_SINGLE_PASS multi_compile in lit*.shader

@@ -20,7 +20,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         static readonly MigrationDescription<PlanarProbeVersion, PlanarReflectionProbe> k_PlanarProbeMigration = MigrationDescription.New(
             MigrationStep.New(PlanarProbeVersion.CaptureSettings, (PlanarReflectionProbe p) =>
             {
-#pragma warning disable 618
+#pragma warning disable 618, 612
                 if (p.m_ObsoleteCaptureSettings == null)
                     p.m_ObsoleteCaptureSettings = new ObsoleteCaptureSettings();
                 if (p.m_ObsoleteOverrideFieldOfView)
@@ -28,7 +28,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 p.m_ObsoleteCaptureSettings.fieldOfView = p.m_ObsoleteFieldOfViewOverride;
                 p.m_ObsoleteCaptureSettings.nearClipPlane = p.m_ObsoleteCaptureNearPlane;
                 p.m_ObsoleteCaptureSettings.farClipPlane = p.m_ObsoleteCaptureFarPlane;
-#pragma warning restore 618
+#pragma warning restore 618, 612
             }),
             MigrationStep.New(PlanarProbeVersion.ProbeSettings, (PlanarReflectionProbe p) =>
             {
@@ -49,6 +49,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         );
 
         // Obsolete Properties
+#pragma warning disable 649
         [SerializeField, FormerlySerializedAs("m_CaptureNearPlane"), Obsolete("For data migration")]
         float m_ObsoleteCaptureNearPlane = ObsoleteCaptureSettings.@default.nearClipPlane;
         [SerializeField, FormerlySerializedAs("m_CaptureFarPlane"), Obsolete("For data migration")]
@@ -58,5 +59,6 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         bool m_ObsoleteOverrideFieldOfView;
         [SerializeField, FormerlySerializedAs("m_FieldOfViewOverride"), Obsolete("For data migration")]
         float m_ObsoleteFieldOfViewOverride = ObsoleteCaptureSettings.@default.fieldOfView;
+#pragma warning restore 649
     }
 }

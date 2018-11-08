@@ -25,10 +25,12 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         // This one is protected only to have access during migration of children classes.
         // In children classes, it must be used only during the migration.
         protected ProbeSettings m_ProbeSettings = ProbeSettings.@default;
+#pragma warning disable 649
         [SerializeField]
         ProbeSettingsOverride m_ProbeSettingsOverride;
         [SerializeField]
         ReflectionProxyVolumeComponent m_ProxyVolume;
+#pragma warning restore 649
 
         [SerializeField]
         Texture m_BakedTexture;
@@ -160,7 +162,6 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 return settings;
             }
         }
-        internal ProbeSettingsOverride settingsOverrides => m_ProbeSettingsOverride;
 
         internal bool wasRenderedAfterOnEnable { get; set; } = false;
         internal int lastRenderedFrame { get; set; } = int.MinValue;

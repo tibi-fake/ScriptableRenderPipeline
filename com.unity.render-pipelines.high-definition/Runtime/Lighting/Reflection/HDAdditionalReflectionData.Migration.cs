@@ -56,7 +56,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 }),
                 MigrationStep.New(ReflectionProbeVersion.AddCaptureSettingsAndFrameSettings, (HDAdditionalReflectionData t) =>
                 {
-#pragma warning disable 618
+#pragma warning disable 618, 612
                     t.m_ObsoleteCaptureSettings = t.m_ObsoleteCaptureSettings ?? new ObsoleteCaptureSettings();
                     t.m_ObsoleteCaptureSettings.cullingMask = t.reflectionProbe.cullingMask;
 #if UNITY_EDITOR //m_UseOcclusionCulling is not exposed in c# !
@@ -65,7 +65,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 #endif
                     t.m_ObsoleteCaptureSettings.nearClipPlane = t.reflectionProbe.nearClipPlane;
                     t.m_ObsoleteCaptureSettings.farClipPlane = t.reflectionProbe.farClipPlane;
-#pragma warning restore 618
+#pragma warning restore 618, 612
                 }),
                 MigrationStep.New(ReflectionProbeVersion.ModeAndTextures, (HDAdditionalReflectionData t) =>
                 {
