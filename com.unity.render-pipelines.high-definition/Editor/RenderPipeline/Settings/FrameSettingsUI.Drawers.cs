@@ -49,7 +49,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
                 CED.space
                 );
         }
-        
+
         public static CED.IDrawer SectionRenderingSettings(bool withOverride)
         {
             return CED.FoldoutGroup(
@@ -71,7 +71,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
                 CED.space
                 );
         }
-        
+
         public static CED.IDrawer SectionLightingSettings(bool withOverride)
         {
             return CED.FoldoutGroup(
@@ -142,7 +142,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
                     default:
                         throw new System.ArgumentOutOfRangeException("Unknown ShaderLitMode");
                 }
-                
+
                 area.Add(p.litShaderMode, litShaderModeContent, () => p.overridesShaderLitMode, a => p.overridesShaderLitMode = a,
                     () => !GL.wireframe && hdrpSettings.supportedLitShaderMode == RenderPipelineSettings.SupportedLitShaderMode.Both,
                     defaultValue: defaultShaderLitMode);
@@ -159,6 +159,9 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
                 area.Add(p.enableOpaqueObjects, opaqueObjectsContent, () => p.overridesOpaqueObjects, a => p.overridesOpaqueObjects = a, defaultValue: defaultFrameSettings.enableOpaqueObjects);
                 area.Add(p.enableTransparentObjects, transparentObjectsContent, () => p.overridesTransparentObjects, a => p.overridesTransparentObjects = a, defaultValue: defaultFrameSettings.enableTransparentObjects);
                 area.Add(p.enableRealtimePlanarReflection, realtimePlanarReflectionContent, () => p.overridesRealtimePlanarReflection, a => p.overridesRealtimePlanarReflection = a, defaultValue: defaultFrameSettings.enableRealtimePlanarReflection);
+
+                area.Add(p.enableConstantBuffers, constantBuffersContent, () => p.overridesConstantBuffers, a => p.overridesConstantBuffers = a, defaultValue: defaultFrameSettings.enableConstantBuffers);
+
                 area.Draw(withOverride);
             }
         }

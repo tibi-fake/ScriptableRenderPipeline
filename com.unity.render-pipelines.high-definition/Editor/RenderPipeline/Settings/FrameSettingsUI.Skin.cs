@@ -11,7 +11,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
         const string xrSettingsHeaderContent = "XR Settings";
         const string lightSettingsHeaderContent = "Lighting Settings";
         const string asyncComputeSettingsHeaderContent = "Async Compute Settings";
-        
+
         static readonly GUIContent transparentPrepassContent = CoreEditorUtils.GetContent("Transparent Prepass");
         static readonly GUIContent transparentPostpassContent = CoreEditorUtils.GetContent("Transparent Postpass");
         static readonly GUIContent motionVectorContent = CoreEditorUtils.GetContent("Motion Vectors");
@@ -24,7 +24,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
         static readonly GUIContent depthPrepassWithDeferredRenderingContent = CoreEditorUtils.GetContent("Depth Prepass With Deferred Rendering");
         static readonly GUIContent opaqueObjectsContent = CoreEditorUtils.GetContent("Opaque Objects");
         static readonly GUIContent transparentObjectsContent = CoreEditorUtils.GetContent("Transparent Objects");
-        static readonly GUIContent realtimePlanarReflectionContent = CoreEditorUtils.GetContent("Enable Realtime Planar Reflection"); 
+        static readonly GUIContent realtimePlanarReflectionContent = CoreEditorUtils.GetContent("Enable Realtime Planar Reflection");
         static readonly GUIContent msaaContent = CoreEditorUtils.GetContent("MSAA");
         static readonly GUIContent shadowContent = CoreEditorUtils.GetContent("Shadow");
         static readonly GUIContent contactShadowContent = CoreEditorUtils.GetContent("Contact Shadows");
@@ -37,6 +37,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
         static readonly GUIContent volumetricContent = CoreEditorUtils.GetContent("Volumetric");
         static readonly GUIContent reprojectionForVolumetricsContent = CoreEditorUtils.GetContent("Reprojection For Volumetrics");
         static readonly GUIContent lightLayerContent = CoreEditorUtils.GetContent("LightLayers");
+        static readonly GUIContent constantBuffersContent = CoreEditorUtils.GetContent("Constant buffers|This will have an effect only if target platform supports direct binding of constant buffers.");
 
         // Async compute
         static readonly GUIContent asyncComputeContent = CoreEditorUtils.GetContent("Async Compute|This will have an effect only if target platform supports async compute.");

@@ -49,6 +49,8 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         LightListAsync = 1 << 27,
         SSRAsync = 1 << 28,
         SSAOAsync = 1 << 29,
+
+        ConstantBuffers = 1 << 30,
     }
 
     // The settings here are per frame settings.
@@ -87,7 +89,8 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             {FrameSettingsOverrides.RealtimePlanarReflection, (a, b) => { a.enableRealtimePlanarReflection = b.enableRealtimePlanarReflection; } },
             {FrameSettingsOverrides.LightListAsync, (a, b) => { a.runLightListAsync = b.runLightListAsync; } },
             {FrameSettingsOverrides.SSRAsync, (a, b) => { a.runSSRAsync= b.runSSRAsync; } },
-            {FrameSettingsOverrides.SSAOAsync, (a, b) => { a.runSSAOAsync = b.runSSAOAsync; } }
+            {FrameSettingsOverrides.SSAOAsync, (a, b) => { a.runSSAOAsync = b.runSSAOAsync; } },
+            {FrameSettingsOverrides.ConstantBuffers, (a, b) => { a.enableConstantBuffers = b.enableConstantBuffers; } }
 
         };
 
@@ -131,6 +134,8 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 
         public bool enableMSAA = false;
 
+        public bool enableConstantBuffers = true; // If true, stores shader variables in ComputeBuffers
+
         // Async Compute
         public bool enableAsyncCompute = true;
         public bool runLightListAsync = true;
@@ -138,7 +143,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         public bool runSSAOAsync = true;
 
         // GC.Alloc
-        // FrameSettings..ctor() 
+        // FrameSettings..ctor()
         public LightLoopSettings lightLoopSettings = new LightLoopSettings();
 
         public FrameSettings() {
@@ -147,7 +152,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         {
             toCopy.CopyTo(this);
         }
-        
+
         public void CopyTo(FrameSettings frameSettings)
         {
             frameSettings.enableShadow = this.enableShadow;
@@ -176,15 +181,17 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             frameSettings.enableTransparentPostpass = this.enableTransparentPostpass;
             frameSettings.enableDistortion = this.enableDistortion;
             frameSettings.enablePostprocess = this.enablePostprocess;
-            
+
             frameSettings.enableOpaqueObjects = this.enableOpaqueObjects;
             frameSettings.enableTransparentObjects = this.enableTransparentObjects;
-            frameSettings.enableRealtimePlanarReflection = this.enableRealtimePlanarReflection;            
+            frameSettings.enableRealtimePlanarReflection = this.enableRealtimePlanarReflection;
 
             frameSettings.enableAsyncCompute = this.enableAsyncCompute;
             frameSettings.runLightListAsync = this.runLightListAsync;
             frameSettings.runSSAOAsync = this.runSSAOAsync;
             frameSettings.runSSRAsync = this.runSSRAsync;
+
+            frameSettings.enableConstantBuffers = this.enableConstantBuffers;
 
             frameSettings.enableMSAA = this.enableMSAA;
 
@@ -293,15 +300,18 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 
             // Planar and real time cubemap doesn't need post process and render in FP16
             aggregate.enablePostprocess = camera.cameraType != CameraType.Reflection && srcFrameSettings.enablePostprocess;
-                        
+
             aggregate.enableAsyncCompute = srcFrameSettings.enableAsyncCompute && SystemInfo.supportsAsyncCompute;
             aggregate.runLightListAsync = aggregate.enableAsyncCompute && srcFrameSettings.runLightListAsync;
             aggregate.runSSRAsync = aggregate.enableAsyncCompute && srcFrameSettings.runSSRAsync;
             aggregate.runSSAOAsync = aggregate.enableAsyncCompute && srcFrameSettings.runSSAOAsync;
 
+            aggregate.enableConstantBuffers =
+                srcFrameSettings.enableConstantBuffers && SystemInfo.supportsSetConstantBuffer;
+
             aggregate.enableOpaqueObjects = srcFrameSettings.enableOpaqueObjects;
             aggregate.enableTransparentObjects = srcFrameSettings.enableTransparentObjects;
-            aggregate.enableRealtimePlanarReflection = srcFrameSettings.enableRealtimePlanarReflection;       
+            aggregate.enableRealtimePlanarReflection = srcFrameSettings.enableRealtimePlanarReflection;
 
             //MSAA only supported in forward
             aggregate.enableMSAA = srcFrameSettings.enableMSAA && renderPipelineSettings.supportMSAA && aggregate.shaderLitMode == LitShaderMode.Forward;
@@ -412,8 +422,9 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                         new DebugUI.BoolField { displayName = "Deferred Depth Prepass", getter = () => frameSettings.enableDepthPrepassWithDeferredRendering, setter = value => frameSettings.enableDepthPrepassWithDeferredRendering = value },
                         new DebugUI.BoolField { displayName = "Enable Opaque Objects", getter = () => frameSettings.enableOpaqueObjects, setter = value => frameSettings.enableOpaqueObjects = value },
                         new DebugUI.BoolField { displayName = "Enable Transparent Objects", getter = () => frameSettings.enableTransparentObjects, setter = value => frameSettings.enableTransparentObjects = value },
-                        new DebugUI.BoolField { displayName = "Enable Realtime Planar Reflection", getter = () => frameSettings.enableRealtimePlanarReflection, setter = value => frameSettings.enableRealtimePlanarReflection = value },                        
+                        new DebugUI.BoolField { displayName = "Enable Realtime Planar Reflection", getter = () => frameSettings.enableRealtimePlanarReflection, setter = value => frameSettings.enableRealtimePlanarReflection = value },
                         new DebugUI.BoolField { displayName = "Enable MSAA", getter = () => frameSettings.enableMSAA, setter = value => frameSettings.enableMSAA = value },
+                        new DebugUI.BoolField { displayName = "Enable Constant Buffers", getter = () => frameSettings.enableConstantBuffers, setter = value => frameSettings.enableConstantBuffers = value },
                     }
                 },
                 new DebugUI.Foldout
