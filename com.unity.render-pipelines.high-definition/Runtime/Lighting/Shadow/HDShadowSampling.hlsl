@@ -260,20 +260,12 @@ float SampleShadow_MSM_1tap(float3 tcs, float lightLeakBias, float momentBias, f
 
 #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/Shadow/HDPCSS.hlsl"
 
-float InterleavedGradientNoise2(float2 uv, uint frameCount)
-{
-    const float3 magic = float3(0.06711056f, 0.00583715f, 52.9829189f);
-    float2 frameMagicScale = float2(2.083f, 4.867f);
-    uv += frameCount * frameMagicScale;
-    return frac(magic.z * frac(dot(uv, magic.xy)));
-}
-
 //
 //                  PCSS sampling
 //
 float SampleShadow_PCSS(float3 tcs, float2 posSS, float2 scale, float2 offset, float2 sampleBias, float shadowSoftness, int blockerSampleCount, int filterSampleCount, Texture2D tex, SamplerComparisonState compSamp, SamplerState samp)
 {
-    float sampleJitterAngle = InterleavedGradientNoise2(posSS.xy, _FrameCount%8) * 2.0 * PI;
+    float sampleJitterAngle = InterleavedGradientNoise(posSS.xy, (_FrameCount % 8) * _TaaEnabled) * 2.0 * PI;
     float2 sampleJitter = float2(sin(sampleJitterAngle), cos(sampleJitterAngle));
 
     //1) Blocker Search

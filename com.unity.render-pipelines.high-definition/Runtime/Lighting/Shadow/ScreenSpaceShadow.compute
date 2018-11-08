@@ -36,21 +36,11 @@ CBUFFER_END
 #define _ContactShadowFadeEnd               _ContactShadowParamsParameters.z
 #define _ContactShadowFadeOneOverRange      _ContactShadowParamsParameters.w
 #define _ContactShadowOpacity               _ContactShadowParamsParameters2.x
-#define _EnableTimeDependentNoise           _ContactShadowParamsParameters2.y
-#define _RenderTargetHeight                 _ContactShadowParamsParameters2.z
+#define _RenderTargetHeight                 _ContactShadowParamsParameters2.y
 
 #define DEFERRED_SHADOW_TILE_SIZE 16
 
 
-//From  Next Generation Post Processing in Call of Duty: Advanced Warfare [Jimenez 2014]
-// http://advances.realtimerendering.com/s2014/index.html
-float InterleavedGradientNoise(float2 uv, uint frameCount)
-{
-    const float3 magic = float3(0.06711056f, 0.00583715f, 52.9829189f);
-    float2 frameMagicScale = _EnableTimeDependentNoise * float2(2.083f, 4.867f);
-    uv += frameCount * frameMagicScale;
-    return frac(magic.z * frac(dot(uv, magic.xy)));
-}
 
 float SampleDepth(float2 UV, bool HalfRes)
 {
@@ -73,7 +63,7 @@ float ScreenSpaceShadowRayCast(float3 positionWS, float3 rayDirWS, float rayLeng
     float ditherBias = 0.5f;
     // With a mod of 8 and taa we'd get no visible flickering, but the stitching pattern is more noticeable. With %16 we do get a bit of visible flickering, but a smoother gradient.
     // If TAA is off, the noise pattern does not vary over time. 
-    float dither = InterleavedGradientNoise(positionSS, _FrameCount % 16u) - ditherBias;
+    float dither = InterleavedGradientNoise(positionSS, (_FrameCount % 16u) * _TaaEnabled) - ditherBias;
 
     float3 rayStartWS = positionWS;
     float3 rayEndWS = rayStartWS + rayDirWS * rayLength;

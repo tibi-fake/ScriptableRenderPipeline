@@ -173,6 +173,9 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         public static readonly int _CosTime        = Shader.PropertyToID("_CosTime");
         public static readonly int unity_DeltaTime = Shader.PropertyToID("unity_DeltaTime");
 
+        public static readonly int _TAAEnabled     = Shader.PropertyToID("_TaaEnabled");
+
+
         public static readonly int _EnvLightSkyEnabled = Shader.PropertyToID("_EnvLightSkyEnabled");
         public static readonly int _AmbientOcclusionParam = Shader.PropertyToID("_AmbientOcclusionParam");
         public static readonly int _SkyTexture = Shader.PropertyToID("_SkyTexture");
