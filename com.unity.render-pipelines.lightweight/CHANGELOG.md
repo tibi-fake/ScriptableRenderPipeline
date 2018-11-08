@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 - LWRP now respects the iOS Player setting **Force hard shadows**. When you enable this setting, hardware filtering of shadows is disabled.
 - Scene view mode now renders baked lightmaps correctly. [1092227](https://issuetracker.unity3d.com/issues/lwrp-scene-view-modes-render-objects-black)
+- Shadow bias calculation was incorrect with both Shadergraph shaders and Terrain, this is now corrected.
+- Blit shader was being culled, now ignores culling in shader.
 
 ### Added
 
