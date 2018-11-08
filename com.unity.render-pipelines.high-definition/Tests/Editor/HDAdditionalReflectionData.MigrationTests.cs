@@ -1,7 +1,4 @@
 using NUnit.Framework;
-using System;
-using System.IO;
-using UnityEditor;
 using UnityEditor.Experimental.Rendering.TestFramework;
 using UnityEngine.Rendering;
 
