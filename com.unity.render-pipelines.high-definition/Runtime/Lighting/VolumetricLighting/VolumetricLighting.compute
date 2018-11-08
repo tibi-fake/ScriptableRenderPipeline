@@ -465,9 +465,11 @@ void FillVolumetricLightingBuffer(LightLoopContext context, uint featureFlags,
 
         // Sample the participating medium at the center of the voxel.
         // We consider it to be constant along the interval [t0, t1] (within the voxel).
-        // TODO: piecewise linear.
-        float3 scattering = LOAD_TEXTURE3D(_VBufferDensity, voxelCoord).rgb;
-        float  extinction = LOAD_TEXTURE3D(_VBufferDensity, voxelCoord).a;
+        float4 density = LOAD_TEXTURE3D(_VBufferDensity, voxelCoord);
+
+        // Use sRGB-like compressed encoding.
+        float3 scattering = Sq(density.rgb);
+        float  extinction = Sq(density.a);
         float  anisotropy = _GlobalFogAnisotropy;
 
         // Prevent division by 0.
