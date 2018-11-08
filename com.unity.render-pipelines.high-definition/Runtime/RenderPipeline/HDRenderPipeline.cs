@@ -674,7 +674,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 
                 m_DbufferManager.PushGlobalParams(hdCamera, cmd, m_GlobalsCB);
 
-                m_VolumetricLightingSystem.PushGlobalParams(hdCamera, cmd, m_FrameCount);
+                m_VolumetricLightingSystem.PushGlobalParams(hdCamera, cmd, m_FrameCount, m_GlobalsCB);
 
                 var ssRefraction = VolumeManager.instance.stack.GetComponent<ScreenSpaceRefraction>()
                     ?? ScreenSpaceRefraction.@default;

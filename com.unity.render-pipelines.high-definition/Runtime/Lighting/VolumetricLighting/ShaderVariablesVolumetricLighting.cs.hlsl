@@ -7,11 +7,6 @@
 // Generated from UnityEngine.Experimental.Rendering.HDPipeline.ShaderVariablesVolumetricLighting
 // PackingRules = Exact
     float4 _AmbientProbeCoeffs[7];
-    float3 _HeightFogBaseScattering;
-    float _HeightFogBaseExtinction;
-    float2 _HeightFogExponents;
-    float _HeightFogBaseHeight;
-    float _GlobalFogAnisotropy;
     float4 _VBufferResolution;
     float4 _VBufferSliceCount;
     float4 _VBufferUvScaleAndLimit;
@@ -24,6 +19,8 @@
     float4 _VBufferPrevDepthDecodingParams;
     float _VBufferMaxLinearDepth;
     int _EnableDistantFog;
+    int VolPad1;
+    int VolPad2;
 
 
 #endif

@@ -94,6 +94,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         {
             public ShaderVariablesSubsurfaceScattering m_SS;
             public ShaderVariablesDecal m_Decal;
+            public ShaderVariablesVolumetricLighting m_Vol;
         }
 
         private GlobalsCB m_CB;
@@ -151,6 +152,42 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         public Vector2 _DecalAtlasResolution { set { CBAccessor<Vector2>.Set(() => ref m_CB.m_Decal._DecalAtlasResolution, value, ref IsDirty); } }
         public uint _EnableDecals { set { CBAccessor<uint>.Set(() => ref m_CB.m_Decal._EnableDecals, value, ref IsDirty); } }
 //        public uint _DecalCount { set { CBAccessor<uint>.Set(() => ref m_CB.m_Decal._DecalCount, value, ref IsDirty); } }
+
+        // Volumetric lighting
+        public unsafe Vector4[] _AmbientProbeCoeffs {
+            set
+            {
+                fixed (float* dst = m_CB.m_Vol._AmbientProbeCoeffs)
+                {
+                    CBArrayAccessor.Set(dst, value,
+                        7 * 4, ref IsDirty);
+                }
+            }
+        }
+
+/*    // These are in atmospheric scattering
+        public Vector3 _HeightFogBaseScattering { set { CBAccessor<Vector3>.Set(() => ref m_CB.m_Vol._HeightFogBaseScattering, value, ref IsDirty); } }
+        public float _HeightFogBaseExtinction { set { CBAccessor<float>.Set(() => ref m_CB.m_Vol._HeightFogBaseExtinction, value, ref IsDirty); } }
+
+        public Vector2 _HeightFogExponents { set { CBAccessor<Vector2>.Set(() => ref m_CB.m_Vol._HeightFogExponents, value, ref IsDirty); } }
+        public float _HeightFogBaseHeight { set { CBAccessor<float>.Set(() => ref m_CB.m_Vol._HeightFogBaseHeight, value, ref IsDirty); } }
+        public float _GlobalFogAnisotropy { set { CBAccessor<float>.Set(() => ref m_CB.m_Vol._GlobalFogAnisotropy, value, ref IsDirty); } }
+*/
+        public Vector4 _VBufferResolution { set { CBAccessor<Vector4>.Set(() => ref m_CB.m_Vol._VBufferResolution, value, ref IsDirty); } }
+        public Vector4 _VBufferSliceCount { set { CBAccessor<Vector4>.Set(() => ref m_CB.m_Vol._VBufferSliceCount, value, ref IsDirty); } }
+        public Vector4 _VBufferUvScaleAndLimit { set { CBAccessor<Vector4>.Set(() => ref m_CB.m_Vol._VBufferUvScaleAndLimit, value, ref IsDirty); } }
+        public Vector4 _VBufferDepthEncodingParams { set { CBAccessor<Vector4>.Set(() => ref m_CB.m_Vol._VBufferDepthEncodingParams, value, ref IsDirty); } }
+        public Vector4 _VBufferDepthDecodingParams { set { CBAccessor<Vector4>.Set(() => ref m_CB.m_Vol._VBufferDepthDecodingParams, value, ref IsDirty); } }
+
+        public Vector4 _VBufferPrevResolution { set { CBAccessor<Vector4>.Set(() => ref m_CB.m_Vol._VBufferPrevResolution, value, ref IsDirty); } }
+        public Vector4 _VBufferPrevSliceCount { set { CBAccessor<Vector4>.Set(() => ref m_CB.m_Vol._VBufferPrevSliceCount, value, ref IsDirty); } }
+        public Vector4 _VBufferPrevUvScaleAndLimit { set { CBAccessor<Vector4>.Set(() => ref m_CB.m_Vol._VBufferPrevUvScaleAndLimit, value, ref IsDirty); } }
+        public Vector4 _VBufferPrevDepthEncodingParams { set { CBAccessor<Vector4>.Set(() => ref m_CB.m_Vol._VBufferPrevDepthEncodingParams, value, ref IsDirty); } }
+        public Vector4 _VBufferPrevDepthDecodingParams { set { CBAccessor<Vector4>.Set(() => ref m_CB.m_Vol._VBufferPrevDepthDecodingParams, value, ref IsDirty); } }
+
+        public float _VBufferMaxLinearDepth { set { CBAccessor<float>.Set(() => ref m_CB.m_Vol._VBufferMaxLinearDepth, value, ref IsDirty); } }
+        public int _EnableDistantFog { set { CBAccessor<int>.Set(() => ref m_CB.m_Vol._EnableDistantFog, value, ref IsDirty); } }
+
 
         public HDGlobalsConstantBuffer() : base(HDShaderIDs.HDRPGlobals, Marshal.SizeOf<GlobalsCB>(), "HDRPGlobals")
         {

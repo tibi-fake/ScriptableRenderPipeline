@@ -16,6 +16,16 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         public float   _FogColorMode;
 
         public float   _SkyTextureMipCount;
+
+        public int _AtmPad;
+
+        public Vector3 _HeightFogBaseScattering;
+        public float  _HeightFogBaseExtinction;
+
+        public Vector2 _HeightFogExponents;         // {a, 1/a}
+        public float  _HeightFogBaseHeight;
+        public float  _GlobalFogAnisotropy;
+
     }
 }
 

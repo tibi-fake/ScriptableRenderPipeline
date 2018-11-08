@@ -435,7 +435,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             return depthParams;
         }
 
-        void SetPreconvolvedAmbientLightProbe(CommandBuffer cmd, float dimmer, float anisotropy)
+        void SetPreconvolvedAmbientLightProbe(CommandBuffer cmd, float dimmer, float anisotropy, HDGlobalsConstantBuffer hdCB)
         {
             SphericalHarmonicsL2 probeSH = SphericalHarmonicMath.UndoCosineRescaling(RenderSettings.ambientProbe);
                                  probeSH = SphericalHarmonicMath.RescaleCoefficients(probeSH, dimmer);
@@ -443,7 +443,11 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             SphericalHarmonicsL2 finalSH = SphericalHarmonicMath.PremultiplyCoefficients(SphericalHarmonicMath.Convolve(probeSH, m_PhaseZH));
 
             SphericalHarmonicMath.PackCoefficients(m_PackedCoeffs, finalSH);
-            cmd.SetGlobalVectorArray(HDShaderIDs._AmbientProbeCoeffs, m_PackedCoeffs);
+
+            if (hdCB != null)
+                hdCB._AmbientProbeCoeffs = m_PackedCoeffs;
+            else
+                cmd.SetGlobalVectorArray(HDShaderIDs._AmbientProbeCoeffs, m_PackedCoeffs);
         }
 
         float CornetteShanksPhasePartConstant(float anisotropy)
@@ -453,7 +457,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             return (1.0f / (4.0f * Mathf.PI)) * 1.5f * (1.0f - g * g) / (2.0f + g * g);
         }
 
-        public void PushGlobalParams(HDCamera hdCamera, CommandBuffer cmd, uint frameIndex)
+        public void PushGlobalParams(HDCamera hdCamera, CommandBuffer cmd, uint frameIndex, HDGlobalsConstantBuffer hdCB)
         {
             var visualEnvironment = VolumeManager.instance.stack.GetComponent<VisualEnvironment>();
 
@@ -469,7 +473,6 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             // Get the interpolated anisotropy value.
             var fog = VolumeManager.instance.stack.GetComponent<VolumetricFog>();
 
-            SetPreconvolvedAmbientLightProbe(cmd, fog.globalLightProbeDimmer, fog.anisotropy);
 
             var currFrameParams = hdCamera.vBufferParams[0];
             var prevFrameParams = hdCamera.vBufferParams[1];
@@ -480,20 +483,43 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             var cvp = currFrameParams.viewportSize;
             var pvp = prevFrameParams.viewportSize;
 
-            cmd.SetGlobalVector(HDShaderIDs._VBufferResolution,              new Vector4(cvp.x, cvp.y, 1.0f / cvp.x, 1.0f / cvp.y));
-            cmd.SetGlobalVector(HDShaderIDs._VBufferSliceCount,              new Vector2(cvp.z, 1.0f / cvp.z));
-            cmd.SetGlobalVector(HDShaderIDs._VBufferUvScaleAndLimit,         currFrameParams.ComputeUvScaleAndLimit(bufferSize));
-            cmd.SetGlobalVector(HDShaderIDs._VBufferDepthEncodingParams,     currFrameParams.depthEncodingParams);
-            cmd.SetGlobalVector(HDShaderIDs._VBufferDepthDecodingParams,     currFrameParams.depthDecodingParams);
+            if (hdCamera.frameSettings.enableConstantBuffers)
+            {
+                SetPreconvolvedAmbientLightProbe(cmd, fog.globalLightProbeDimmer, fog.anisotropy, hdCB);
 
-            cmd.SetGlobalVector(HDShaderIDs._VBufferPrevResolution,          new Vector4(pvp.x, pvp.y, 1.0f / pvp.x, 1.0f / pvp.y));
-            cmd.SetGlobalVector(HDShaderIDs._VBufferPrevSliceCount,          new Vector2(pvp.z, 1.0f / pvp.z));
-            cmd.SetGlobalVector(HDShaderIDs._VBufferPrevUvScaleAndLimit,     prevFrameParams.ComputeUvScaleAndLimit(bufferSize));
-            cmd.SetGlobalVector(HDShaderIDs._VBufferPrevDepthEncodingParams, prevFrameParams.depthEncodingParams);
-            cmd.SetGlobalVector(HDShaderIDs._VBufferPrevDepthDecodingParams, prevFrameParams.depthDecodingParams);
+                hdCB._VBufferResolution =              new Vector4(cvp.x, cvp.y, 1.0f / cvp.x, 1.0f / cvp.y);
+                hdCB._VBufferSliceCount =              new Vector2(cvp.z, 1.0f / cvp.z);
+                hdCB._VBufferUvScaleAndLimit =         currFrameParams.ComputeUvScaleAndLimit(bufferSize);
+                hdCB._VBufferDepthEncodingParams =     currFrameParams.depthEncodingParams;
+                hdCB._VBufferDepthDecodingParams =     currFrameParams.depthDecodingParams;
+                hdCB._VBufferPrevResolution =          new Vector4(pvp.x, pvp.y, 1.0f / pvp.x, 1.0f / pvp.y);
+                hdCB._VBufferPrevSliceCount =          new Vector2(pvp.z, 1.0f / pvp.z);
+                hdCB._VBufferPrevUvScaleAndLimit =     prevFrameParams.ComputeUvScaleAndLimit(bufferSize);
+                hdCB._VBufferPrevDepthEncodingParams = prevFrameParams.depthEncodingParams;
+                hdCB._VBufferPrevDepthDecodingParams = prevFrameParams.depthDecodingParams;
 
-            // Compute the linear depth of the log-center of the last slice.
-            cmd.SetGlobalFloat(  HDShaderIDs._VBufferMaxLinearDepth,          currFrameParams.ComputeMaxLinearDepth());
+                hdCB._VBufferMaxLinearDepth = currFrameParams.ComputeMaxLinearDepth();
+            }
+            else
+            {
+                SetPreconvolvedAmbientLightProbe(cmd, fog.globalLightProbeDimmer, fog.anisotropy, null);
+
+                cmd.SetGlobalVector(HDShaderIDs._VBufferResolution,              new Vector4(cvp.x, cvp.y, 1.0f / cvp.x, 1.0f / cvp.y));
+                cmd.SetGlobalVector(HDShaderIDs._VBufferSliceCount,              new Vector2(cvp.z, 1.0f / cvp.z));
+                cmd.SetGlobalVector(HDShaderIDs._VBufferUvScaleAndLimit,         currFrameParams.ComputeUvScaleAndLimit(bufferSize));
+                cmd.SetGlobalVector(HDShaderIDs._VBufferDepthEncodingParams,     currFrameParams.depthEncodingParams);
+                cmd.SetGlobalVector(HDShaderIDs._VBufferDepthDecodingParams,     currFrameParams.depthDecodingParams);
+
+                cmd.SetGlobalVector(HDShaderIDs._VBufferPrevResolution,          new Vector4(pvp.x, pvp.y, 1.0f / pvp.x, 1.0f / pvp.y));
+                cmd.SetGlobalVector(HDShaderIDs._VBufferPrevSliceCount,          new Vector2(pvp.z, 1.0f / pvp.z));
+                cmd.SetGlobalVector(HDShaderIDs._VBufferPrevUvScaleAndLimit,     prevFrameParams.ComputeUvScaleAndLimit(bufferSize));
+                cmd.SetGlobalVector(HDShaderIDs._VBufferPrevDepthEncodingParams, prevFrameParams.depthEncodingParams);
+                cmd.SetGlobalVector(HDShaderIDs._VBufferPrevDepthDecodingParams, prevFrameParams.depthDecodingParams);
+
+                // Compute the linear depth of the log-center of the last slice.
+                cmd.SetGlobalFloat(  HDShaderIDs._VBufferMaxLinearDepth,          currFrameParams.ComputeMaxLinearDepth());
+            }
+
             cmd.SetGlobalTexture(HDShaderIDs._VBufferLighting,                m_LightingBufferHandle);
         }
 

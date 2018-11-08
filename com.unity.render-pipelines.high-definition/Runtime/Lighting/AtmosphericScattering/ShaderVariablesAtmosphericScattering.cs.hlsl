@@ -13,6 +13,12 @@
     int _AtmosphericScatteringType;
     float _FogColorMode;
     float _SkyTextureMipCount;
+    int _AtmPad;
+    float3 _HeightFogBaseScattering;
+    float _HeightFogBaseExtinction;
+    float2 _HeightFogExponents;
+    float _HeightFogBaseHeight;
+    float _GlobalFogAnisotropy;
 
 
 #endif

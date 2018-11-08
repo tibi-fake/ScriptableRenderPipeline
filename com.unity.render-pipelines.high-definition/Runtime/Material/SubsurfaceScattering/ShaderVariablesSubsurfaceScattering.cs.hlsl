@@ -11,8 +11,9 @@
     float4 _TransmissionTintsAndFresnel0[16];
     float4 _WorldScales[16];
     uint _EnableSubsurfaceScattering;
-    float _TexturingModeFlags;
-    float _TransmissionFlags;
+    uint _TexturingModeFlags;
+    uint _TransmissionFlags;
     float _SSPad;
+
 
 #endif
