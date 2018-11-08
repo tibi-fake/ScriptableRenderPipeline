@@ -218,11 +218,11 @@ namespace UnityEditor.ShaderGraph.Drawing
             {
                 if (evt.GetEventTypeId() == MouseEnterEvent.TypeId())
                 {
-                    propRow.Q<Pill>().AddToClassList("highlighted");
+                    propRow.AddToClassList("hovered");
                 }
                 else
                 {
-                    propRow.Q<Pill>().RemoveFromClassList("highlighted");
+                    propRow.RemoveFromClassList("hovered");
                 }
             }
         }
