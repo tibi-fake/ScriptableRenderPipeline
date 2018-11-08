@@ -40,6 +40,11 @@ namespace UnityEditor.ShaderGraph.Drawing
         EdgeConnectorListener m_EdgeConnectorListener;
         BlackboardProvider m_BlackboardProvider;
 
+        internal BlackboardProvider blackboardProvider
+        {
+            get { return m_BlackboardProvider; }
+        }
+
         const string k_ToggleSettings = "UnityEditor.ShaderGraph.ToggleSettings";
         ToggleSettings m_ToggleSettings;
 

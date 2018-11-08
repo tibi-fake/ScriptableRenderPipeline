@@ -7,7 +7,6 @@ using UnityEngine;
 using UnityEngine.Experimental.UIElements;
 using UnityEditor.Graphing;
 using UnityEditor.ShaderGraph.Drawing.Controls;
-using UnityEngine.Experimental.Rendering;
 using UnityEngine.Experimental.UIElements.StyleEnums;
 using UnityEngine.Experimental.UIElements.StyleSheets;
 using UnityEngine.Rendering;
@@ -144,6 +143,12 @@ namespace UnityEditor.ShaderGraph.Drawing
                 RegisterCallback<MouseDownEvent>(OnSubGraphDoubleClick);
             }
 
+            if (node is PropertyNode)
+            {
+                RegisterCallback<MouseEnterEvent>(OnMouseHover);
+                RegisterCallback<MouseLeaveEvent>(OnMouseHover);
+            }
+
             var masterNode = node as IMasterNode;
             if (masterNode != null)
             {
@@ -193,6 +198,32 @@ namespace UnityEditor.ShaderGraph.Drawing
                 //titleButtonContainer.Add(m_CollapseButton);
 
                 RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+            }
+        }
+
+        void OnMouseHover(EventBase evt)
+        {
+            var grahView = GetFirstAncestorOfType<GraphEditorView>();
+            if(grahView == null)
+                return;
+
+            var blackboardProvider = grahView.blackboardProvider;
+            if(blackboardProvider == null)
+                return;
+
+            var propNode = (PropertyNode)node;
+
+            var propRow = blackboardProvider.GetBlackboardRow(propNode.propertyGuid);
+            if (propRow != null)
+            {
+                if (evt.GetEventTypeId() == MouseEnterEvent.TypeId())
+                {
+                    propRow.Q<Pill>().AddToClassList("highlighted");
+                }
+                else
+                {
+                    propRow.Q<Pill>().RemoveFromClassList("highlighted");
+                }
             }
         }
 

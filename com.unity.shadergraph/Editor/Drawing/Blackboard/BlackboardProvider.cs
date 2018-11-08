@@ -274,6 +274,11 @@ namespace UnityEditor.ShaderGraph.Drawing
             }
         }
 
+        public BlackboardRow GetBlackboardRow(Guid guid)
+        {
+            return m_PropertyRows[guid];
+        }
+
         void OnMouseHover(EventBase evt, IShaderProperty property)
         {
             var graphView = blackboard.GetFirstAncestorOfType<MaterialGraphView>();
