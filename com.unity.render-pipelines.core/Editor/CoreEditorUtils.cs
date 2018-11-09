@@ -186,9 +186,9 @@ namespace UnityEditor.Experimental.Rendering
             {
                 advancedRect = backgroundRect;
                 advancedRect.x += advancedRect.width - 16 - 1;
-                advancedRect.y -= 3;
-                advancedRect.height += 1;
-                advancedRect.width = 16;
+                advancedRect.y -= 2;
+                advancedRect.height = 17;
+                advancedRect.width = 17;
 
                 GUIStyle styleAdvanced = new GUIStyle(GUI.skin.toggle);
                 styleAdvanced.normal.background = isAdvanced()
