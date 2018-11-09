@@ -127,7 +127,7 @@ namespace UnityEditor.ShaderGraph
             {
                 foreach (var type in assembly.GetTypesOrNothing())
                 {
-                    var isValid = !type.IsAbstract && type.IsPublic && !type.IsGenericType && type.IsClass && typeof(T).IsAssignableFrom(type);
+                    var isValid = !type.IsAbstract && !type.IsGenericType && type.IsClass && typeof(T).IsAssignableFrom(type);
                     if (isValid && !subShaders.Any(s => s.GetType() == type))
                     {
                         try
