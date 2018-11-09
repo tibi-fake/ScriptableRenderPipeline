@@ -177,7 +177,8 @@ void LightLoop( float3 V, PositionInputs posInput, PreLightData preLightData, BS
                 // If we are not in fast path, v_lightIdx is not scalar, so we need to query the Min value across the wave. 
                 s_lightIdx = WaveMinUint(v_lightIdx);
 
-                // If WaveMinUint returns 0xffffffff it means that all lanes are actually dead, so we can safely ignore the loop and move forward. 
+                // If WaveMinUint returns 0xffffffff it means that all lanes are actually dead, so we can safely ignore the loop and move forward.
+                // This could happen as an helper lane could reach this point, hence having a valid v_lightIdx, but their values will be ignored by the WaveMin
                 if (s_lightIdx == -1)
                 {
                     break;
@@ -348,7 +349,8 @@ void LightLoop( float3 V, PositionInputs posInput, PreLightData preLightData, BS
                     s_envLightIdx = WaveMinUint(v_envLightIdx);
 
                     // If we are not in fast path, s_envLightIdx is not scalar
-                    // If WaveMinUint returns 0xffffffff it means that all lanes are actually dead, so we can safely ignore the loop and move forward. 
+                    // If WaveMinUint returns 0xffffffff it means that all lanes are actually dead, so we can safely ignore the loop and move forward.
+                    // This could happen as an helper lane could reach this point, hence having a valid v_lightIdx, but their values will be ignored by the WaveMin
                     if (s_envLightIdx == -1)
                     {
                         break;
