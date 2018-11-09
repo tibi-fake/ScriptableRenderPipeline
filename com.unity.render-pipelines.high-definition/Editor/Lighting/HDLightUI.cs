@@ -58,10 +58,11 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
         static HDLightUI()
         {
             Inspector = CED.Group(
-                CED.Group((s, d) => s.serializedLightData.showAdditionalSettings.boolValue = false),
-                CED.FoldoutGroup(s_Styles.generalHeader, Expandable.General, k_ExpandedState,
+                CED.AdvancedFoldoutGroup(s_Styles.generalHeader, Expandable.General, k_ExpandedState,
+                    (serialized, owner) => serialized.serializedLightData.showAdditionalSettings.boolValue,
+                    (serialized, owner) => serialized.serializedLightData.showAdditionalSettings.boolValue ^= true,
                     DrawGeneralContent,
-                    CED.Conditional((serialized, owner) => serialized.serializedLightData.showAdditionalSettings.boolValue && k_ExpandedState[Expandable.General], DrawGeneralAdvancedContent).Draw
+                    DrawGeneralAdvancedContent
                     ),
                 CED.FoldoutGroup(s_Styles.shapeHeader, Expandable.Shape, k_ExpandedState,
                     DrawShapeContent,
