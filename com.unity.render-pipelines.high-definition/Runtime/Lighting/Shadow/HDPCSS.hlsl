@@ -18,7 +18,7 @@
 //     res += "float2 (" + Math.cos(theta) + ", " + Math.sin(theta) + "),\n";
 // }
 
-static const float2 fibonacciSpiralDirection64[64] =
+static const float2 fibonacciSpiralDirection[DISK_SAMPLE_COUNT] =
 {
     float2 (1, 0),
     float2 (-0.7373688780783197, 0.6754902942615238),
@@ -93,7 +93,7 @@ real2 ComputeFibonacciSpiralDiskSample(const in int sampleIndex, const in real d
     // For performance we drop the sqrt(), resulting in a higher sample density toward the center of the disk.
     // Visually resulting in a curved falloff function.
     real sampleRadius = diskRadius * ((real)sampleIndex * sampleCountInverse + sampleCountBias);
-    real2 sampleDirection = fibonacciSpiralDirection64[sampleIndex];
+    real2 sampleDirection = fibonacciSpiralDirection[sampleIndex];
     return sampleDirection * sampleRadius;
 }
 
