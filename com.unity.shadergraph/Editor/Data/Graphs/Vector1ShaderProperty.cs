@@ -74,7 +74,7 @@ namespace UnityEditor.ShaderGraph
             {
                 case FloatType.Slider:
                     result.Append("\", Range(");
-                    result.Append(m_RangeValues.x + ", " + m_RangeValues.y);
+                    result.Append(String.Format("{0:0.0###}, {1:0.0###}", m_RangeValues.x, m_RangeValues.y));
                     result.Append(")) = ");
                     break;
                 case FloatType.Integer:
