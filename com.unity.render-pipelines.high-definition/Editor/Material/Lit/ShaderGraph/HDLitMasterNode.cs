@@ -254,9 +254,9 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
         }
 
         [SerializeField]
-        ScreenSpaceLighting.RefractionModel m_RefractionModel;
+        ScreenSpaceRefraction.RefractionModel m_RefractionModel;
 
-        public ScreenSpaceLighting.RefractionModel refractionModel
+        public ScreenSpaceRefraction.RefractionModel refractionModel
         {
             get { return m_RefractionModel; }
             set
@@ -578,7 +578,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
 
         public bool HasRefraction()
         {
-            return (surfaceType == SurfaceType.Transparent && !drawBeforeRefraction.isOn && refractionModel != ScreenSpaceLighting.RefractionModel.None);
+            return (surfaceType == SurfaceType.Transparent && !drawBeforeRefraction.isOn && refractionModel != ScreenSpaceRefraction.RefractionModel.None);
         }
 
         public bool HasDistortion()
