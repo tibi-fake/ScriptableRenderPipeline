@@ -679,7 +679,7 @@ Shader ""hidden/preview""
         }
     }
 
-    public delegate void OnPreviewChanged();
+    delegate void OnPreviewChanged();
 
     class PreviewShaderData
     {
