@@ -122,10 +122,6 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         RTHandleSystem.RTHandle m_CameraColorMSAABuffer;
         RTHandleSystem.RTHandle m_CameraSssDiffuseLightingMSAABuffer;
 
-        // Temporary hack post process output for multi camera setup
-        static int _TempPostProcessOutputTexture = Shader.PropertyToID("_TempPostProcessOutputTexture");
-        static RenderTargetIdentifier _TempPostProcessOutputTextureID = new RenderTargetIdentifier(_TempPostProcessOutputTexture);
-
         // The current MSAA count
         MSAASamples m_MSAASamples;
 
@@ -769,37 +765,6 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             CoreUtils.SetKeyword(cmd, "WRITE_MSAA_DEPTH", hdCamera.frameSettings.enableMSAA);
         }
 
-        static bool CompareCamRT(Camera cam1, Camera cam2)
-        {
-            if (cam1.targetTexture == null)
-                return false;
-            else if (cam2.targetTexture == null)
-                return true;
-            else return  cam1.targetTexture.GetInstanceID() < cam2.targetTexture.GetInstanceID();
-        }
-
-        // We want the camera sorting to be stable and keep the sorting done by C++ internally.
-        // Bubble sort is simple enough and will work fine for lists of camera that should stay small.
-        static void SortCameraByRT(Camera[] cameras)
-        {
-            bool swap = true;
-            while (swap)
-            {
-                swap = false;
-                for (int i = 0; (i < cameras.Length - 1) ; ++i)
-                {
-                    var cam1 = cameras[i];
-                    var cam2 = cameras[i + 1];
-                    if (CompareCamRT(cam1, cam2))
-                    {
-                        cameras[i] = cam2;
-                        cameras[i + 1] = cam1;
-                        swap = true;
-                    }
-                }
-            }
-        }
-
         CullResults m_CullResults;
         ReflectionProbeCullResults m_ReflectionProbeCullResults;
         public override void Render(ScriptableRenderContext renderContext, Camera[] cameras)
@@ -860,20 +825,10 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             bool assetFrameSettingsIsDirty = m_Asset.frameSettingsIsDirty;
             m_Asset.UpdateDirtyFrameSettings();
 
-            // We need to sort by target RenderTexture because we need to accumulate cameras rendering in the same RT.
-            // In this case (and if there is more than one camera with the same target) we need to blit to the final target only for the last camera of the group.
-            SortCameraByRT(cameras);
-
-            for (int cameraIndex = 0; cameraIndex < cameras.Length; ++cameraIndex)
+            foreach (var camera in cameras)
             {
-                var camera = cameras[cameraIndex];
-
                 if (camera == null)
                     continue;
-
-                bool lastCameraFromGroup = true;
-                if (cameraIndex < (cameras.Length - 1))
-                    lastCameraFromGroup = (camera.targetTexture != cameras[cameraIndex + 1].targetTexture);
 
                 RenderPipeline.BeginCameraRendering(camera);
 
@@ -1167,8 +1122,10 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                     {
                         StartStereoRendering(cmd, renderContext, camera);
 
-                        // TODO: Everything here (SSAO, Shadow, Build light list, deferred shadow, material and light classification can be parallelize with Async compute)
-                        RenderSSAO(cmd, hdCamera, renderContext, postProcessLayer);
+                        if (!hdCamera.frameSettings.SSAORunsAsync())
+                        {
+                            RenderSSAO(cmd, hdCamera, renderContext, postProcessLayer);
+                        }
 
                         // Clear and copy the stencil texture needs to be moved to before we invoke the async light list build,
                         // otherwise the async compute queue can end up using that texture before the graphics queue is done with it.
@@ -1208,27 +1165,48 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                             }
                         }
 
-                        // Needs the depth pyramid and motion vectors, as well as the render of the previous frame.
-                        RenderSSR(hdCamera, cmd);
+
+                        if (!hdCamera.frameSettings.SSRRunsAsync())
+                        {
+                            // Needs the depth pyramid and motion vectors, as well as the render of the previous frame.
+                            RenderSSR(hdCamera, cmd);
+                        }
 
                         StopStereoRendering(cmd, renderContext, camera);
 
-#if UNITY_2019_1_OR_NEWER
-                        GraphicsFence buildGPULightListsCompleteFence = new GraphicsFence();
-#else
-                        GPUFence buildGPULightListsCompleteFence = new GPUFence();
-#endif
-                        if (hdCamera.frameSettings.enableAsyncCompute)
-                        {
-#if UNITY_2019_1_OR_NEWER
-                            GraphicsFence startFence = cmd.CreateAsyncGraphicsFence();
-#else
-                            GPUFence startFence = cmd.CreateGPUFence();
-#endif
-                            renderContext.ExecuteCommandBuffer(cmd);
-                            cmd.Clear();
+                        HDGPUAsyncTask buildLightListTask = new HDGPUAsyncTask("Build light list", ComputeQueueType.Background);
+                        HDGPUAsyncTask SSRTask = new HDGPUAsyncTask("Screen Space Reflection", ComputeQueueType.Background);
+                        HDGPUAsyncTask SSAOTask = new HDGPUAsyncTask("SSAO", ComputeQueueType.Background);
 
-                            buildGPULightListsCompleteFence = m_LightLoop.BuildGPULightListsAsyncBegin(hdCamera, renderContext, m_SharedRTManager.GetDepthStencilBuffer(), m_SharedRTManager.GetStencilBufferCopy(), startFence, m_SkyManager.IsLightingSkyValid());
+                        bool haveAsyncTaskWithShadows = false;
+                        if (hdCamera.frameSettings.BuildLightListRunsAsync())
+                        {
+                            buildLightListTask.Start(cmd, renderContext, (CommandBuffer asyncCmd) =>
+                            {
+                                m_LightLoop.BuildGPULightListsCommon(hdCamera, asyncCmd, m_SharedRTManager.GetDepthStencilBuffer(hdCamera.frameSettings.enableMSAA), m_SharedRTManager.GetStencilBufferCopy(), m_SkyManager.IsLightingSkyValid());
+                            }, !haveAsyncTaskWithShadows);
+
+                            haveAsyncTaskWithShadows = true;
+                        }
+
+                        if (hdCamera.frameSettings.SSRRunsAsync())
+                        {
+                            SSRTask.Start(cmd, renderContext, (CommandBuffer asyncCmd) =>
+                            {
+                                RenderSSR(hdCamera, asyncCmd);
+                            }, !haveAsyncTaskWithShadows);
+
+                            haveAsyncTaskWithShadows = true;
+                        }
+
+                        if (hdCamera.frameSettings.SSAORunsAsync())
+                        {
+                            SSAOTask.Start(cmd, renderContext, (CommandBuffer asyncCmd) =>
+                            {
+                                RenderSSAO(asyncCmd, hdCamera, renderContext, postProcessLayer);
+                            }, !haveAsyncTaskWithShadows);
+
+                            haveAsyncTaskWithShadows = true;
                         }
 
                         using (new ProfilingSample(cmd, "Render shadows", CustomSamplerId.RenderShadows.GetSampler()))
@@ -1260,15 +1238,20 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                             StopStereoRendering(cmd, renderContext, camera);
                         }
 
-                        if (hdCamera.frameSettings.enableAsyncCompute)
+
+                        if (hdCamera.frameSettings.BuildLightListRunsAsync())
                         {
-                            m_LightLoop.BuildGPULightListAsyncEnd(hdCamera, cmd, buildGPULightListsCompleteFence);
+                            buildLightListTask.EndWithPostWork(cmd, () =>
+                            {
+                                m_LightLoop.PushGlobalParams(hdCamera, cmd);
+                            }
+                            );
                         }
                         else
                         {
                             using (new ProfilingSample(cmd, "Build Light list", CustomSamplerId.BuildLightList.GetSampler()))
                             {
-                                m_LightLoop.BuildGPULightLists(hdCamera, cmd, m_SharedRTManager.GetDepthStencilBuffer(), m_SharedRTManager.GetStencilBufferCopy(), m_SkyManager.IsLightingSkyValid());
+                                m_LightLoop.BuildGPULightLists(hdCamera, cmd, m_SharedRTManager.GetDepthStencilBuffer(hdCamera.frameSettings.enableMSAA), m_SharedRTManager.GetStencilBufferCopy(), m_SkyManager.IsLightingSkyValid());
                             }
                         }
 
@@ -1288,7 +1271,17 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 
 						SetMicroShadowingSettings(cmd);
 
-						// Might float this higher if we enable stereo w/ deferred
+                        if (hdCamera.frameSettings.SSAORunsAsync())
+                        {
+                            SSAOTask.End(cmd);
+                        }
+
+                        if (hdCamera.frameSettings.SSRRunsAsync())
+                        {
+                            SSRTask.End(cmd);
+                        }
+
+                        // Might float this higher if we enable stereo w/ deferred
                         StartStereoRendering(cmd, renderContext, camera);
 
                         RenderDeferredLighting(hdCamera, cmd);
@@ -1342,9 +1335,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                         // Final blit
                         if (hdCamera.frameSettings.enablePostprocess)
                         {
-                            // when we have a group of multiple cameras rendering into the same render target, for every camera but the last of the group, we need to output the result into
-                            // the camera color buffer so that the next camera can accumulate over it.
-                            RenderPostProcess(hdCamera, cmd, postProcessLayer, !lastCameraFromGroup);
+                            RenderPostProcess(hdCamera, cmd, postProcessLayer);
                         }
                         else
                         {
@@ -2167,7 +2158,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             PushFullScreenDebugTextureMip(hdCamera, cmd, m_SharedRTManager.GetDepthTexture(), mipCount, m_PyramidScale, debugMode);
         }
 
-        void RenderPostProcess(HDCamera hdcamera, CommandBuffer cmd, PostProcessLayer layer, bool needOutputToColorBuffer)
+        void RenderPostProcess(HDCamera hdcamera, CommandBuffer cmd, PostProcessLayer layer)
         {
             using (new ProfilingSample(cmd, "Post-processing", CustomSamplerId.PostProcessing.GetSampler()))
             {
@@ -2198,14 +2189,6 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                     cmd.GetTemporaryRT(HDShaderIDs._CameraColorTexture, hdcamera.actualWidth, hdcamera.actualHeight, 0, FilterMode.Point, m_CameraColorBuffer.rt.format);
                     HDUtils.BlitCameraTexture(cmd, hdcamera, m_CameraColorBuffer, HDShaderIDs._CameraColorTexture);
                     source = HDShaderIDs._CameraColorTexture;
-
-                    // When we want to output to color buffer, we have to allocate a temp RT of the right size because post processes don't support output viewport.
-                    // We'll then copy the result into the camera color buffer.
-                    if (needOutputToColorBuffer)
-                    {
-                        cmd.ReleaseTemporaryRT(_TempPostProcessOutputTexture);
-                        cmd.GetTemporaryRT(_TempPostProcessOutputTexture, hdcamera.actualWidth, hdcamera.actualHeight, 0, FilterMode.Point, m_CameraColorBuffer.rt.format);
-                    }
                 }
                 else
                 {
@@ -2216,30 +2199,19 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                         cmd.SetGlobalTexture(HDShaderIDs._CameraMotionVectorsTexture, m_SharedRTManager.GetVelocityBuffer());
                 }
 
-                RenderTargetIdentifier dest = BuiltinRenderTextureType.CameraTarget;
-                if (needOutputToColorBuffer)
-                {
-                    dest = tempHACK ? _TempPostProcessOutputTextureID : m_CameraColorBuffer;
-                }
-
                 var context = hdcamera.postprocessRenderContext;
                 context.Reset();
                 context.source = source;
-                context.destination = dest;
+                context.destination = BuiltinRenderTextureType.CameraTarget;
                 context.command = cmd;
                 context.camera = hdcamera.camera;
                 context.sourceFormat = RenderTextureFormat.ARGBHalf;
-                context.flip = (hdcamera.camera.targetTexture == null) && !needOutputToColorBuffer;
+                context.flip = (hdcamera.camera.targetTexture == null) && (!hdcamera.camera.stereoEnabled);
 #if !UNITY_2019_1_OR_NEWER // Y-flip correction available in 2019.1
                 context.flip = context.flip && (!hdcamera.camera.stereoEnabled);
 #endif
 
                 layer.Render(context);
-
-                if (needOutputToColorBuffer && tempHACK)
-                {
-                    HDUtils.BlitCameraTexture(cmd, hdcamera, _TempPostProcessOutputTextureID, m_CameraColorBuffer);
-                }
             }
         }
 
