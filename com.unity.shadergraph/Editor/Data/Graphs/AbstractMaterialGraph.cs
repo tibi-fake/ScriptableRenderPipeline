@@ -135,11 +135,11 @@ namespace UnityEditor.ShaderGraph
         }
 
         [NonSerialized]
-        List<GroupNodeStruct> m_groupNodeStruct = new List<GroupNodeStruct>();
+        List<NodeGroupChange> m_NodeGroupChanges = new List<NodeGroupChange>();
 
-        public IEnumerable<GroupNodeStruct> groupNodeStruct
+        public IEnumerable<NodeGroupChange> nodeGroupChanges
         {
-            get { return m_groupNodeStruct; }
+            get { return m_NodeGroupChanges; }
         }
 
         [NonSerialized]
@@ -221,7 +221,7 @@ namespace UnityEditor.ShaderGraph
             m_AddedNodes.Clear();
             m_RemovedNodes.Clear();
             m_PastedNodes.Clear();
-            m_groupNodeStruct.Clear();
+            m_NodeGroupChanges.Clear();
             m_AddedGroups.Clear();
             m_RemovedGroups.Clear();
             m_AddedEdges.Clear();
@@ -286,7 +286,7 @@ namespace UnityEditor.ShaderGraph
             else
                 groupGuid = Guid.Empty;
 
-            var groupStruct = new GroupNodeStruct()
+            var groupStruct = new NodeGroupChange()
             {
                 nodeGuid = node.guid,
                 oldGroupGuid = node.groupGuid,
@@ -304,7 +304,7 @@ namespace UnityEditor.ShaderGraph
             if (group != null)
                 m_GroupNodes[group.guid].Add(node);
 
-            m_groupNodeStruct.Add(groupStruct);
+            m_NodeGroupChanges.Add(groupStruct);
         }
 
         void AddNodeNoValidate(INode node)

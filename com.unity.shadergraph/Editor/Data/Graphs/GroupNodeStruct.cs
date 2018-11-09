@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace UnityEditor.ShaderGraph
 {
-    public struct GroupNodeStruct
+    public struct NodeGroupChange
     {
         public Guid nodeGuid;
         public Guid oldGroupGuid;

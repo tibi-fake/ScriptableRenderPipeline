@@ -409,12 +409,12 @@ namespace UnityEditor.ShaderGraph.Drawing
                 AddNode(node);
             }
 
-            foreach (var groupNodeStruct in m_Graph.groupNodeStruct)
+            foreach (var groupChange in m_Graph.nodeGroupChanges)
             {
-                var nodeView = (MaterialNodeView)m_GraphView.GetNodeByGuid(groupNodeStruct.nodeGuid.ToString());
+                var nodeView = (MaterialNodeView)m_GraphView.GetNodeByGuid(groupChange.nodeGuid.ToString());
                 if (nodeView != null)
                 {
-                    nodeView.node.groupGuid = groupNodeStruct.newGroupGuid;
+                    nodeView.node.groupGuid = groupChange.newGroupGuid;
                 }
             }
 
