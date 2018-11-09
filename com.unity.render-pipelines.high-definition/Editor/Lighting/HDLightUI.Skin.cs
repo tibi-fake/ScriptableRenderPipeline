@@ -4,11 +4,16 @@ using UnityEngine;
 
 namespace UnityEditor.Experimental.Rendering.HDPipeline
 {
-    // TODO: Missing UI tooltips
     partial class HDLightUI
     {
         sealed class Styles
         {
+            // Headers
+            public readonly GUIContent generalHeader = new GUIContent("General");
+            public readonly GUIContent shapeHeader = new GUIContent("Shape");
+            public readonly GUIContent emissionHeader = new GUIContent("Emission");
+            public readonly GUIContent shadowHeader = new GUIContent("Shadows");
+
             // Base (copy from LightEditor.cs)
             public readonly GUIContent cookieSizeX = new GUIContent("Size X", "Controls the size of the cookie mask currently assigned to the light.");
             public readonly GUIContent cookieSizeY = new GUIContent("Size Y", "Controls the size of the cookie mask currently assigned to the light.");
@@ -27,7 +32,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline
             public readonly GUIContent lightIntensity = new GUIContent("Intensity", "");
 
             public readonly GUIContent maxSmoothness = new GUIContent("Max Smoothness", "Very low cost way of faking spherical area lighting. This will modify the roughness of the material lit. This is useful when the specular highlight is too small or too sharp.");
-            public readonly GUIContent lightRadius = new GUIContent("Light Radius", "Can be used to soften the core of the punctual light to create fill lighting.");
+            public readonly GUIContent lightRadius = new GUIContent("Emission Radius", "Can be used to soften the core of the punctual light to create fill lighting.");
             public readonly GUIContent affectDiffuse = new GUIContent("Affect Diffuse", "This will disable diffuse lighting for this light. Doesn't save performance, diffuse lighting is still computed.");
             public readonly GUIContent affectSpecular = new GUIContent("Affect Specular", "This will disable specular lighting for this light. Doesn't save performance, specular lighting is still computed.");
             public readonly GUIContent nonLightmappedOnly = new GUIContent("Non Lightmapped Only", "This will disable the rendering of lightmapped object for shadow map. Only effective with shadow mask feature");
