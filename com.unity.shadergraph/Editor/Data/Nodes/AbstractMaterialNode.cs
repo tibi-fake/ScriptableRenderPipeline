@@ -184,7 +184,6 @@ namespace UnityEditor.ShaderGraph
         {
             m_DrawState.expanded = true;
             m_Guid = Guid.NewGuid();
-            //m_GroupGuid;
             version = 0;
         }
 
@@ -507,12 +506,6 @@ namespace UnityEditor.ShaderGraph
         public virtual string GetVariableNameForNode()
         {
             return defaultVariableName;
-        }
-
-        public void AddGroupOwner(Group group)
-        {
-            // If we already have an owner we should replace that GUID with the new one.
-
         }
 
         public void AddSlot(ISlot slot)

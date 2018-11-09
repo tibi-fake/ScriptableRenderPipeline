@@ -5,9 +5,7 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEditor.Graphing;
 using UnityEditor.Graphing.Util;
-using UnityEditor.Experimental.UIElements.GraphView;
 using Edge = UnityEditor.Graphing.Edge;
-using Group = UnityEditor.Experimental.UIElements.GraphView.Group;
 
 namespace UnityEditor.ShaderGraph
 {
@@ -278,33 +276,26 @@ namespace UnityEditor.ShaderGraph
 
         public void SetNodeGroup(AbstractMaterialNode node, GroupData group)
         {
-            // Checking if the groupdata is null. If it is, then it means node has been removed out of a group.
-            // If the group data is null, then maybe the old group id should be removed
-            Guid groupGuid;
-            if (group != null)
-                groupGuid = group.guid;
-            else
-                groupGuid = Guid.Empty;
-
-            var groupStruct = new NodeGroupChange()
+            var groupChange = new NodeGroupChange()
             {
                 nodeGuid = node.guid,
                 oldGroupGuid = node.groupGuid,
-                newGroupGuid = groupGuid
+                // Checking if the groupdata is null. If it is, then it means node has been removed out of a group.
+                // If the group data is null, then maybe the old group id should be removed
+                newGroupGuid = group?.guid ?? Guid.Empty
             };
-            node.groupGuid = groupGuid;
+            node.groupGuid = groupChange.newGroupGuid;
 
-            var oldGroupNodes = m_GroupNodes[groupStruct.oldGroupGuid];
+            var oldGroupNodes = m_GroupNodes[groupChange.oldGroupGuid];
             oldGroupNodes.Remove(node);
-            if (!oldGroupNodes.Any())
+
+            if (groupChange.oldGroupGuid != Guid.Empty && !oldGroupNodes.Any())
             {
-                RemoveGroupNoValidate(m_Groups.First(x => x.guid == groupStruct.oldGroupGuid));
+                RemoveGroupNoValidate(m_Groups.First(x => x.guid == groupChange.oldGroupGuid));
             }
 
-            if (group != null)
-                m_GroupNodes[group.guid].Add(node);
-
-            m_NodeGroupChanges.Add(groupStruct);
+            m_GroupNodes[groupChange.newGroupGuid].Add(node);
+            m_NodeGroupChanges.Add(groupChange);
         }
 
         void AddNodeNoValidate(INode node)
@@ -330,10 +321,7 @@ namespace UnityEditor.ShaderGraph
             }
             m_NodeDictionary.Add(materialNode.guid, materialNode);
             m_AddedNodes.Add(materialNode);
-            if (materialNode.groupGuid != Guid.Empty)
-            {
-                m_GroupNodes[materialNode.groupGuid].Add(materialNode);
-            }
+            m_GroupNodes[materialNode.groupGuid].Add(materialNode);
         }
 
         public void RemoveNode(INode node)
@@ -360,10 +348,10 @@ namespace UnityEditor.ShaderGraph
             m_NodeDictionary.Remove(materialNode.guid);
             m_RemovedNodes.Add(materialNode);
 
-            if (materialNode.groupGuid != Guid.Empty && m_GroupNodes.TryGetValue(materialNode.groupGuid, out var nodes))
+            if (m_GroupNodes.TryGetValue(materialNode.groupGuid, out var nodes))
             {
                 nodes.Remove(materialNode);
-                if (!nodes.Any())
+                if (materialNode.groupGuid != Guid.Empty && !nodes.Any())
                 {
                     RemoveGroupNoValidate(m_Groups.First(x => x.guid == materialNode.groupGuid));
                 }
@@ -697,7 +685,6 @@ namespace UnityEditor.ShaderGraph
 
         public void ReplaceWith(IGraph other)
         {
-
             var otherMg = other as AbstractMaterialGraph;
             if (otherMg == null)
                 throw new ArgumentException("Can only replace with another AbstractMaterialGraph", "other");
@@ -850,7 +837,6 @@ namespace UnityEditor.ShaderGraph
                 m_Nodes.Add(node);
                 m_NodeDictionary.Add(node.guid, node);
 
-                // Adding the node to the Group Node Dict
                 if(m_GroupNodes.ContainsKey(node.groupGuid))
                     m_GroupNodes[node.groupGuid].Add(node);
                 else

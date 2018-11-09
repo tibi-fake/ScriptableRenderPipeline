@@ -1,7 +1,4 @@
 ﻿using System;
-using System.CodeDom;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEditor.Experimental.UIElements.GraphView;
 using UnityEditor.Graphing;
@@ -13,16 +10,22 @@ using ContextualMenu = UnityEngine.Experimental.UIElements.DropdownMenu;
 
 namespace UnityEditor.ShaderGraph
 {
-    sealed class MaterialGraphGroup : Group
+    sealed class ShaderGroup : Group
     {
-        public MaterialGraphGroup()
+        public new GroupData userData
+        {
+            get => (GroupData)base.userData;
+            set => base.userData = value;
+        }
+
+        public ShaderGroup()
         {
             this.AddManipulator(new ContextualMenuManipulator(BuildContextualMenu));
         }
 
         public void BuildContextualMenu(ContextualMenuPopulateEvent evt)
         {
-            if (evt.target is MaterialGraphGroup)
+            if (evt.target is ShaderGroup)
             {
                 evt.menu.AppendAction("Ungroup All Nodes", RemoveNodesInsideGroup, ContextualMenu.MenuAction.AlwaysEnabled);
             }

@@ -9,7 +9,6 @@ using UnityEngine.Experimental.UIElements;
 using Edge = UnityEditor.Experimental.UIElements.GraphView.Edge;
 using Node = UnityEditor.Experimental.UIElements.GraphView.Node;
 using Object = UnityEngine.Object;
-using UnityEditor.Graphs;
 #if UNITY_2018_3_OR_NEWER
 using ContextualMenu = UnityEngine.Experimental.UIElements.DropdownMenu;
 #endif
@@ -83,53 +82,53 @@ namespace UnityEditor.ShaderGraph.Drawing
                 evt.menu.AppendAction("Convert To Inline Node", ConvertToInlineNode, ConvertToInlineNodeStatus);
                 evt.menu.AppendAction("Convert To Property", ConvertToProperty, ConvertToPropertyStatus);
 
-                evt.menu.AppendAction("Group Selection", AddToGroupNode, (a) =>
+                evt.menu.AppendAction("Group Selection", GroupSelection, (a) =>
+                {
+                    List<ISelectable> filteredSelection = new List<ISelectable>();
+
+                    foreach (ISelectable selectedObject in selection)
                     {
-                        List<ISelectable> filteredSelection = new List<ISelectable>();
-
-                        foreach (ISelectable selectedObject in selection)
-                        {
-                            if (selectedObject is Group)
-                                return ContextualMenu.MenuAction.StatusFlags.Disabled;
-                            VisualElement ve = selectedObject as VisualElement;
-                            if (ve.userData is AbstractMaterialNode)
-                            {
-                                var selectedNode = selectedObject as Node;
-                                if( selectedNode.GetContainingScope() is Group )
-                                    return ContextualMenu.MenuAction.StatusFlags.Disabled;
-
-                                filteredSelection.Add(selectedObject);
-                            }
-                        }
-
-                        if (filteredSelection.Count > 0)
-                            return ContextualMenu.MenuAction.StatusFlags.Normal;
-                        else
+                        if (selectedObject is Group)
                             return ContextualMenu.MenuAction.StatusFlags.Disabled;
-                    });
+                        VisualElement ve = selectedObject as VisualElement;
+                        if (ve.userData is AbstractMaterialNode)
+                        {
+                            var selectedNode = selectedObject as Node;
+                            if (selectedNode.GetContainingScope() is Group)
+                                return ContextualMenu.MenuAction.StatusFlags.Disabled;
+
+                            filteredSelection.Add(selectedObject);
+                        }
+                    }
+
+                    if (filteredSelection.Count > 0)
+                        return ContextualMenu.MenuAction.StatusFlags.Normal;
+                    else
+                        return ContextualMenu.MenuAction.StatusFlags.Disabled;
+                });
 
                 evt.menu.AppendAction("Ungroup Selection", RemoveFromGroupNode, (a) =>
+                {
+                    List<ISelectable> filteredSelection = new List<ISelectable>();
+
+                    foreach (ISelectable selectedObject in selection)
                     {
-                        List<ISelectable> filteredSelection = new List<ISelectable>();
-
-                        foreach (ISelectable selectedObject in selection)
-                        {
-                            if (selectedObject is Group)
-                                return ContextualMenu.MenuAction.StatusFlags.Disabled;
-                            VisualElement ve = selectedObject as VisualElement;
-                            if (ve.userData is AbstractMaterialNode)
-                            {
-                                var selectedNode = selectedObject as Node;
-                                if( selectedNode.GetContainingScope() is Group )
-                                    filteredSelection.Add(selectedObject);
-                            }
-                        }
-
-                        if (filteredSelection.Count > 0)
-                            return ContextualMenu.MenuAction.StatusFlags.Normal;
-                        else
+                        if (selectedObject is Group)
                             return ContextualMenu.MenuAction.StatusFlags.Disabled;
-                    });
+                        VisualElement ve = selectedObject as VisualElement;
+                        if (ve.userData is AbstractMaterialNode)
+                        {
+                            var selectedNode = selectedObject as Node;
+                            if (selectedNode.GetContainingScope() is Group)
+                                filteredSelection.Add(selectedObject);
+                        }
+                    }
+
+                    if (filteredSelection.Count > 0)
+                        return ContextualMenu.MenuAction.StatusFlags.Normal;
+                    else
+                        return ContextualMenu.MenuAction.StatusFlags.Disabled;
+                });
 
                 if (selection.OfType<MaterialNodeView>().Count() == 1)
                 {
@@ -154,14 +153,14 @@ namespace UnityEditor.ShaderGraph.Drawing
             }
         }
 
-        void AddToGroupNode(ContextualMenu.MenuAction a)
+        void GroupSelection(ContextualMenu.MenuAction a)
         {
             Vector2 pos = a.eventInfo.localMousePosition;
 
-            string title = "New Material Group";
+            string title = "New Group";
             GroupData groupData = new GroupData(title, pos);
 
-            graph.owner.RegisterCompleteObjectUndo("Creating Group Node");
+            graph.owner.RegisterCompleteObjectUndo("Create Group Node");
             graph.AddGroupData(groupData);
 
             foreach (ISelectable selectable in selection)
@@ -177,7 +176,7 @@ namespace UnityEditor.ShaderGraph.Drawing
 
         void RemoveFromGroupNode(ContextualMenu.MenuAction a)
         {
-            graph.owner.RegisterCompleteObjectUndo("Remove from group node");
+            graph.owner.RegisterCompleteObjectUndo("Ungroup Node(s)");
             foreach (ISelectable selectable in selection)
             {
                 var node = selectable as Node;
@@ -347,7 +346,7 @@ namespace UnityEditor.ShaderGraph.Drawing
             graph.owner.RegisterCompleteObjectUndo(operationName);
             graph.RemoveElements(selection.OfType<MaterialNodeView>().Where(v => !(v.node is SubGraphOutputNode)).Select(x => (INode)x.node),
                 selection.OfType<Edge>().Select(x => x.userData).OfType<IEdge>(),
-                selection.OfType<MaterialGraphGroup>().Select(x => x.userData).OfType<GroupData>());
+                selection.OfType<ShaderGroup>().Select(x => x.userData));
 
             foreach (var selectable in selection)
             {
