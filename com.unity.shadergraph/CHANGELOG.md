@@ -50,11 +50,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Corrected some instances of incorrect port dimensions on several nodes.
 - `Scene Depth` and `Scene Color` nodes now work in single pass stereo in Lightweight Render Pipeline.
 - `Channel Mask` node controls are now aligned correctly.
-- In Lightweight Render Pipeline, Pre-multiply surface type now matches the Lit shader. 
+- In Lightweight Render Pipeline, Pre-multiply surface type now matches the Lit shader.
 - Non-exposed properties in the blackboard no longer have a green dot next to them.
 - Default reference name for shader properties are now serialized. You cannot change them after initial creation.
 - When you save Shader Graph and Sub Graph files, they're now automatically checked out on version control.
 - Shader Graph no longer throws an exception when you double-click a folder in the Project window.
+- Fix serializing of exposed Vector1 shader proprties on cultures where the decimal separator is other than a dot.
 
 ## [5.0.0-preview] - 2018-09-28
 
