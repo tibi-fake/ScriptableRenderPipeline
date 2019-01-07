@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - The `Color` node control is now a consistent width.
 - Function declarations no longer contain double delimiters.
 - The `Slider` node control now functions correctly.
+- Serializing now works correctly for exposed Vector1 shader properties where the decimal separator is not a dot.
 
 ## [5.2.0] - 2018-11-27
 ### Added
@@ -55,7 +56,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Default reference name for shader properties are now serialized. You cannot change them after initial creation.
 - When you save Shader Graph and Sub Graph files, they're now automatically checked out on version control.
 - Shader Graph no longer throws an exception when you double-click a folder in the Project window.
-- Serializing now works correctly for exposed Vector1 shader properties where the decimal separator is not a dot.
 
 ## [5.0.0-preview] - 2018-09-28
 
